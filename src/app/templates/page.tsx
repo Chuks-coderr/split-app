@@ -5,6 +5,10 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { encodeTemplate } from "@/lib/templateSharing";
 import { type UserTemplate, loadTemplates, saveTemplates } from "@/components/TemplateManager";
+<<<<<<< HEAD
+=======
+import TemplateMarketplace from "@/components/TemplateMarketplace";
+>>>>>>> upstream/main
 
 const MAX_TEMPLATES = 20;
 
@@ -335,6 +339,22 @@ export default function TemplatesPage() {
             ← Back to Dashboard
           </Link>
         </div>
+<<<<<<< HEAD
+=======
+
+        <TemplateMarketplace
+          onImport={(t) => {
+            const current = loadTemplates();
+            if (current.length >= MAX_TEMPLATES) {
+              flash(`Template limit (${MAX_TEMPLATES}) reached`, true);
+              return;
+            }
+            persist([...current, t]);
+            flash(`"${t.name}" imported to your library`);
+          }}
+          importedIds={new Set(templates.map((t) => t.name))}
+        />
+>>>>>>> upstream/main
       </div>
     </main>
   );

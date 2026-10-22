@@ -4,16 +4,30 @@
  */
 
 import { getFreighterPublicKey } from "./freighter";
+<<<<<<< HEAD
+=======
+import { getLedgerStatus, LedgerStatus } from "./ledger";
+>>>>>>> upstream/main
 
 export interface WalletState {
   publicKey: string | null;
   isConnected: boolean;
+<<<<<<< HEAD
+=======
+  ledger?: LedgerStatus;
+>>>>>>> upstream/main
 }
 
 export type WalletCallback = (state: WalletState) => void;
 
 let pollingInterval: NodeJS.Timeout | null = null;
+<<<<<<< HEAD
 let lastKnownAddress: string | null = null;
+=======
+let ledgerPollingInterval: NodeJS.Timeout | null = null;
+let lastKnownAddress: string | null = null;
+let lastLedgerStatus: LedgerStatus | null = null;
+>>>>>>> upstream/main
 const callbacks: Set<WalletCallback> = new Set();
 
 export function subscribeToWalletChanges(callback: WalletCallback): () => void {
@@ -58,6 +72,56 @@ export function stopWalletPolling(): void {
   }
 }
 
+<<<<<<< HEAD
+=======
+export function startLedgerPolling(
+  interval: number = 10000
+): () => void {
+  if (ledgerPollingInterval) return () => stopLedgerPolling();
+
+  ledgerPollingInterval = setInterval(async () => {
+    try {
+      const status = await getLedgerStatus();
+      const changed =
+        !lastLedgerStatus ||
+        lastLedgerStatus.connected !== status.connected ||
+        lastLedgerStatus.publicKey !== status.publicKey;
+
+      if (changed) {
+        lastLedgerStatus = status;
+        notifySubscribers({
+          publicKey: status.publicKey ?? lastKnownAddress,
+          isConnected: status.connected || !!lastKnownAddress,
+          ledger: status,
+        });
+      }
+    } catch {
+      if (lastLedgerStatus?.connected) {
+        lastLedgerStatus = { connected: false, publicKey: null };
+        notifySubscribers({
+          publicKey: lastKnownAddress,
+          isConnected: !!lastKnownAddress,
+          ledger: lastLedgerStatus,
+        });
+      }
+    }
+  }, interval);
+
+  return stopLedgerPolling;
+}
+
+export function stopLedgerPolling(): void {
+  if (ledgerPollingInterval) {
+    clearInterval(ledgerPollingInterval);
+    ledgerPollingInterval = null;
+  }
+}
+
+export function getLastLedgerStatus(): LedgerStatus | null {
+  return lastLedgerStatus;
+}
+
+>>>>>>> upstream/main
 function notifySubscribers(state: WalletState): void {
   callbacks.forEach((cb) => cb(state));
 }

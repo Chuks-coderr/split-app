@@ -29,6 +29,15 @@ interface FiatRateContextValue extends RateState {
   /** Rate for the user's selected currency, or null when unavailable. */
   rate: number | null;
   currency: FiatCurrency;
+<<<<<<< HEAD
+=======
+  /** Full map of available fiat rates keyed by lowercase currency code. */
+  ratesByCurrency: RatesByCurrency | null;
+  /** Force an immediate refetch of all rates. */
+  refresh: () => void;
+  /** Subscribe to successful rate updates; returns an unsubscribe function. */
+  subscribe: (listener: (rates: RatesByCurrency, fetchedAt: number) => void) => () => void;
+>>>>>>> upstream/main
 }
 
 const DEFAULT_TTL_SECONDS = 60;
@@ -50,12 +59,24 @@ export function FiatRateProvider({ children }: { children: React.ReactNode }) {
     lastFetchedAt: null,
   });
   const mounted = useRef(true);
+<<<<<<< HEAD
 
   useEffect(() => {
     mounted.current = true;
     const controller = new AbortController();
 
     const load = async () => {
+=======
+  const controllerRef = useRef<AbortController | null>(null);
+  const listeners = useRef(new Set<(rates: RatesByCurrency, fetchedAt: number) => void>());
+
+  const load = useMemo(() => {
+    return async () => {
+      controllerRef.current?.abort();
+      const controller = new AbortController();
+      controllerRef.current = controller;
+
+>>>>>>> upstream/main
       try {
         const res = await fetch("/api/rates", { signal: controller.signal });
         if (!res.ok) throw new Error(`Rate request failed (${res.status})`);
@@ -63,8 +84,21 @@ export function FiatRateProvider({ children }: { children: React.ReactNode }) {
         const body = (await res.json()) as { rates?: RatesByCurrency };
         if (!body.rates) throw new Error("Malformed rate response");
 
+<<<<<<< HEAD
         if (mounted.current) {
           setState({ rates: body.rates, loading: false, error: null, lastFetchedAt: Date.now() });
+=======
+        if (mounted.current && !controller.signal.aborted) {
+          const fetchedAt = Date.now();
+          setState({ rates: body.rates, loading: false, error: null, lastFetchedAt: fetchedAt });
+          listeners.current.forEach((listener) => {
+            try {
+              listener(body.rates as RatesByCurrency, fetchedAt);
+            } catch {
+              // A misbehaving subscriber must not break rate propagation.
+            }
+          });
+>>>>>>> upstream/main
         }
       } catch (error) {
         if (controller.signal.aborted || !mounted.current) return;
@@ -72,16 +106,42 @@ export function FiatRateProvider({ children }: { children: React.ReactNode }) {
         setState((prev) => ({ rates: null, loading: false, error: message, lastFetchedAt: prev.lastFetchedAt }));
       }
     };
+<<<<<<< HEAD
+=======
+  }, []);
+
+  useEffect(() => {
+    mounted.current = true;
+>>>>>>> upstream/main
 
     load();
     const timer = setInterval(load, RATE_REFRESH_MS);
 
     return () => {
       mounted.current = false;
+<<<<<<< HEAD
       controller.abort();
       clearInterval(timer);
     };
   }, []);
+=======
+      controllerRef.current?.abort();
+      clearInterval(timer);
+    };
+  }, [load]);
+
+  const refresh = useMemo(() => () => void load(), [load]);
+
+  const subscribe = useMemo(
+    () => (listener: (rates: RatesByCurrency, fetchedAt: number) => void) => {
+      listeners.current.add(listener);
+      return () => {
+        listeners.current.delete(listener);
+      };
+    },
+    [],
+  );
+>>>>>>> upstream/main
 
   const value = useMemo<FiatRateContextValue>(() => {
     const key = fiatCurrency.toLowerCase() as Lowercase<FiatCurrency>;
@@ -90,10 +150,20 @@ export function FiatRateProvider({ children }: { children: React.ReactNode }) {
       ...state,
       rate,
       currency: fiatCurrency,
+<<<<<<< HEAD
       // A response that omits the selected currency is as unusable as no response.
       error: state.error ?? (!state.loading && rate === null ? "Rate unavailable" : null),
     };
   }, [state, fiatCurrency]);
+=======
+      ratesByCurrency: state.rates,
+      refresh,
+      subscribe,
+      // A response that omits the selected currency is as unusable as no response.
+      error: state.error ?? (!state.loading && rate === null ? "Rate unavailable" : null),
+    };
+  }, [state, fiatCurrency, refresh, subscribe]);
+>>>>>>> upstream/main
 
   return createElement(FiatRateContext.Provider, { value }, children);
 }
@@ -117,6 +187,12 @@ export function useFiatRate(ttl: number = DEFAULT_TTL_SECONDS): FiatRateContextV
       currency: "USD",
       lastFetchedAt: null,
       isStale: false,
+<<<<<<< HEAD
+=======
+      ratesByCurrency: null,
+      refresh: () => {},
+      subscribe: () => () => {},
+>>>>>>> upstream/main
     };
   }
   const isStale = ctx.lastFetchedAt !== null && Date.now() - ctx.lastFetchedAt > ttl * 1000;

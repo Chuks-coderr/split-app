@@ -1,5 +1,10 @@
 import '@testing-library/jest-dom';
+<<<<<<< HEAD
 import { vi } from 'vitest';
+=======
+import { vi, beforeEach, afterEach } from 'vitest';
+import 'fake-indexeddb/auto';
+>>>>>>> upstream/main
 
 (globalThis as any).jest = vi as any;
 
@@ -35,3 +40,50 @@ vi.mock('@stellar/freighter-api', () => ({
   }),
   WatchWalletChanges: vi.fn().mockReturnValue({ unsubscribe: vi.fn() }),
 }));
+<<<<<<< HEAD
+=======
+
+// ---------------------------------------------------------------------------
+// Reliability feature test setup (error handling, retry, offline queue)
+// ---------------------------------------------------------------------------
+
+// Track online status so tests can simulate connectivity changes.
+let onlineStatus = true;
+
+Object.defineProperty(globalThis.navigator, 'onLine', {
+  configurable: true,
+  get: () => onlineStatus,
+});
+
+/**
+ * Simulate a connectivity change. Dispatches the appropriate window event so
+ * listeners registered by the offline queue / connectivity hooks fire.
+ */
+export function setOnlineStatus(online: boolean): void {
+  onlineStatus = online;
+  const event = new Event(online ? 'online' : 'offline');
+  globalThis.window?.dispatchEvent(event);
+}
+
+(globalThis as any).setOnlineStatus = setOnlineStatus;
+
+// Mock fetch so tests never hit the network. Individual tests can override
+// this with vi.mocked(fetch).mockResolvedValueOnce(...) etc.
+const fetchMock = vi.fn(async () =>
+  new Response(JSON.stringify({ ok: true }), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' },
+  })
+);
+vi.stubGlobal('fetch', fetchMock);
+
+beforeEach(() => {
+  onlineStatus = true;
+  fetchMock.mockClear();
+});
+
+afterEach(() => {
+  onlineStatus = true;
+  vi.clearAllMocks();
+});
+>>>>>>> upstream/main

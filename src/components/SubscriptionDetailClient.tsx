@@ -7,6 +7,11 @@ import { splitClient } from "@/lib/stellar";
 import { SubscriptionDetailSkeleton } from "@/components/Skeleton";
 import SubscriptionCalendarPreview from "@/components/SubscriptionCalendarPreview";
 import SubscriptionHistoryTable from "@/components/SubscriptionHistoryTable";
+<<<<<<< HEAD
+=======
+import CancelModal from "@/components/CancelModal";
+import SubscriptionModifyModal from "@/components/SubscriptionModifyModal";
+>>>>>>> upstream/main
 import type { Subscription } from "@/types/subscription";
 import {
   loadSubscriptions,
@@ -15,6 +20,10 @@ import {
   pauseSubscription,
   resumeSubscription,
   cancelSubscription,
+<<<<<<< HEAD
+=======
+  modifySubscription,
+>>>>>>> upstream/main
   formatSubscriptionForDisplay,
 } from "@/lib/subscriptions";
 
@@ -29,6 +38,11 @@ export default function SubscriptionDetailClient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
+<<<<<<< HEAD
+=======
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showModifyModal, setShowModifyModal] = useState(false);
+>>>>>>> upstream/main
 
   const fetchSubscription = useCallback(async () => {
     setLoading(true);
@@ -103,11 +117,29 @@ export default function SubscriptionDetailClient() {
     }
   };
 
+<<<<<<< HEAD
   const handleCancel = async () => {
     if (!confirm("Are you sure you want to cancel this subscription?")) return;
     setActionLoading(true);
     try {
       updateSub(cancelSubscription);
+=======
+  const handleCancel = async (reason: string) => {
+    setActionLoading(true);
+    try {
+      updateSub((sub) => cancelSubscription(sub, reason));
+      setShowCancelModal(false);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleModify = async (changes: Partial<Subscription>) => {
+    setActionLoading(true);
+    try {
+      updateSub((sub) => modifySubscription(sub, changes));
+      setShowModifyModal(false);
+>>>>>>> upstream/main
     } finally {
       setActionLoading(false);
     }
@@ -206,6 +238,35 @@ export default function SubscriptionDetailClient() {
               {display.totalUsdcFormatted} USDC
             </p>
           </div>
+<<<<<<< HEAD
+=======
+          {subscription.status === "paused" && subscription.pausedAt && (
+            <div className="sm:col-span-2">
+              <p className="text-gray-500">Paused Since</p>
+              <p className="text-yellow-400">
+                {new Date(subscription.pausedAt).toLocaleString()}
+              </p>
+            </div>
+          )}
+          {subscription.status === "cancelled" && (
+            <>
+              <div>
+                <p className="text-gray-500">Cancelled At</p>
+                <p className="text-red-400">
+                  {subscription.cancelledAt
+                    ? new Date(subscription.cancelledAt).toLocaleString()
+                    : "—"}
+                </p>
+              </div>
+              <div>
+                <p className="text-gray-500">Cancellation Reason</p>
+                <p className="text-red-400">
+                  {subscription.cancellationReason ?? "No reason provided"}
+                </p>
+              </div>
+            </>
+          )}
+>>>>>>> upstream/main
         </div>
       </div>
 
@@ -249,6 +310,7 @@ export default function SubscriptionDetailClient() {
             </button>
           )}
           {subscription.status !== "cancelled" && (
+<<<<<<< HEAD
             <button
               onClick={handleCancel}
               disabled={actionLoading}
@@ -256,10 +318,48 @@ export default function SubscriptionDetailClient() {
             >
               {actionLoading ? "Processing..." : "Cancel Subscription"}
             </button>
+=======
+            <>
+              <button
+                onClick={() => setShowModifyModal(true)}
+                disabled={actionLoading}
+                className="px-4 py-2 rounded-lg border border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/10 text-sm font-medium transition-colors disabled:opacity-50"
+              >
+                Modify Subscription
+              </button>
+              <button
+                onClick={() => setShowCancelModal(true)}
+                disabled={actionLoading}
+                className="px-4 py-2 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 text-sm font-medium transition-colors disabled:opacity-50"
+              >
+                {actionLoading ? "Processing..." : "Cancel Subscription"}
+              </button>
+            </>
+>>>>>>> upstream/main
           )}
         </div>
       </div>
 
+<<<<<<< HEAD
+=======
+      {showCancelModal && (
+        <CancelModal
+          onConfirm={handleCancel}
+          onClose={() => setShowCancelModal(false)}
+          loading={actionLoading}
+        />
+      )}
+
+      {showModifyModal && (
+        <SubscriptionModifyModal
+          subscription={subscription}
+          onSave={handleModify}
+          onClose={() => setShowModifyModal(false)}
+          loading={actionLoading}
+        />
+      )}
+
+>>>>>>> upstream/main
       {/* Calendar Preview */}
       {subscription.status === "active" && (
         <div className="mb-6">

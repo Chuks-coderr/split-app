@@ -3,20 +3,50 @@
 import { useEffect, useRef } from "react";
 import FocusTrap from "./FocusTrap";
 import { QRCodeCanvas } from "qrcode.react";
+<<<<<<< HEAD
 import { isWalletConnected } from "@/lib/freighter";
+=======
+
+export type WalletConnectStatus =
+  | "idle"
+  | "connecting"
+  | "awaiting_scan"
+  | "session_approved"
+  | "timeout"
+  | "error";
+>>>>>>> upstream/main
 
 type QRModalProps = {
   open: boolean;
   uri: string;
+<<<<<<< HEAD
   onClose: () => void;
   onCopied?: () => void;
   onConnected?: () => void;
   pollingInterval?: number;
+=======
+  status?: WalletConnectStatus;
+  errorMessage?: string;
+  onClose: () => void;
+  onCopied?: () => void;
+  onRetry?: () => void;
+  onConnected?: () => void;
+};
+
+const STATUS_TEXT: Record<WalletConnectStatus, string> = {
+  idle: "Preparing connection…",
+  connecting: "Connecting to WalletConnect…",
+  awaiting_scan: "Waiting for wallet to scan and approve…",
+  session_approved: "Session approved. Closing…",
+  timeout: "Connection timed out. The QR code may have expired.",
+  error: "Something went wrong while connecting.",
+>>>>>>> upstream/main
 };
 
 export default function QRModal({
   open,
   uri,
+<<<<<<< HEAD
   onClose,
   onCopied,
   onConnected,
@@ -24,11 +54,24 @@ export default function QRModal({
 }: QRModalProps) {
   const firedRef = useRef(false);
 
+=======
+  status = "awaiting_scan",
+  errorMessage,
+  onClose,
+  onCopied,
+  onRetry,
+  onConnected,
+}: QRModalProps) {
+  const firedRef = useRef(false);
+
+  // Close the modal once the parent reports a successful session approval.
+>>>>>>> upstream/main
   useEffect(() => {
     if (!open) {
       firedRef.current = false;
       return;
     }
+<<<<<<< HEAD
 
     const id = setInterval(async () => {
       if (firedRef.current) return;
@@ -45,6 +88,25 @@ export default function QRModal({
 
   if (!open) return null;
 
+=======
+    if (status === "session_approved" && !firedRef.current) {
+      firedRef.current = true;
+      onConnected?.();
+      onClose();
+    }
+  }, [open, status, onConnected, onClose]);
+
+  if (!open) return null;
+
+  const isBusy = status === "idle" || status === "connecting";
+  const isAwaiting = status === "awaiting_scan";
+  const isTimeout = status === "timeout";
+  const isError = status === "error";
+  const canShowQR = !!uri && !isTimeout && !isError;
+  const statusText = isError && errorMessage ? errorMessage : STATUS_TEXT[status];
+======
+
+>>>>>>> upstream/main
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(uri);
@@ -82,6 +144,7 @@ export default function QRModal({
 
         <div className="px-4 py-5">
           <div className="flex flex-col items-center gap-4">
+<<<<<<< HEAD
             <div className="bg-white rounded-xl p-3 w-[260px] max-w-full">
               <QRCodeCanvas
                 value={uri}
@@ -107,11 +170,80 @@ export default function QRModal({
         </div>
 
         <div className="px-4 py-3 border-t border-gray-800">
+=======
+            {canShowQR ? (
+              <div className="relative bg-white rounded-xl p-3 w-[260px] max-w-full">
+                <QRCodeCanvas
+                  value={uri}
+                  size={240}
+                  level="M"
+                  includeMargin={false}
+                />
+                {(isBusy || isAwaiting) && (
+                  <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-white/70">
+                    <span
+                      className="h-8 w-8 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"
+                      aria-hidden="true"
+                    />
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex h-[264px] w-[260px] max-w-full items-center justify-center rounded-xl border border-gray-800 bg-gray-950 px-4 text-center">
+                <p className="text-sm text-gray-300">{statusText}</p>
+              </div>
+            )}
+
+            <div
+              role="status"
+              aria-live="polite"
+              className="flex items-center gap-2 text-xs text-gray-400"
+            >
+              {(isBusy || isAwaiting) && (
+                <span
+                  className="h-3 w-3 animate-spin rounded-full border border-gray-500 border-t-transparent"
+                  aria-hidden="true"
+                />
+              )}
+              <span>{statusText}</span>
+            </div>
+
+            {canShowQR && (
+              <div className="w-full">
+                <button
+                  onClick={handleCopy}
+                  className="w-full px-4 py-3 rounded-lg bg-gray-800 hover:bg-gray-700 text-sm font-semibold transition-colors"
+                >
+                  Copy URI
+                </button>
+
+                <p className="mt-3 text-xs text-gray-400 break-all font-mono">
+                  {uri}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="px-4 py-3 border-t border-gray-800 flex flex-col gap-2">
+          {(isTimeout || isError) && onRetry && (
+            <button
+              onClick={onRetry}
+              className="w-full px-4 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-sm font-semibold text-white transition-colors"
+            >
+              Retry
+            </button>
+          )}
+>>>>>>> upstream/main
           <button
             onClick={onClose}
             className="w-full px-4 py-3 rounded-lg bg-transparent hover:bg-gray-800 border border-gray-800 text-sm font-semibold text-gray-200 transition-colors"
           >
+<<<<<<< HEAD
             Dismiss
+=======
+            {isTimeout || isError ? "Cancel" : "Dismiss"}
+>>>>>>> upstream/main
           </button>
         </div>
       </div>

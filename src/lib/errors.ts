@@ -2,6 +2,13 @@ export type ErrorKind =
   | "wallet_not_connected"
   | "invoice_not_found"
   | "rpc_timeout"
+<<<<<<< HEAD
+=======
+  | "ledger_not_connected"
+  | "ledger_locked"
+  | "ledger_app_not_open"
+  | "ledger_denied"
+>>>>>>> upstream/main
   | "unknown";
 
 export interface ClassifiedError {
@@ -25,6 +32,29 @@ const PATTERNS: { kind: ErrorKind; match: RegExp; message: string }[] = [
     match: /rpc timeout|timed out|timeout/i,
     message: "The Stellar RPC request timed out. Please try again.",
   },
+<<<<<<< HEAD
+=======
+  {
+    kind: "ledger_not_connected",
+    match: /ledger.*not connected|no ledger device|ledger device not found|device not found|disconnected/i,
+    message: "Connect your Ledger device and try again.",
+  },
+  {
+    kind: "ledger_locked",
+    match: /ledger.*locked|device.*locked|unlock your ledger/i,
+    message: "Unlock your Ledger device to continue.",
+  },
+  {
+    kind: "ledger_app_not_open",
+    match: /ledger.*app.*not open|open the stellar app|stellar app.*not open|app is not open/i,
+    message: "Open the Stellar app on your Ledger device to continue.",
+  },
+  {
+    kind: "ledger_denied",
+    match: /ledger.*denied|user denied|rejected on device|transaction rejected|denied on device/i,
+    message: "The transaction was rejected on your Ledger device.",
+  },
+>>>>>>> upstream/main
 ];
 
 export function classifyError(error: unknown): ClassifiedError {

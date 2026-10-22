@@ -1,8 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+<<<<<<< HEAD
 
 type PaymentMethod = "freighter" | "walletconnect";
+=======
+import { getLedgerStatus } from "../lib/ledger";
+
+type PaymentMethod = "freighter" | "walletconnect" | "ledger";
+>>>>>>> upstream/main
 
 const STORAGE_KEY_PREFIX = "paymentMethodPref:";
 
@@ -13,7 +19,11 @@ export function getPreferenceKey(payer: string, recipient: string): string {
 export function loadPreference(payer: string, recipient: string): PaymentMethod | null {
   if (typeof window === "undefined") return null;
   const val = localStorage.getItem(getPreferenceKey(payer, recipient));
+<<<<<<< HEAD
   if (val === "freighter" || val === "walletconnect") return val;
+=======
+  if (val === "freighter" || val === "walletconnect" || val === "ledger") return val;
+>>>>>>> upstream/main
   return null;
 }
 
@@ -31,6 +41,10 @@ interface Props {
 export default function PaymentMethodSelector({ onMethodChange, payerAddress, recipientAddress }: Props) {
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>("freighter");
   const [walletConnectAvailable, setWalletConnectAvailable] = useState(false);
+<<<<<<< HEAD
+=======
+  const [ledgerAvailable, setLedgerAvailable] = useState(false);
+>>>>>>> upstream/main
 
   useEffect(() => {
     const checkWalletConnect = async () => {
@@ -44,6 +58,27 @@ export default function PaymentMethodSelector({ onMethodChange, payerAddress, re
   }, []);
 
   useEffect(() => {
+<<<<<<< HEAD
+=======
+    let cancelled = false;
+    const checkLedger = async () => {
+      try {
+        const status = await getLedgerStatus();
+        if (!cancelled) setLedgerAvailable(status.connected);
+      } catch {
+        if (!cancelled) setLedgerAvailable(false);
+      }
+    };
+    checkLedger();
+    const interval = setInterval(checkLedger, 5000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, []);
+
+  useEffect(() => {
+>>>>>>> upstream/main
     if (payerAddress && recipientAddress) {
       const saved = loadPreference(payerAddress, recipientAddress);
       if (saved) {
@@ -53,7 +88,14 @@ export default function PaymentMethodSelector({ onMethodChange, payerAddress, re
       }
     }
     const globalSaved = localStorage.getItem("preferredWallet") as PaymentMethod | null;
+<<<<<<< HEAD
     if (globalSaved && (globalSaved === "freighter" || globalSaved === "walletconnect")) {
+=======
+    if (
+      globalSaved &&
+      (globalSaved === "freighter" || globalSaved === "walletconnect" || globalSaved === "ledger")
+    ) {
+>>>>>>> upstream/main
       setSelectedMethod(globalSaved);
       onMethodChange(globalSaved);
     }
@@ -100,6 +142,22 @@ export default function PaymentMethodSelector({ onMethodChange, payerAddress, re
             </span>
           )}
         </label>
+<<<<<<< HEAD
+=======
+        {ledgerAvailable && (
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="radio"
+              name="payment-method"
+              value="ledger"
+              checked={selectedMethod === "ledger"}
+              onChange={() => handleMethodChange("ledger")}
+              className="w-4 h-4 accent-indigo-500"
+            />
+            <span className="text-sm text-gray-300">Ledger Hardware Wallet</span>
+          </label>
+        )}
+>>>>>>> upstream/main
       </div>
     </fieldset>
   );

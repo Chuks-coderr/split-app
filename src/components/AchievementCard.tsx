@@ -2,6 +2,10 @@
 
 import { useRef, useState, useEffect } from "react";
 import confetti from "canvas-confetti";
+<<<<<<< HEAD
+=======
+import { getActiveNetwork } from "@/lib/networks";
+>>>>>>> upstream/main
 
 export interface NFTDetails {
   tokenId?: string;
@@ -19,9 +23,13 @@ interface Props {
 }
 
 const STELLAR_EXPERT_BASE =
+<<<<<<< HEAD
   process.env.NEXT_PUBLIC_STELLAR_NETWORK === "mainnet"
     ? "https://stellar.expert/explorer/public/tx"
     : "https://stellar.expert/explorer/testnet/tx";
+=======
+  getActiveNetwork().explorerTxBase;
+>>>>>>> upstream/main
 
 export default function AchievementCard({
   invoiceId,
@@ -91,7 +99,11 @@ export default function AchievementCard({
     }
 
     try {
+<<<<<<< HEAD
       await navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
+=======
+      await (navigator as any).clipboard.writeText(`${shareText} ${shareUrl}`);
+>>>>>>> upstream/main
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {

@@ -15,11 +15,48 @@ export default defineConfig({
     },
   },
 
+<<<<<<< HEAD
+=======
+  // Visual regression settings: a small per-pixel color tolerance plus an
+  // overall ratio keeps the suite resilient to anti-aliasing/font-rendering
+  // noise between CI runs while still catching real UI regressions.
+  expect: {
+    toHaveScreenshot: {
+      maxDiffPixelRatio: 0.02,
+      threshold: 0.2,
+      animations: 'disabled',
+    },
+  },
+
+>>>>>>> upstream/main
   projects: [
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
+<<<<<<< HEAD
+=======
+    {
+      name: 'error-handling',
+      testMatch: /error-handling\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'retry',
+      testMatch: /retry\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'offline-queue',
+      testMatch: /offline-queue\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'api-docs',
+      testMatch: /api-docs\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'] },
+    },
+>>>>>>> upstream/main
   ],
 
   webServer: {
@@ -34,4 +71,8 @@ export default defineConfig({
       NEXT_PUBLIC_USDC_ADDRESS: process.env.NEXT_PUBLIC_USDC_ADDRESS || '',
     },
   },
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> upstream/main

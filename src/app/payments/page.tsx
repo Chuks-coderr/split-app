@@ -8,8 +8,15 @@ import { getFreighterPublicKey } from "@/lib/freighter";
 import { formatAmount, truncateAddress } from "@stellar-split/sdk";
 import type { Invoice, Payment } from "@stellar-split/sdk";
 import { SkeletonPaymentRow } from "@/components/Skeleton";
+<<<<<<< HEAD
 
 const STELLAR_EXPERT_BASE = "https://stellar.expert/explorer/testnet/tx";
+=======
+import PaymentScheduler from "@/components/PaymentScheduler";
+import { getActiveNetwork } from "@/lib/networks";
+
+const STELLAR_EXPERT_BASE = getActiveNetwork().explorerTxBase;
+>>>>>>> upstream/main
 const ITEMS_PER_PAGE = 20;
 const MAX_INVOICES = 100;
 
@@ -358,6 +365,20 @@ export default function PaymentsPage() {
           )}
         </>
       )}
+<<<<<<< HEAD
+=======
+
+      {/* Pay Over Time — schedule future payments */}
+      {publicKey && (
+        <div className="mt-10">
+          <PaymentScheduler
+            invoiceId={`wallet-${publicKey.slice(0, 8)}`}
+            totalAmount={1000}
+            token="USDC"
+          />
+        </div>
+      )}
+>>>>>>> upstream/main
     </main>
   );
 }

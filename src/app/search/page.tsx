@@ -32,6 +32,20 @@ import {
   isLastColumn,
   type SearchColumn,
 } from '@/lib/searchColumns';
+<<<<<<< HEAD
+=======
+import {
+  searchInvoices,
+  getStoredSearches,
+  saveSearch,
+  removeRecentSearch,
+  clearSearchHistory,
+  getSavedSearches,
+  saveNamedSearch,
+  removeSavedSearch,
+  type SavedSearch,
+} from '@/lib/invoiceSearch';
+>>>>>>> upstream/main
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -69,6 +83,18 @@ function hasActiveFilters(c: FilterCriteria): boolean {
   });
 }
 
+<<<<<<< HEAD
+=======
+/** Counts how many individual filter dimensions are currently active (for a filter-count badge). */
+function countActiveFilters(c: FilterCriteria): number {
+  return Object.keys(c).reduce((count, k) => {
+    const v = (c as unknown as Record<string, unknown>)[k];
+    const active = Array.isArray(v) ? v.length > 0 : v !== undefined;
+    return active ? count + 1 : count;
+  }, 0);
+}
+
+>>>>>>> upstream/main
 // ── Status badge styles ───────────────────────────────────────────────────────
 
 const STATUS_STYLES: Record<string, string> = {
@@ -77,7 +103,257 @@ const STATUS_STYLES: Record<string, string> = {
   Refunded: 'bg-gray-500/20 text-gray-300',
 };
 
+<<<<<<< HEAD
 // ── ColumnPicker ──────────────────────────────────────────────────────────────
+=======
+// ── Highlight ───────────────────────────────────────────────────────────────
+
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/** Wraps occurrences of `query` inside `text` with a highlight <mark>. */
+function highlightMatch(text: string, query: string): React.ReactNode {
+  const trimmed = query.trim();
+  if (!trimmed) return text;
+  const escaped = escapeRegExp(trimmed);
+  const parts = text.split(new RegExp(`(${escaped})`, 'ig'));
+  if (parts.length === 1) return text;
+  return parts.map((part, i) =>
+    part.toLowerCase() === trimmed.toLowerCase() ? (
+      <mark key={i} className="bg-indigo-500/40 text-indigo-100 rounded px-0.5">
+        {part}
+      </mark>
+    ) : (
+      <span key={i}>{part}</span>
+    ),
+  );
+}
+
+// ── Smart suggestions ─────────────────────────────────────────────────────────
+
+/** Builds lightweight "did you mean" style suggestions from history + common terms. */
+function buildSmartSuggestions(
+  query: string,
+  recentSearches: string[],
+  savedSearches: SavedSearch[],
+): string[] {
+  const trimmed = query.trim().toLowerCase();
+  if (!trimmed) return [];
+  const pool = [
+    ...recentSearches,
+    ...savedSearches.map((s) => s.query),
+    ...STATUSES,
+    ...DEFAULT_TOKENS,
+  ];
+  const seen = new Set<string>();
+  const suggestions: string[] = [];
+  for (const candidate of pool) {
+    const c = candidate.trim();
+    if (!c || c.toLowerCase() === trimmed) continue;
+    if (c.toLowerCase().includes(trimmed) && !seen.has(c.toLowerCase())) {
+      seen.add(c.toLowerCase());
+      suggestions.push(c);
+    }
+    if (suggestions.length >= 5) break;
+  }
+  return suggestions;
+}
+
+// ── FullTextSearchBar ─────────────────────────────────────────────────────────
+
+interface FullTextSearchBarProps {
+  value: string;
+  onChange: (v: string) => void;
+  onSubmit: (v: string) => void;
+  onFocus: () => void;
+  inputRef: React.RefObject<HTMLInputElement | null>;
+}
+
+function FullTextSearchBar({
+  value,
+  onChange,
+  onSubmit,
+  onFocus,
+  inputRef,
+}: FullTextSearchBarProps) {
+  return (
+    <div className="relative flex items-center">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="absolute left-3 h-4 w-4 text-gray-500 pointer-events-none"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
+        aria-hidden="true"
+      >
+        <circle cx="11" cy="11" r="8" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35" />
+      </svg>
+      <input
+        ref={inputRef as React.RefObject<HTMLInputElement>}
+        type="search"
+        value={value}
+        placeholder="Full-text search: id, creator, recipient, token, status…"
+        className="w-full pl-9 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-200 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        aria-label="Full-text invoice search"
+        autoComplete="off"
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={onFocus}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            onSubmit(value);
+          }
+        }}
+        data-testid="fulltext-search-input"
+      />
+      {value && (
+        <button
+          type="button"
+          aria-label="Clear search"
+          className="absolute right-3 text-gray-500 hover:text-gray-300 transition-colors"
+          onClick={() => onChange('')}
+        >
+          ×
+        </button>
+      )}
+    </div>
+  );
+}
+
+// ── SearchHistoryPanel ────────────────────────────────────────────────────────
+
+interface SearchHistoryPanelProps {
+  recentSearches: string[];
+  savedSearches: SavedSearch[];
+  onSelect: (query: string) => void;
+  onRemoveRecent: (query: string) => void;
+  onRemoveSaved: (id: string) => void;
+  onClearHistory: () => void;
+  onSaveCurrent: () => void;
+  currentQuery: string;
+}
+
+function SearchHistoryPanel({
+  recentSearches,
+  savedSearches,
+  onSelect,
+  onRemoveRecent,
+  onRemoveSaved,
+  onClearHistory,
+  onSaveCurrent,
+  currentQuery,
+}: SearchHistoryPanelProps) {
+  const hasAnything = recentSearches.length > 0 || savedSearches.length > 0;
+  if (!hasAnything && !currentQuery.trim()) return null;
+
+  return (
+    <div
+      className="bg-gray-900 border border-gray-700 rounded-lg p-4 space-y-4"
+      data-testid="search-history-panel"
+    >
+      {/* Save current search */}
+      {currentQuery.trim() && (
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-gray-500">
+            Current: <span className="text-gray-300 font-medium">&ldquo;{currentQuery}&rdquo;</span>
+          </span>
+          <button
+            type="button"
+            onClick={onSaveCurrent}
+            className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1"
+            data-testid="save-search-btn"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2H7a2 2 0 01-2-2V5z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 3v5H9V3" />
+            </svg>
+            Save search
+          </button>
+        </div>
+      )}
+
+      {/* Saved searches */}
+      {savedSearches.length > 0 && (
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Saved Searches</h3>
+          </div>
+          <ul className="space-y-1" aria-label="Saved searches">
+            {savedSearches.map((s) => (
+              <li key={s.id} className="flex items-center gap-2 group">
+                <button
+                  type="button"
+                  onClick={() => onSelect(s.query)}
+                  className="flex-1 text-left text-sm text-indigo-300 hover:text-indigo-200 truncate flex items-center gap-1.5"
+                  data-testid={`saved-search-${s.id}`}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 shrink-0 text-indigo-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  {s.name}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onRemoveSaved(s.id)}
+                  className="text-gray-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 text-xs"
+                  aria-label={`Remove saved search "${s.name}"`}
+                >
+                  ×
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Recent searches */}
+      {recentSearches.length > 0 && (
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Recent</h3>
+            <button
+              type="button"
+              onClick={onClearHistory}
+              className="text-xs text-gray-500 hover:text-red-400 transition-colors"
+              data-testid="clear-history-btn"
+            >
+              Clear all
+            </button>
+          </div>
+          <ul className="space-y-1" aria-label="Recent searches">
+            {recentSearches.map((q) => (
+              <li key={q} className="flex items-center gap-2 group">
+                <button
+                  type="button"
+                  onClick={() => onSelect(q)}
+                  className="flex-1 text-left text-sm text-gray-300 hover:text-white truncate flex items-center gap-1.5"
+                  data-testid={`recent-search-${q}`}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 shrink-0 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {q}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onRemoveRecent(q)}
+                  className="text-gray-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 text-xs"
+                  aria-label={`Remove recent search "${q}"`}
+                >
+                  ×
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+>>>>>>> upstream/main
 
 function ColumnPicker({
   visibleColumns,
@@ -153,9 +429,17 @@ function ColumnPicker({
 function InvoiceRow({
   invoice,
   visibleColumns,
+<<<<<<< HEAD
 }: {
   invoice: Invoice;
   visibleColumns: SearchColumn[];
+=======
+  highlightQuery,
+}: {
+  invoice: Invoice;
+  visibleColumns: SearchColumn[];
+  highlightQuery?: string;
+>>>>>>> upstream/main
 }) {
   const total = invoice.recipients.reduce((s, r) => s + r.amount, 0n);
   const fundedPct = total > 0n ? Number((invoice.funded * 100n) / total) : 0;
@@ -164,7 +448,11 @@ function InvoiceRow({
     <div className="bg-gray-900 rounded-xl p-4 hover:bg-gray-800 transition-colors cursor-pointer">
       <div className="flex flex-wrap items-center gap-3">
         <span className="text-sm font-semibold text-gray-300 shrink-0">
+<<<<<<< HEAD
           Invoice #{invoice.id}
+=======
+          Invoice #{highlightQuery ? highlightMatch(String(invoice.id), highlightQuery) : invoice.id}
+>>>>>>> upstream/main
         </span>
 
         {visibleColumns.includes('amount') && (
@@ -177,7 +465,11 @@ function InvoiceRow({
           <span
             className={`text-xs px-2 py-0.5 rounded-full font-semibold ${STATUS_STYLES[invoice.status] ?? ''}`}
           >
+<<<<<<< HEAD
             {invoice.status}
+=======
+            {highlightQuery ? highlightMatch(invoice.status, highlightQuery) : invoice.status}
+>>>>>>> upstream/main
           </span>
         )}
 
@@ -189,7 +481,13 @@ function InvoiceRow({
 
         {visibleColumns.includes('creator') && (
           <span className="text-xs text-gray-500 font-mono">
+<<<<<<< HEAD
             {truncateAddress(invoice.creator)}
+=======
+            {highlightQuery
+              ? highlightMatch(truncateAddress(invoice.creator), highlightQuery)
+              : truncateAddress(invoice.creator)}
+>>>>>>> upstream/main
           </span>
         )}
 
@@ -214,9 +512,16 @@ function InvoiceRow({
 interface VirtualListProps {
   items: Invoice[];
   visibleColumns: SearchColumn[];
+<<<<<<< HEAD
 }
 
 function VirtualList({ items, visibleColumns }: VirtualListProps) {
+=======
+  highlightQuery?: string;
+}
+
+function VirtualList({ items, visibleColumns, highlightQuery }: VirtualListProps) {
+>>>>>>> upstream/main
   const [scrollTop, setScrollTop] = useState(0);
 
   const startIdx = Math.floor(scrollTop / ITEM_HEIGHT_PX);
@@ -241,7 +546,11 @@ function VirtualList({ items, visibleColumns }: VirtualListProps) {
             className="mb-4"
           >
             <Link href={`/invoice/${inv.id}`}>
+<<<<<<< HEAD
               <InvoiceRow invoice={inv} visibleColumns={visibleColumns} />
+=======
+              <InvoiceRow invoice={inv} visibleColumns={visibleColumns} highlightQuery={highlightQuery} />
+>>>>>>> upstream/main
             </Link>
           </div>
         ))}
@@ -326,6 +635,16 @@ function SearchPageInner() {
   const [draftCreator, setDraftCreator] = useState(criteria.creator ?? '');
   const [draftRecipient, setDraftRecipient] = useState(criteria.recipient ?? '');
 
+<<<<<<< HEAD
+=======
+  // Full-text search state
+  const [fullTextQuery, setFullTextQuery] = useState('');
+  const [showHistory, setShowHistory] = useState(false);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([]);
+  const fullTextInputRef = useRef<HTMLInputElement | null>(null);
+
+>>>>>>> upstream/main
   // Share status feedback
   const [shareStatus, setShareStatus] = useState<string | null>(null);
 
@@ -356,6 +675,52 @@ function SearchPageInner() {
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [knownTokens, setKnownTokens] = useState<string[]>(DEFAULT_TOKENS);
 
+<<<<<<< HEAD
+=======
+  // ── Load search history from localStorage ────────────────────────────────
+
+  useEffect(() => {
+    setRecentSearches(getStoredSearches());
+    setSavedSearches(getSavedSearches());
+  }, []);
+
+  // ── Collapse history panel when clicking outside ───────────────────────────
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (
+        fullTextInputRef.current &&
+        !fullTextInputRef.current.contains(e.target as Node) &&
+        !(e.target as Element)?.closest('[data-testid="search-history-panel"]')
+      ) {
+        setShowHistory(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  // ── Full-text search submit ────────────────────────────────────────────────
+
+  const handleFullTextSubmit = useCallback((query: string) => {
+    const trimmed = query.trim();
+    if (trimmed) {
+      saveSearch(trimmed);
+      setRecentSearches(getStoredSearches());
+    }
+    setShowHistory(false);
+  }, []);
+
+  // ── Save current search as named ──────────────────────────────────────────
+
+  const handleSaveCurrentSearch = useCallback(() => {
+    const trimmed = fullTextQuery.trim();
+    if (!trimmed) return;
+    saveNamedSearch(trimmed, trimmed);
+    setSavedSearches(getSavedSearches());
+  }, [fullTextQuery]);
+
+>>>>>>> upstream/main
   // ── Sync URL back to state on changes ──────────────────────────────────────
 
   const searchParamsString = searchParams.toString();
@@ -417,6 +782,10 @@ function SearchPageInner() {
     setDraftFundedMax('');
     setDraftCreator('');
     setDraftRecipient('');
+<<<<<<< HEAD
+=======
+    setFullTextQuery('');
+>>>>>>> upstream/main
     router.replace('/search', { scroll: false });
   }, [router]);
 
@@ -518,10 +887,22 @@ function SearchPageInner() {
 
   const results = useMemo(() => {
     const compiled = compileFilter(criteria);
+<<<<<<< HEAD
     return FilterIndex.queryIndex(allInvoices, compiled);
   }, [allInvoices, criteria]);
 
   const filtersActive = hasActiveFilters(criteria);
+=======
+    const filtered = FilterIndex.queryIndex(allInvoices, compiled);
+    // Apply full-text search on top of structured filters
+    if (fullTextQuery.trim()) {
+      return searchInvoices(filtered, fullTextQuery);
+    }
+    return filtered;
+  }, [allInvoices, criteria, fullTextQuery]);
+
+  const filtersActive = hasActiveFilters(criteria) || !!fullTextQuery.trim();
+>>>>>>> upstream/main
 
   // ── Input handlers ─────────────────────────────────────────────────────────
 
@@ -570,6 +951,18 @@ function SearchPageInner() {
             <span>{shareStatus || 'Share search'}</span>
           </button>
           <ColumnPicker visibleColumns={visibleColumns} onToggle={handleToggleColumn} />
+<<<<<<< HEAD
+=======
+          {countActiveFilters(criteria) > 0 && (
+            <span
+              className="text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-semibold"
+              data-testid="active-filter-count"
+              title="Number of active filter dimensions"
+            >
+              {countActiveFilters(criteria)} filter{countActiveFilters(criteria) !== 1 ? 's' : ''}
+            </span>
+          )}
+>>>>>>> upstream/main
           {filtersActive && (
             <button
               type="button"
@@ -587,6 +980,69 @@ function SearchPageInner() {
         <p className="text-red-400 mb-6" role="alert">{fetchError}</p>
       )}
 
+<<<<<<< HEAD
+=======
+      {/* Full-text search bar */}
+      <div className="relative mb-4">
+        <FullTextSearchBar
+          value={fullTextQuery}
+          onChange={setFullTextQuery}
+          onSubmit={handleFullTextSubmit}
+          onFocus={() => setShowHistory(true)}
+          inputRef={fullTextInputRef}
+        />
+        {fullTextQuery.trim() && !showHistory && (
+          (() => {
+            const suggestions = buildSmartSuggestions(fullTextQuery, recentSearches, savedSearches);
+            if (suggestions.length === 0) return null;
+            return (
+              <div
+                className="absolute top-full left-0 right-0 mt-1 z-20 bg-gray-900 border border-gray-700 rounded-lg p-2 flex flex-wrap gap-2"
+                data-testid="smart-suggestions"
+              >
+                {suggestions.map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => setFullTextQuery(s)}
+                    className="text-xs px-2 py-1 rounded-full bg-gray-800 text-indigo-300 hover:bg-gray-700 transition-colors"
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            );
+          })()
+        )}
+        {showHistory && (
+          <div className="absolute top-full left-0 right-0 mt-1 z-30">
+            <SearchHistoryPanel
+              recentSearches={recentSearches}
+              savedSearches={savedSearches}
+              currentQuery={fullTextQuery}
+              onSelect={(q) => {
+                setFullTextQuery(q);
+                setShowHistory(false);
+              }}
+              onRemoveRecent={(q) => {
+                removeRecentSearch(q);
+                setRecentSearches(getStoredSearches());
+              }}
+              onRemoveSaved={(id) => {
+                removeSavedSearch(id);
+                setSavedSearches(getSavedSearches());
+              }}
+              onClearHistory={() => {
+                clearSearchHistory();
+                setRecentSearches([]);
+              }}
+              onSaveCurrent={handleSaveCurrentSearch}
+            />
+          </div>
+        )}
+      </div>
+
+>>>>>>> upstream/main
       {/* Filter panel */}
       <div
         className="bg-gray-900 rounded-lg p-6 mb-8 space-y-6"
@@ -852,7 +1308,11 @@ function SearchPageInner() {
       ) : results.length === 0 ? (
         <EmptyState hasInvoices={allInvoices.length > 0} hasFilters={filtersActive} />
       ) : (
+<<<<<<< HEAD
         <VirtualList items={results} visibleColumns={visibleColumns} />
+=======
+        <VirtualList items={results} visibleColumns={visibleColumns} highlightQuery={fullTextQuery} />
+>>>>>>> upstream/main
       )}
     </main>
   );

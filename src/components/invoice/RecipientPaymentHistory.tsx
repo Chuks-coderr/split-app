@@ -3,6 +3,10 @@
 import { useEffect, useState } from "react";
 import TxHash from "@/components/ui/TxHash";
 import RelativeTime from "@/components/ui/RelativeTime";
+<<<<<<< HEAD
+=======
+import PayerReputationDisplay from "@/components/PayerReputationDisplay";
+>>>>>>> upstream/main
 
 export interface RecipientHistoryEntry {
   operationHash: string;
@@ -148,11 +152,23 @@ export default function RecipientPaymentHistory({
                 <span className="text-sm font-medium text-gray-100">
                   {entry.amount} {entry.asset}
                 </span>
+<<<<<<< HEAD
                 <span className="text-xs text-gray-400">
+=======
+                <span className="text-xs text-gray-400 flex items-center gap-1.5 flex-wrap">
+>>>>>>> upstream/main
                   from{" "}
                   <code className="bg-gray-700 px-1.5 py-0.5 rounded text-[11px]">
                     {entry.from.slice(0, 8)}...{entry.from.slice(-6)}
                   </code>
+<<<<<<< HEAD
+=======
+                  <PayerReputationDisplay
+                    address={entry.from}
+                    compact
+                    showAddress={false}
+                  />
+>>>>>>> upstream/main
                 </span>
               </div>
 

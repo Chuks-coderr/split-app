@@ -68,6 +68,15 @@ Open [http://localhost:3000](http://localhost:3000).
 | `/invoice/[id]` | Invoice detail, payment progress, Pay button |
 | `/verify/[id]` | Public on-chain verification (no login needed) |
 
+## Continuous Testing (Local Dev)
+
+Run tests continuously while developing, instead of a single one-off run:
+
+```bash
+npm run test:watch       # vitest in watch mode, scoped to files changed vs. the last commit
+npm run test:watch:all   # vitest in watch mode, full suite
+```
+
 ## Run Lint
 
 ```bash
@@ -87,3 +96,14 @@ This project participates in the [Drips Wave Program](https://drips.network/wave
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full guide.
 
 **Do not start coding until assigned to an issue by a maintainer.**
+
+## Handsoff notes
+
+<!-- handsoff-issue-844 -->
+- #844: Implement advanced invoice personalization engine
+
+<!-- handsoff-issue-989 -->
+- #989: Implement customizable dashboards with drag-and-drop widgets
+
+<!-- handsoff-issue-991 -->
+- #991: Implement custom report builder and scheduling

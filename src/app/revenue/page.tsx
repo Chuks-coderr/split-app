@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+<<<<<<< HEAD
 import { splitClient } from "@/lib/stellar";
 import { getFreighterPublicKey } from "@/lib/freighter";
 import { formatAmount } from "@stellar-split/sdk";
@@ -14,6 +15,21 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import type { Invoice } from "@stellar-split/sdk";
+=======
+import dynamic from "next/dynamic";
+import { splitClient } from "@/lib/stellar";
+import { getFreighterPublicKey } from "@/lib/freighter";
+import { formatAmount } from "@stellar-split/sdk";
+import type { Invoice } from "@stellar-split/sdk";
+import EarningsForecastChart from "@/components/EarningsForecastChart";
+
+// recharts is a sizeable dependency only needed once data has loaded, so it's
+// excluded from this route's initial chunk and fetched on demand.
+const DynamicRevenueMonthlyChart = dynamic(() => import("@/components/RevenueMonthlyChart"), {
+  ssr: false,
+  loading: () => <div className="w-full h-full animate-pulse bg-gray-800 rounded-lg" />,
+});
+>>>>>>> upstream/main
 
 /** Convert a bigint USDC amount (7 decimals) to a JS number for charting. */
 function toUsdc(amount: bigint): number {
@@ -174,6 +190,7 @@ export default function RevenuePage() {
           <section aria-labelledby="chart-heading" className="bg-gray-900 rounded-xl p-5 mb-8">
             <h2 id="chart-heading" className="text-lg font-semibold mb-4">Monthly Revenue (Last 6 Months)</h2>
             <div className="w-full h-48 sm:h-64">
+<<<<<<< HEAD
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={monthlyData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
@@ -191,6 +208,16 @@ export default function RevenuePage() {
             </div>
           </section>
 
+=======
+              <DynamicRevenueMonthlyChart data={monthlyData} />
+            </div>
+          </section>
+
+          <EarningsForecastChart
+            history={monthlyData.map((d) => ({ label: d.month, value: d.usdc }))}
+          />
+
+>>>>>>> upstream/main
           {/* Invoice breakdown table */}
           <section aria-labelledby="breakdown-heading" className="bg-gray-900 rounded-xl p-5">
             <h2 id="breakdown-heading" className="text-lg font-semibold mb-4">Invoice Breakdown</h2>

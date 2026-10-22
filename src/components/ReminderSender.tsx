@@ -1,7 +1,21 @@
 "use client";
 
+<<<<<<< HEAD
 import { useState } from "react";
 import { formatAmount } from "@stellar-split/sdk";
+=======
+import { useEffect, useMemo, useState } from "react";
+import { formatAmount } from "@stellar-split/sdk";
+import {
+  computeReminderSchedule,
+  renderReminderTemplate,
+  getEscalationLevel,
+  isSuppressed,
+  setSuppressed,
+  recordEngagement,
+  type ReminderChannel,
+} from "../lib/reminders";
+>>>>>>> upstream/main
 
 interface ReminderSenderProps {
   invoiceId: string;
@@ -10,6 +24,7 @@ interface ReminderSenderProps {
   verifyUrl: string;
 }
 
+<<<<<<< HEAD
 function buildReminderText(
   invoiceId: string,
   amount: bigint,
@@ -47,6 +62,8 @@ function scheduleReminder(reminder: ScheduledReminder) {
   }
 }
 
+=======
+>>>>>>> upstream/main
 export default function ReminderSender({
   invoiceId,
   amount,
@@ -58,11 +75,46 @@ export default function ReminderSender({
   const [sendAt, setSendAt] = useState("");
   const [sendAtError, setSendAtError] = useState<string | null>(null);
   const [scheduled, setScheduled] = useState(false);
+<<<<<<< HEAD
 
   const reminderText = buildReminderText(invoiceId, amount, deadline, verifyUrl);
   const encodedText = encodeURIComponent(reminderText);
   const isScheduling = sendAt.trim().length > 0;
 
+=======
+  const [suppressed, setSuppressedState] = useState(false);
+
+  useEffect(() => {
+    setSuppressedState(isSuppressed(invoiceId));
+  }, [invoiceId]);
+
+  const schedule = useMemo(
+    () => computeReminderSchedule({ invoiceId, amount, deadline, verifyUrl }),
+    [invoiceId, amount, deadline, verifyUrl]
+  );
+  const escalation = getEscalationLevel(deadline);
+  const nextReminder = schedule.find((r) => r.sendAt > Date.now()) ?? null;
+
+  const reminderText = renderReminderTemplate(schedule[0]?.template ?? "initial", {
+    invoiceId,
+    amount,
+    deadline,
+    verifyUrl,
+  });
+  const encodedText = encodeURIComponent(reminderText);
+  const isScheduling = sendAt.trim().length > 0;
+
+  const handleToggleSuppression = () => {
+    const next = !suppressed;
+    setSuppressed(next);
+    setSuppressedState(next);
+  };
+
+  const handleDispatch = (channel: ReminderChannel) => {
+    recordEngagement(invoiceId, "sent", channel);
+  };
+
+>>>>>>> upstream/main
   const whatsappUrl = `https://wa.me/?text=${encodedText}`;
   const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(verifyUrl)}&text=${encodeURIComponent(
     `Reminder: Invoice #${invoiceId} needs your payment of ${formatAmount(amount)} USDC. Pay here:`
@@ -94,7 +146,11 @@ export default function ReminderSender({
       setSendAtError("Send time cannot be in the past");
       return;
     }
+<<<<<<< HEAD
     scheduleReminder({ invoiceId, sendAt: selected, text: reminderText });
+=======
+    recordEngagement(invoiceId, "scheduled", "manual", { sendAt: selected });
+>>>>>>> upstream/main
     setScheduled(true);
   };
 
@@ -148,6 +204,34 @@ export default function ReminderSender({
         </button>
       </div>
 
+<<<<<<< HEAD
+=======
+      {/* Escalation status */}
+      <div className="flex flex-wrap items-center gap-2 mb-3 text-xs">
+        <span className="px-2 py-1 rounded-full bg-amber-900/60 text-amber-200 font-semibold">
+          Escalation: {escalation.label}
+        </span>
+        {nextReminder && (
+          <span className="text-gray-400">
+            Next reminder: {new Date(nextReminder.sendAt).toLocaleString()}
+          </span>
+        )}
+      </div>
+
+      {suppressed ? (
+        <div className="bg-gray-800 rounded-lg p-3 mb-4 text-sm text-gray-300">
+          <p className="mb-2">Reminders are turned off for this invoice.</p>
+          <button
+            type="button"
+            onClick={handleToggleSuppression}
+            className="min-h-11 px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm font-semibold transition-colors"
+          >
+            Re-enable reminders
+          </button>
+        </div>
+      ) : (
+        <>
+>>>>>>> upstream/main
       {/* Reminder text preview */}
       <div className="bg-gray-800 rounded-lg p-3 mb-4 text-sm text-gray-200 break-words leading-relaxed">
         {reminderText}
@@ -190,7 +274,14 @@ export default function ReminderSender({
       <div className="flex flex-wrap gap-2">
         <button
           type="button"
+<<<<<<< HEAD
           onClick={handleCopy}
+=======
+          onClick={() => {
+            handleDispatch("copy");
+            void handleCopy();
+          }}
+>>>>>>> upstream/main
           disabled={isScheduling}
           className="min-h-11 flex-1 sm:flex-none px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-sm font-semibold transition-colors"
           aria-live="polite"
@@ -203,7 +294,17 @@ export default function ReminderSender({
           target="_blank"
           rel="noopener noreferrer"
           aria-disabled={isScheduling}
+<<<<<<< HEAD
           onClick={(e) => { if (isScheduling) e.preventDefault(); }}
+=======
+          onClick={(e) => {
+            if (isScheduling) {
+              e.preventDefault();
+              return;
+            }
+            handleDispatch("whatsapp");
+          }}
+>>>>>>> upstream/main
           className={`min-h-11 flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-green-700 hover:bg-green-600 text-sm font-semibold transition-colors ${
             isScheduling ? "opacity-40 cursor-not-allowed pointer-events-none" : ""
           }`}
@@ -226,7 +327,17 @@ export default function ReminderSender({
           target="_blank"
           rel="noopener noreferrer"
           aria-disabled={isScheduling}
+<<<<<<< HEAD
           onClick={(e) => { if (isScheduling) e.preventDefault(); }}
+=======
+          onClick={(e) => {
+            if (isScheduling) {
+              e.preventDefault();
+              return;
+            }
+            handleDispatch("telegram");
+          }}
+>>>>>>> upstream/main
           className={`min-h-11 flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-sky-600 hover:bg-sky-500 text-sm font-semibold transition-colors ${
             isScheduling ? "opacity-40 cursor-not-allowed pointer-events-none" : ""
           }`}
@@ -244,6 +355,21 @@ export default function ReminderSender({
           Telegram
         </a>
       </div>
+<<<<<<< HEAD
+=======
+
+      <div className="mt-4">
+        <button
+          type="button"
+          onClick={handleToggleSuppression}
+          className="text-xs text-gray-400 hover:text-gray-200 underline"
+        >
+          Turn off reminders for this invoice
+        </button>
+      </div>
+        </>
+      )}
+>>>>>>> upstream/main
     </section>
   );
 }

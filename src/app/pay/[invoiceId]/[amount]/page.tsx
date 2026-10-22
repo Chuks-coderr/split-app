@@ -6,15 +6,23 @@ import { splitClient, payWithNonce } from "@/lib/stellar";
 import { getFreighterPublicKey } from "@/lib/freighter";
 import { formatAmount, parseAmount } from "@stellar-split/sdk";
 import type { Invoice } from "@stellar-split/sdk";
+<<<<<<< HEAD
+=======
+import { getActiveNetwork } from "@/lib/networks";
+>>>>>>> upstream/main
 
 interface Props {
   params: { invoiceId: string; amount: string };
 }
 
 const STELLAR_EXPERT_BASE =
+<<<<<<< HEAD
   process.env.NEXT_PUBLIC_STELLAR_NETWORK === "mainnet"
     ? "https://stellar.expert/explorer/public/tx"
     : "https://stellar.expert/explorer/testnet/tx";
+=======
+  getActiveNetwork().explorerTxBase;
+>>>>>>> upstream/main
 
 export default function DeepLinkPayPage({ params }: Props) {
   const { invoiceId, amount: rawAmount } = params;

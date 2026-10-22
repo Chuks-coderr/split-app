@@ -1,5 +1,9 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+<<<<<<< HEAD
+=======
+import { vi } from "vitest";
+>>>>>>> upstream/main
 import userEvent from "@testing-library/user-event";
 import CancelModal from "@/components/CancelModal";
 
@@ -130,8 +134,13 @@ describe("CancelModal multi-step confirmation flow and gate", () => {
 
     // Step 4: success state
     await waitFor(() => {
+<<<<<<< HEAD
       expect(screen.getByTestId("step-success")).toBeInTheDocument();
       expect(screen.getByText("Invoice Cancelled")).toBeInTheDocument();
+=======
+      const successStep = screen.getByTestId("step-success");
+      expect(successStep).toBeInTheDocument();
+>>>>>>> upstream/main
     });
   });
 });

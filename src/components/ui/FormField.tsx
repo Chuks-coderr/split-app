@@ -31,7 +31,11 @@ export default function FormField({
       <div className="relative">
         {React.cloneElement(React.Children.toArray(children)[0] as React.ReactElement, {
           id,
+<<<<<<< HEAD
           'aria-describedby': errorId || helperText ? `${id}-hint` : undefined,
+=======
+          'aria-describedby': errorId ?? (helperText ? `${id}-hint` : undefined),
+>>>>>>> upstream/main
           'aria-invalid': !!error,
         })}
         {React.Children.toArray(children).slice(1)}

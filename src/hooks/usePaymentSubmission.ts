@@ -2,6 +2,13 @@
 
 import { useState, useCallback } from "react";
 import { simulateTransaction, SimulationResult } from "@/lib/simulateTx";
+<<<<<<< HEAD
+=======
+import { retryWithBackoff } from "@/lib/retryWithBackoff";
+import { toAppError } from "@/lib/appError";
+import { useToast } from "@/context/ToastContext";
+import { useOfflineQueue } from "@/hooks/useOfflineQueue";
+>>>>>>> upstream/main
 
 interface PaymentSubmissionState {
   showSimulationPreview: boolean;
@@ -28,6 +35,12 @@ export function usePaymentSubmission(): UsePaymentSubmissionReturn {
     simulationError: null,
   });
 
+<<<<<<< HEAD
+=======
+  const { notify } = useToast();
+  const { enqueue } = useOfflineQueue();
+
+>>>>>>> upstream/main
   const initiateDemoPayment = useCallback(
     async (
       transactionXdr: string,
@@ -42,13 +55,28 @@ export function usePaymentSubmission(): UsePaymentSubmissionReturn {
       }));
 
       try {
+<<<<<<< HEAD
         const result = await simulateTransaction(transactionXdr);
+=======
+        const result = await retryWithBackoff(
+          () => simulateTransaction(transactionXdr),
+          {
+            onRetry: (attempt, error) => {
+              notify({
+                type: "info",
+                message: `Simulation failed (${toAppError(error).message}). Retrying attempt ${attempt}...`,
+              });
+            },
+          }
+        );
+>>>>>>> upstream/main
         setState((prev) => ({
           ...prev,
           isSimulating: false,
           simulationResult: result,
         }));
       } catch (error) {
+<<<<<<< HEAD
         const errorMessage =
           error instanceof Error ? error.message : "Failed to simulate transaction";
         setState((prev) => ({
@@ -59,11 +87,23 @@ export function usePaymentSubmission(): UsePaymentSubmissionReturn {
       }
     },
     []
+=======
+        const appError = toAppError(error);
+        setState((prev) => ({
+          ...prev,
+          isSimulating: false,
+          simulationError: appError.message,
+        }));
+      }
+    },
+    [notify]
+>>>>>>> upstream/main
   );
 
   const handleProceed = useCallback(
     async (onConfirm: () => Promise<any>) => {
       try {
+<<<<<<< HEAD
         await onConfirm();
         resetState();
       } catch (error) {
@@ -76,6 +116,34 @@ export function usePaymentSubmission(): UsePaymentSubmissionReturn {
       }
     },
     []
+=======
+        await retryWithBackoff(() => onConfirm(), {
+          onRetry: (attempt, error) => {
+            notify({
+              type: "info",
+              message: `Payment failed (${toAppError(error).message}). Retrying attempt ${attempt}...`,
+            });
+          },
+        });
+        resetState();
+      } catch (error) {
+        const appError = toAppError(error);
+        if (appError.isNetworkError) {
+          enqueue({ type: "payment", execute: onConfirm });
+          notify({
+            type: "warning",
+            message: "Connection lost. Payment queued and will retry when you're back online.",
+          });
+        } else {
+          setState((prev) => ({
+            ...prev,
+            simulationError: appError.message,
+          }));
+        }
+      }
+    },
+    [notify, enqueue]
+>>>>>>> upstream/main
   );
 
   const handleCancel = useCallback((onCancel: () => void) => {
@@ -86,6 +154,7 @@ export function usePaymentSubmission(): UsePaymentSubmissionReturn {
   const handleSkip = useCallback(
     async (onConfirm: () => Promise<any>) => {
       try {
+<<<<<<< HEAD
         await onConfirm();
         resetState();
       } catch (error) {
@@ -98,6 +167,34 @@ export function usePaymentSubmission(): UsePaymentSubmissionReturn {
       }
     },
     []
+=======
+        await retryWithBackoff(() => onConfirm(), {
+          onRetry: (attempt, error) => {
+            notify({
+              type: "info",
+              message: `Payment failed (${toAppError(error).message}). Retrying attempt ${attempt}...`,
+            });
+          },
+        });
+        resetState();
+      } catch (error) {
+        const appError = toAppError(error);
+        if (appError.isNetworkError) {
+          enqueue({ type: "payment", execute: onConfirm });
+          notify({
+            type: "warning",
+            message: "Connection lost. Payment queued and will retry when you're back online.",
+          });
+        } else {
+          setState((prev) => ({
+            ...prev,
+            simulationError: appError.message,
+          }));
+        }
+      }
+    },
+    [notify, enqueue]
+>>>>>>> upstream/main
   );
 
   const resetState = useCallback(() => {

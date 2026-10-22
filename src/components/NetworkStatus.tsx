@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
+<<<<<<< HEAD
 
 const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL ?? "";
 const POLL_MS = 60_000;
@@ -54,6 +55,41 @@ async function checkHealth(): Promise<RpcStatus> {
  * 1. A permanent Mainnet / Testnet network badge — always visible so users
  *    always know which Stellar network the application is connected to.
  * 2. An RPC health indicator (●) showing healthy / degraded / offline status.
+=======
+import { useWalletBalance } from "../hooks/useWalletBalance";
+import { useWalletConnect } from "../hooks/useWalletConnect";
+
+const POLL_MS = 60_000;
+
+type RpcStatus = "healthy" | "degraded" | "offline" | "checking";
+
+async function checkHealth(rpcUrl: string): Promise<RpcStatus> {
+  if (!rpcUrl) return "offline";
+  try {
+    const res = await fetch(rpcUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getHealth", params: {} }),
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) return "offline";
+    const data = await res.json();
+    const s: string = data?.result?.status ?? "";
+    if (s === "healthy") return "healthy";
+    if (s === "degraded") return "degraded";
+    return "degraded";
+  } catch {
+    return "offline";
+  }
+}
+
+/**
+ * NetworkStatus
+ *
+ * Renders an RPC health indicator (●) in the navbar showing healthy /
+ * degraded / offline status for the active network's Soroban RPC. The
+ * network itself is shown and switched by `NetworkSelector`.
+>>>>>>> upstream/main
  *
  * When the RPC is offline a dismissible banner is also shown at the top of the
  * page.
@@ -67,8 +103,16 @@ export default function NetworkStatus() {
   const [browserOffline, setBrowserOffline] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+<<<<<<< HEAD
   const poll = useCallback(async () => {
     const s = await checkHealth();
+=======
+  const { lowBalance, lowBalanceAssets } = useWalletBalance();
+  const { status: wcStatus } = useWalletConnect();
+
+  const poll = useCallback(async () => {
+    const s = await checkHealth(getActiveNetwork().rpcUrl);
+>>>>>>> upstream/main
     setStatus((prev) => {
       if (prev === "offline" && s !== "offline") {
         setJustReconnected(true);
@@ -153,6 +197,39 @@ export default function NetworkStatus() {
       }`
     : "Soroban RPC: checking…";
 
+<<<<<<< HEAD
+=======
+  // ── WalletConnect connection indicator styles ───────────────────────────────
+
+  const wcConnected = wcStatus === "connected";
+  const wcPending = wcStatus === "connecting" || wcStatus === "pairing";
+
+  const wcDotColor = wcConnected
+    ? "bg-blue-400"
+    : wcPending
+    ? "bg-blue-400 animate-pulse"
+    : wcStatus === "error" || wcStatus === "disconnected"
+    ? "bg-gray-500"
+    : "bg-gray-400";
+
+  const wcLabel = wcConnected
+    ? "Wallet connected"
+    : wcPending
+    ? "Connecting…"
+    : wcStatus === "error"
+    ? "Wallet error"
+    : "Wallet disconnected";
+
+  const wcTooltip = `WalletConnect: ${wcLabel}`;
+
+  // ── Low balance warning styles ──────────────────────────────────────────────
+
+  const lowBalanceTooltip =
+    lowBalanceAssets && lowBalanceAssets.length > 0
+      ? `Low balance: ${lowBalanceAssets.join(", ")}`
+      : "One or more token balances are low";
+
+>>>>>>> upstream/main
   // ── Network badge styles ─────────────────────────────────────────────────────
 
   const networkBadgeClasses =
@@ -184,9 +261,13 @@ export default function NetworkStatus() {
             {browserOffline
               ? "You are offline — transactions may fail"
               : "Network issues detected — transactions may fail"}
+<<<<<<< HEAD
             {NETWORK !== "Unknown" && (
               <span className="ml-1 opacity-75">({NETWORK})</span>
             )}
+=======
+            <span className="ml-1 opacity-75">({getActiveNetwork().label})</span>
+>>>>>>> upstream/main
           </span>
           <button
             type="button"
@@ -209,8 +290,34 @@ export default function NetworkStatus() {
         </div>
       )}
 
+<<<<<<< HEAD
       {/* ── Network badge + RPC health ── */}
       <div className="flex items-center gap-2">
+=======
+      {/* ── Network badge + RPC health + WalletConnect + low balance ── */}
+      <div className="flex items-center gap-2">
+        {/* Low balance warning badge */}
+        {lowBalance && (
+          <div className="group relative">
+            <span
+              className="inline-flex items-center gap-1 rounded-full border border-orange-500/40 bg-orange-500/15 px-2 py-0.5 text-xs font-semibold tracking-wide text-orange-300 select-none"
+              role="status"
+              aria-label="Low balance warning"
+            >
+              <span aria-hidden="true">⚠️</span>
+              <span className="hidden sm:inline">Low balance</span>
+            </span>
+            {/* Tooltip */}
+            <span
+              role="tooltip"
+              className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 hidden group-hover:block whitespace-nowrap rounded bg-gray-900 border border-gray-700 px-2 py-1 text-xs text-gray-200 shadow-lg"
+            >
+              {lowBalanceTooltip}
+            </span>
+          </div>
+        )}
+
+>>>>>>> upstream/main
         {/* Permanent Mainnet / Testnet badge */}
         <div className="group relative">
           <span
@@ -244,6 +351,25 @@ export default function NetworkStatus() {
             {rpcTooltip}
           </span>
         </div>
+<<<<<<< HEAD
+=======
+
+        {/* WalletConnect connection dot */}
+        <div className="group relative flex items-center gap-1.5 cursor-default select-none">
+          <span
+            className={`inline-block w-2 h-2 rounded-full shrink-0 ${wcDotColor}`}
+            aria-hidden="true"
+          />
+          <span className="text-xs text-gray-400 hidden sm:inline">{wcLabel}</span>
+          {/* Tooltip */}
+          <span
+            role="tooltip"
+            className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 hidden group-hover:block whitespace-nowrap rounded bg-gray-900 border border-gray-700 px-2 py-1 text-xs text-gray-200 shadow-lg"
+          >
+            {wcTooltip}
+          </span>
+        </div>
+>>>>>>> upstream/main
       </div>
     </>
   );

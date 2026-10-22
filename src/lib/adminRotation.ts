@@ -1,8 +1,15 @@
 import { NETWORK_PASSPHRASE } from "./freighter";
 import { getSplitClient } from "./stellar";
+<<<<<<< HEAD
 
 const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL ?? "https://soroban-testnet.stellar.org";
 const CONTRACT_ID = process.env.NEXT_PUBLIC_CONTRACT_ID ?? "";
+=======
+import { getActiveNetwork } from "@/lib/networks";
+
+const RPC_URL = getActiveNetwork().rpcUrl;
+const CONTRACT_ID = getActiveNetwork().contractId;
+>>>>>>> upstream/main
 
 export interface PendingAdminInfo {
   newAdmin: string;

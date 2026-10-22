@@ -2,6 +2,35 @@ import { NextRequest, NextResponse } from "next/server";
 import { buildCSP, CSP_NONCE_HEADER } from "@/lib/csp";
 
 /**
+<<<<<<< HEAD
+=======
+ * Reads analytics/backup configuration from environment so that no
+ * third-party domains are hardcoded into the CSP. When analytics is
+ * disabled (the default), the policy stays strict and no extra origins
+ * are allowed.
+ */
+function getAnalyticsOrigins(): string[] {
+  if (process.env.ANALYTICS_ENABLED !== "true") {
+    return [];
+  }
+  return (process.env.ANALYTICS_ENDPOINT_ORIGINS ?? "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+}
+
+function getBackupWebhookOrigins(): string[] {
+  if (process.env.BACKUP_ALERTS_ENABLED !== "true") {
+    return [];
+  }
+  return (process.env.BACKUP_WEBHOOK_ORIGINS ?? "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+}
+
+/**
+>>>>>>> upstream/main
  * Generates a fresh CSP nonce per request and forwards it two ways:
  *  - as a request header, so Server Components can read it via next/headers
  *    and stamp it onto any inline <script>/<style> tags they render
@@ -12,7 +41,20 @@ import { buildCSP, CSP_NONCE_HEADER } from "@/lib/csp";
 export function middleware(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const isEmbed = request.nextUrl.pathname.startsWith("/embed/");
+<<<<<<< HEAD
   const csp = buildCSP(nonce, { allowFraming: isEmbed });
+=======
+
+  const connectSrc = [
+    ...getAnalyticsOrigins(),
+    ...getBackupWebhookOrigins(),
+  ];
+
+  const csp = buildCSP(nonce, {
+    allowFraming: isEmbed,
+    connectSrc: connectSrc.length > 0 ? connectSrc : undefined,
+  });
+>>>>>>> upstream/main
 
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set(CSP_NONCE_HEADER, nonce);
@@ -32,7 +74,21 @@ export const config = {
      * Skip static assets and image optimization files — they carry no
      * inline scripts and re-running CSP generation for every asset request
      * is pure overhead.
+<<<<<<< HEAD
      */
     "/((?!_next/static|_next/image|favicon.ico|icons/|manifest.json|sw.js).*)",
   ],
 };
+=======
+     *
+     * Also skip the interactive API documentation route (/api-docs) and the
+     * static OpenAPI spec (/openapi.json, /openapi.yaml). Swagger UI ships its
+     * own bundled scripts/styles and the spec is a static JSON/YAML document,
+     * so neither needs a per-request CSP nonce. Excluding them lets the
+     * Swagger UI assets load correctly while CSP protections remain in place
+     * for the rest of the app.
+     */
+    "/((?!_next/static|_next/image|favicon.ico|icons/|manifest.json|sw.js|api-docs|openapi\\.(?:json|yaml|yml)).*)",
+  ],
+};
+>>>>>>> upstream/main

@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { useWalletStore } from "@/lib/stores/walletStore";
 import { useInvoiceStore } from "@/lib/stores/invoiceStore";
 import { useUIStore } from "@/lib/stores/uiStore";
+<<<<<<< HEAD
 import type { Invoice } from "@stellar-split/sdk";
 
 const mockInvoice: Invoice = {
@@ -14,6 +15,11 @@ const mockInvoice: Invoice = {
   status: "Pending",
   payments: [],
 };
+=======
+import { createMockInvoice } from "@/test/factories";
+
+const mockInvoice = createMockInvoice();
+>>>>>>> upstream/main
 
 beforeEach(() => {
   useWalletStore.setState({

@@ -1,6 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+<<<<<<< HEAD
+=======
+import { getActiveNetwork } from "@/lib/networks";
+>>>>>>> upstream/main
 
 interface Props {
   invoiceId: string;
@@ -9,9 +13,13 @@ interface Props {
 }
 
 const STELLAR_EXPERT_BASE =
+<<<<<<< HEAD
   process.env.NEXT_PUBLIC_STELLAR_NETWORK === "mainnet"
     ? "https://stellar.expert/explorer/public/tx"
     : "https://stellar.expert/explorer/testnet/tx";
+=======
+  getActiveNetwork().explorerTxBase;
+>>>>>>> upstream/main
 
 export default function SuccessAnimation({ invoiceId, txHash, onDismiss }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);

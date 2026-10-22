@@ -3,6 +3,14 @@
 import { useState, useEffect, useCallback } from "react";
 import { getReminders, type Reminder } from "@/lib/reminders";
 import { getSnoozeState, snoozeInvoice, type SnoozeOption } from "@/lib/expirySnooze";
+<<<<<<< HEAD
+=======
+import {
+  isReminderSuppressed,
+  dispatchReminder,
+  recordReminderEvent,
+} from "@/lib/reminderEngine";
+>>>>>>> upstream/main
 
 const CHECK_INTERVAL_MS = 60_000;
 
@@ -12,6 +20,7 @@ const SNOOZE_OPTIONS: { option: SnoozeOption; label: string }[] = [
   { option: "3d", label: "3 days" },
 ];
 
+<<<<<<< HEAD
 async function fireNotification(reminder: Reminder) {
   if (!("Notification" in window)) return;
   const show = () =>
@@ -24,6 +33,12 @@ async function fireNotification(reminder: Reminder) {
   } else if (Notification.permission === "default") {
     const permission = await Notification.requestPermission();
     if (permission === "granted") show();
+=======
+async function deliverReminder(reminder: Reminder) {
+  const delivered = await dispatchReminder(reminder);
+  if (delivered) {
+    recordReminderEvent(reminder.invoiceId, "sent");
+>>>>>>> upstream/main
   }
 }
 
@@ -38,11 +53,22 @@ export default function ReminderChecker() {
   const checkReminders = useCallback(() => {
     const now = new Date();
     const due = getReminders().filter(
+<<<<<<< HEAD
       (r) => new Date(r.reminderDate) <= now && !getSnoozeState(r.invoiceId)
     );
     setDueReminders((prev) => {
       const newlyDue = due.filter((r) => !prev.some((p) => p.invoiceId === r.invoiceId));
       newlyDue.forEach(fireNotification);
+=======
+      (r) =>
+        new Date(r.reminderDate) <= now &&
+        !getSnoozeState(r.invoiceId) &&
+        !isReminderSuppressed(r.invoiceId)
+    );
+    setDueReminders((prev) => {
+      const newlyDue = due.filter((r) => !prev.some((p) => p.invoiceId === r.invoiceId));
+      newlyDue.forEach(deliverReminder);
+>>>>>>> upstream/main
       return due;
     });
   }, []);
@@ -59,6 +85,13 @@ export default function ReminderChecker() {
     setDueReminders((prev) => prev.filter((r) => r.invoiceId !== invoiceId));
   };
 
+<<<<<<< HEAD
+=======
+  const handleOpen = (invoiceId: string) => {
+    recordReminderEvent(invoiceId, "opened");
+  };
+
+>>>>>>> upstream/main
   if (dueReminders.length === 0) return null;
 
   return (
@@ -66,6 +99,10 @@ export default function ReminderChecker() {
       {dueReminders.map((reminder) => (
         <div
           key={reminder.invoiceId}
+<<<<<<< HEAD
+=======
+          onClick={() => handleOpen(reminder.invoiceId)}
+>>>>>>> upstream/main
           className="bg-gray-900 border border-gray-700 rounded-lg p-3 shadow-lg flex items-start justify-between gap-3"
         >
           <div className="text-sm text-gray-200">

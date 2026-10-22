@@ -7,7 +7,14 @@ import { splitClient } from "@/lib/stellar";
 import { getFreighterPublicKey } from "@/lib/freighter";
 import { generateCsv, type CsvRow } from "@/lib/csvExport";
 import type { Invoice } from "@stellar-split/sdk";
+<<<<<<< HEAD
 import ReconciliationReport from "@/components/analytics/ReconciliationReport";
+=======
+import ChartBuilder, { type ChartBuilderDataPoint } from "@/components/analytics/ChartBuilder";
+import AnalyticsPanel from "@/components/subscriptions/AnalyticsPanel";
+import DataQualityPanel from "@/components/DataQualityPanel";
+import { loadSubscriptions, type Subscription } from "@/lib/subscriptions";
+>>>>>>> upstream/main
 
 const STROOPS = 10_000_000;
 
@@ -119,6 +126,13 @@ export default function AnalyticsPage() {
   const [error, setError] = useState<string | null>(null);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+<<<<<<< HEAD
+=======
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+  const [activeTab, setActiveTab] = useState<"invoices" | "subscriptions">(
+    "invoices"
+  );
+>>>>>>> upstream/main
 
   useEffect(() => {
     getFreighterPublicKey()
@@ -155,6 +169,20 @@ export default function AnalyticsPage() {
     fetchInvoices();
   }, [publicKey]);
 
+<<<<<<< HEAD
+=======
+  useEffect(() => {
+    if (!publicKey) return;
+    try {
+      setSubscriptions(loadSubscriptions(publicKey));
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to load subscriptions"
+      );
+    }
+  }, [publicKey]);
+
+>>>>>>> upstream/main
   const filtered = useMemo(() => {
     return invoices.filter((inv) => {
       const ts = inv.createdAt ?? inv.deadline - 7 * 86400;
@@ -270,6 +298,29 @@ export default function AnalyticsPage() {
       .sort((a, b) => b.total - a.total)
       .slice(0, 10);
 
+<<<<<<< HEAD
+=======
+    // Build per-week data points for ChartBuilder
+    const chartBuilderData: ChartBuilderDataPoint[] = weekKeys.map((k) => {
+      const weekInvoices = filtered.filter((inv) => {
+        const ts = inv.createdAt ?? inv.deadline - 7 * 86400;
+        return weekKey(ts) === k;
+      });
+      const weekReleased = weekInvoices.filter((i) => i.status === "Released");
+      const weekTimes: number[] = weekReleased.map((inv) => {
+        const created = inv.createdAt ?? inv.deadline - 7 * 86400;
+        return (inv.deadline - created) / 3600;
+      });
+      return {
+        label: weekLabel(k),
+        amount: parseFloat((weekMap.get(k) ?? 0).toFixed(2)),
+        count: weekInvoices.length,
+        successRate: weekInvoices.length > 0 ? parseFloat(((weekReleased.length / weekInvoices.length) * 100).toFixed(1)) : 0,
+        avgFundingHours: weekTimes.length > 0 ? parseFloat((weekTimes.reduce((a, b) => a + b, 0) / weekTimes.length).toFixed(1)) : 0,
+      };
+    });
+
+>>>>>>> upstream/main
     return {
       total,
       totalRaised,
@@ -281,6 +332,10 @@ export default function AnalyticsPage() {
       uniquePayersOverTime,
       histogramBins,
       topPayers,
+<<<<<<< HEAD
+=======
+      chartBuilderData,
+>>>>>>> upstream/main
     };
   }, [filtered]);
 
@@ -376,6 +431,41 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
+<<<<<<< HEAD
+=======
+        <div className="flex gap-1 mb-6 border-b border-gray-800">
+          <button
+            type="button"
+            onClick={() => setActiveTab("invoices")}
+            className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
+              activeTab === "invoices"
+                ? "border-indigo-500 text-white"
+                : "border-transparent text-gray-400 hover:text-gray-200"
+            }`}
+          >
+            Invoices
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("subscriptions")}
+            className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
+              activeTab === "subscriptions"
+                ? "border-indigo-500 text-white"
+                : "border-transparent text-gray-400 hover:text-gray-200"
+            }`}
+          >
+            Subscriptions
+          </button>
+        </div>
+
+        {activeTab === "subscriptions" ? (
+          <div className="mb-8">
+            <AnalyticsPanel subscriptions={subscriptions} />
+          </div>
+        ) : (
+          <>
+          <DataQualityPanel invoices={filtered} />
+>>>>>>> upstream/main
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <KpiCard
             label="Total Raised"
@@ -439,6 +529,13 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
+<<<<<<< HEAD
+=======
+        <div className="mb-8">
+          <ChartBuilder data={stats.chartBuilderData} />
+        </div>
+
+>>>>>>> upstream/main
         <div className="bg-gray-900 rounded-xl border border-gray-800 p-5 mb-8">
           <h2 className="text-sm font-semibold text-gray-300 mb-4 uppercase tracking-wider">
             Top Invoices by Volume
@@ -479,10 +576,15 @@ export default function AnalyticsPage() {
             </div>
           )}
         </div>
+<<<<<<< HEAD
 
           <div className="mb-8">
             <ReconciliationReport />
           </div>
+=======
+          </>
+        )}
+>>>>>>> upstream/main
 
         <Link
           href="/dashboard"

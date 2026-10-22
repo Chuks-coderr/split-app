@@ -5,6 +5,11 @@
  * (same user) never collide.
  */
 import { openDB, type DBSchema, type IDBPDatabase } from "idb";
+<<<<<<< HEAD
+=======
+import type { SplitMeta } from "@/hooks/useSplitCalculator";
+import type { InstallmentMilestone } from "@/components/invoice/InstallmentPlanBuilder";
+>>>>>>> upstream/main
 
 export interface RecipientRowData {
   address: string;
@@ -17,6 +22,20 @@ export interface DraftFormData {
   deadlineDays: number;
   recurring: boolean;
   intervalDays: 7 | 30;
+<<<<<<< HEAD
+=======
+  // Wizard fields below were added after the original schema, so drafts
+  // saved by older builds may not have them.
+  /** Zero-based wizard step the user was on when the draft was saved. */
+  step?: number;
+  equalSplit?: boolean;
+  totalAmount?: string;
+  tags?: string[];
+  splitMeta?: SplitMeta | null;
+  installments?: InstallmentMilestone[];
+  cosigners?: string[];
+  cosignerThreshold?: number;
+>>>>>>> upstream/main
 }
 
 export interface StoredDraft {

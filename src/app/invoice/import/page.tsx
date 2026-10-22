@@ -9,6 +9,16 @@ import {
   type ValidationResult,
   validateRows,
 } from "@/lib/bulkImporter";
+<<<<<<< HEAD
+=======
+import {
+  getInvoiceOcrAnalytics,
+  recognizeInvoiceFields,
+  recordInvoiceOcrReview,
+  type InvoiceOcrField,
+  type InvoiceOcrFields,
+} from "@/lib/invoiceOcr";
+>>>>>>> upstream/main
 
 // ---------------------------------------------------------------------------
 // Types
@@ -94,6 +104,49 @@ export default function ImportInvoicesPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string[] | null>(null);
+<<<<<<< HEAD
+=======
+  const [ocrFields, setOcrFields] = useState<InvoiceOcrFields | null>(null);
+  const [ocrConfidence, setOcrConfidence] = useState<Record<InvoiceOcrField, number> | null>(null);
+  const [ocrText, setOcrText] = useState<string | null>(null);
+  const [ocrProgress, setOcrProgress] = useState<string | null>(null);
+  const [ocrAnalytics, setOcrAnalytics] = useState(getInvoiceOcrAnalytics);
+
+  const handleImageFile = useCallback(async (image: File) => {
+    const imageUrl = URL.createObjectURL(image);
+    setError(null);
+    setSuccess(null);
+    setOcrProgress("Loading OCR engine...");
+    setOcrFields(null);
+    setParsed([]);
+    setResults([]);
+    try {
+      const { createWorker } = await import("tesseract.js");
+      const worker = await createWorker("eng", 1, {
+        logger: (event) => setOcrProgress(`${event.status}${event.progress ? ` ${Math.round(event.progress * 100)}%` : ""}`),
+      });
+      try {
+        const { data } = await worker.recognize(imageUrl);
+        const extraction = recognizeInvoiceFields(data.text, data.confidence);
+        const rows: InvoiceRow[] = [{ ...extraction.fields }];
+        setParsed(rows);
+        setResults(validateRows(rows));
+        setExcluded(new Set());
+        setOcrFields(extraction.fields);
+        setOcrConfidence(extraction.confidence);
+        setOcrText(extraction.text);
+        setOcrProgress(null);
+      } finally {
+        await worker.terminate();
+      }
+    } catch (err) {
+      setOcrProgress(null);
+      setError(err instanceof Error ? err.message : "Could not extract invoice text from this image.");
+    } finally {
+      URL.revokeObjectURL(imageUrl);
+    }
+  }, []);
+>>>>>>> upstream/main
 
   // ── File upload ────────────────────────────────────────────────────────────
 
@@ -106,6 +159,17 @@ export default function ImportInvoicesPage() {
       setError(null);
       setSuccess(null);
       setExcluded(new Set());
+<<<<<<< HEAD
+=======
+      setOcrFields(null);
+      setOcrConfidence(null);
+      setOcrText(null);
+
+      if (f.type.startsWith("image/")) {
+        void handleImageFile(f);
+        return;
+      }
+>>>>>>> upstream/main
 
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -129,9 +193,23 @@ export default function ImportInvoicesPage() {
       };
       reader.readAsText(f);
     },
+<<<<<<< HEAD
     []
   );
 
+=======
+    [handleImageFile]
+  );
+
+  const updateParsedField = useCallback((index: number, field: InvoiceOcrField, value: string) => {
+    setParsed((current) => {
+      const updated = current.map((row, rowIndex) => rowIndex === index ? { ...row, [field]: value } : row);
+      setResults(validateRows(updated));
+      return updated;
+    });
+  }, []);
+
+>>>>>>> upstream/main
   // ── Checkbox toggle ────────────────────────────────────────────────────────
 
   const toggleExclude = useCallback((idx: number) => {
@@ -182,10 +260,23 @@ export default function ImportInvoicesPage() {
       }
 
       setSuccess(invoiceIds);
+<<<<<<< HEAD
+=======
+      if (ocrFields && includableRows[0]) {
+        recordInvoiceOcrReview(ocrFields, includableRows[0]);
+        setOcrAnalytics(getInvoiceOcrAnalytics());
+      }
+>>>>>>> upstream/main
       setParsed([]);
       setResults([]);
       setExcluded(new Set());
       setFile(null);
+<<<<<<< HEAD
+=======
+      setOcrFields(null);
+      setOcrConfidence(null);
+      setOcrText(null);
+>>>>>>> upstream/main
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to create invoices"
@@ -210,22 +301,41 @@ export default function ImportInvoicesPage() {
       <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl font-bold mb-2">Import Invoices</h1>
         <p className="text-gray-500 text-sm mb-8">
+<<<<<<< HEAD
           Upload a CSV file to bulk-create invoices. Review and fix (or exclude)
           any invalid rows before importing.
+=======
+          Upload a CSV to bulk-create invoices or an image to extract invoice fields. Review and correct values before importing.
+>>>>>>> upstream/main
         </p>
 
         {/* ── Upload card ── */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <label className="block text-sm font-semibold mb-2">
+<<<<<<< HEAD
             Upload CSV File
+=======
+            Upload CSV or invoice image
+>>>>>>> upstream/main
           </label>
           <input
             id="csv-file-input"
             type="file"
+<<<<<<< HEAD
             accept=".csv"
             onChange={handleFileChange}
             className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
           />
+=======
+            accept=".csv,image/png,image/jpeg,image/webp"
+            onChange={handleFileChange}
+            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          />
+          {ocrProgress && <p role="status" className="mt-3 text-sm text-blue-700">{ocrProgress}</p>}
+          <p className="mt-2 text-xs text-gray-400">
+            OCR analytics: {ocrAnalytics.extractions} reviewed, {ocrAnalytics.reviewedFields - ocrAnalytics.correctedFields} unchanged of {ocrAnalytics.reviewedFields} fields.
+          </p>
+>>>>>>> upstream/main
           <p className="text-xs text-gray-400 mt-2">
             Expected columns:{" "}
             <code className="bg-gray-100 px-1 rounded">recipient_address</code>
@@ -286,6 +396,11 @@ export default function ImportInvoicesPage() {
             </div>
 
             <div className="overflow-x-auto">
+<<<<<<< HEAD
+=======
+              {ocrConfidence && <p className="mb-3 text-xs text-gray-600">Estimated OCR confidence: recipient {ocrConfidence.recipient_address}%, amount {ocrConfidence.amount}%, deadline {ocrConfidence.deadline_days}%, token {ocrConfidence.token}%.</p>}
+              {ocrText && <details className="mb-3 text-xs text-gray-500"><summary className="cursor-pointer">Show recognized text</summary><pre className="mt-2 whitespace-pre-wrap">{ocrText}</pre></details>}
+>>>>>>> upstream/main
               <table className="w-full text-sm border-collapse">
                 <thead>
                   <tr className="bg-gray-100 text-left">
@@ -334,6 +449,7 @@ export default function ImportInvoicesPage() {
                         </td>
 
                         {/* Data cells */}
+<<<<<<< HEAD
                         <td
                           className={`px-3 py-2 font-mono text-xs truncate max-w-[160px] ${
                             isExcluded ? "text-gray-400 line-through" : ""
@@ -367,6 +483,12 @@ export default function ImportInvoicesPage() {
                         >
                           {row.token}
                         </td>
+=======
+                        <td className="px-3 py-2"><input aria-label={`Recipient address row ${idx + 1}`} value={row.recipient_address} onChange={(event) => updateParsedField(idx, "recipient_address", event.target.value)} className="w-44 rounded border border-gray-300 px-2 py-1 font-mono text-xs" /></td>
+                        <td className="px-3 py-2"><input aria-label={`Amount row ${idx + 1}`} value={row.amount} onChange={(event) => updateParsedField(idx, "amount", event.target.value)} className="w-24 rounded border border-gray-300 px-2 py-1" /></td>
+                        <td className="px-3 py-2"><input aria-label={`Deadline days row ${idx + 1}`} value={row.deadline_days} onChange={(event) => updateParsedField(idx, "deadline_days", event.target.value)} className="w-20 rounded border border-gray-300 px-2 py-1" /></td>
+                        <td className="px-3 py-2"><input aria-label={`Token row ${idx + 1}`} value={row.token} onChange={(event) => updateParsedField(idx, "token", event.target.value)} className="w-20 rounded border border-gray-300 px-2 py-1" /></td>
+>>>>>>> upstream/main
 
                         {/* Status */}
                         <td className="px-3 py-2">

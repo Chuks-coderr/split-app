@@ -6,8 +6,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { getFreighterPublicKey } from "@/lib/freighter";
 import {
   ALLOWED_LOGO_MIME_TYPES,
+<<<<<<< HEAD
   brandSettingsSchema,
   DEFAULT_ACCENT_COLOR,
+=======
+  BRAND_FONT_OPTIONS,
+  brandSettingsSchema,
+  DEFAULT_ACCENT_COLOR,
+  getBrandFontCssFamily,
+>>>>>>> upstream/main
   isAllowedLogoMimeType,
   isLogoSizeOk,
   LOGO_SIZE_ERROR,
@@ -25,7 +32,11 @@ import {
   uploadBrandLogo,
 } from "@/lib/branding";
 
+<<<<<<< HEAD
 const EMPTY_VALUES = { logoUrl: "", accentColor: "", tagline: "" } as const;
+=======
+const EMPTY_VALUES = { logoUrl: "", accentColor: "", tagline: "", fontFamily: "" } as const;
+>>>>>>> upstream/main
 
 const MAX_LOGO_MB = MAX_LOGO_BYTES / (1024 * 1024);
 
@@ -72,6 +83,10 @@ export default function BrandingForm() {
           logoUrl: settings.logoUrl ?? "",
           accentColor: settings.accentColor ?? "",
           tagline: settings.tagline ?? "",
+<<<<<<< HEAD
+=======
+          fontFamily: settings.fontFamily ?? "",
+>>>>>>> upstream/main
         });
       })
       .catch(() => {
@@ -88,6 +103,11 @@ export default function BrandingForm() {
   const logoUrl = watch("logoUrl") ?? "";
   const accentColor = watch("accentColor") ?? "";
   const tagline = watch("tagline") ?? "";
+<<<<<<< HEAD
+=======
+  const fontFamily = watch("fontFamily") ?? "";
+  const previewFontFamily = getBrandFontCssFamily(fontFamily || null);
+>>>>>>> upstream/main
 
   // Real-time contrast feedback: warn inline as soon as the typed/picked
   // color fails WCAG AA against white — before the user even hits save.
@@ -140,11 +160,19 @@ export default function BrandingForm() {
         logoUrl: data.logoUrl ?? null,
         accentColor: data.accentColor ?? null,
         tagline: data.tagline ?? null,
+<<<<<<< HEAD
+=======
+        fontFamily: data.fontFamily ?? null,
+>>>>>>> upstream/main
       });
       reset({
         logoUrl: saved.logoUrl ?? "",
         accentColor: saved.accentColor ?? "",
         tagline: saved.tagline ?? "",
+<<<<<<< HEAD
+=======
+        fontFamily: saved.fontFamily ?? "",
+>>>>>>> upstream/main
       });
       setFeedback({ kind: "success", text: "Branding saved — it now applies to all of your invoices." });
     } catch (err) {
@@ -201,7 +229,17 @@ export default function BrandingForm() {
           {logoUrl ? (
             <div className="flex items-center gap-3 rounded-lg border border-gray-700 bg-white/95 px-3 py-2">
               {/* eslint-disable-next-line @next/next/no-img-element -- user-supplied CDN URL */}
+<<<<<<< HEAD
               <img src={logoUrl} alt="Your logo" className="h-10 w-auto max-w-[160px] object-contain" />
+=======
+              <img
+                src={logoUrl}
+                alt="Your logo"
+                loading="lazy"
+                decoding="async"
+                className="h-10 w-auto max-w-[160px] object-contain"
+              />
+>>>>>>> upstream/main
             </div>
           ) : (
             <div className="flex h-14 w-24 items-center justify-center rounded-lg border border-dashed border-gray-600 text-xs text-gray-500">
@@ -341,16 +379,61 @@ export default function BrandingForm() {
         </div>
       </section>
 
+<<<<<<< HEAD
+=======
+      {/* ── Font ─────────────────────────────────────────────────────────── */}
+      <section aria-labelledby="branding-font-heading">
+        <h2 id="branding-font-heading" className="text-lg font-semibold mb-1">
+          Invoice font
+        </h2>
+        <p className="text-sm text-gray-400 mb-4">
+          Applied to your invoice page preview and exported PDFs.
+        </p>
+        <select
+          aria-label="Invoice font"
+          value={fontFamily}
+          onChange={(e) => setValue("fontFamily", e.target.value, { shouldDirty: true, shouldValidate: true })}
+          className="w-full max-w-xs rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        >
+          <option value="">Platform default</option>
+          {BRAND_FONT_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+        {errors.fontFamily && (
+          <p role="alert" className="mt-3 text-sm text-red-400">
+            {errors.fontFamily.message}
+          </p>
+        )}
+      </section>
+
+>>>>>>> upstream/main
       {/* ── Live preview ─────────────────────────────────────────────────── */}
       <section aria-labelledby="branding-preview-heading" aria-live="polite">
         <h2 id="branding-preview-heading" className="text-lg font-semibold mb-3">
           Invoice preview
         </h2>
+<<<<<<< HEAD
         <div className="rounded-xl bg-white p-5 text-gray-900 shadow-lg">
           <div className="flex items-center gap-3">
             {logoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element -- user-supplied CDN URL
               <img src={logoUrl} alt="Logo preview" className="h-10 w-auto max-w-[140px] object-contain" />
+=======
+        <div className="rounded-xl bg-white p-5 text-gray-900 shadow-lg" style={{ fontFamily: previewFontFamily }}>
+          <div className="flex items-center gap-3">
+            {logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element -- user-supplied CDN URL
+              <img
+                src={logoUrl}
+                alt="Logo preview"
+                loading="lazy"
+                decoding="async"
+                className="h-10 w-auto max-w-[140px] object-contain"
+              />
+>>>>>>> upstream/main
             ) : (
               <span aria-hidden="true" className="text-2xl" style={{ color: previewAccent }}>
                 ✦

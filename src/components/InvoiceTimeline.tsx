@@ -4,6 +4,10 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import WalletAddress from './WalletAddress';
 import RelativeTime from '@/components/ui/RelativeTime';
 import { splitClient as _splitClient } from '@/lib/stellar';
+<<<<<<< HEAD
+=======
+import { getActiveNetwork } from "@/lib/networks";
+>>>>>>> upstream/main
 
 export interface InvoiceEvent {
   type:
@@ -15,11 +19,26 @@ export interface InvoiceEvent {
     | 'DisputeRaised'
     | 'DisputeResolved'
     | 'Frozen'
+<<<<<<< HEAD
     | 'Archived';
+=======
+    | 'Archived'
+    | 'Amended'
+    | 'VersionRestored';
+>>>>>>> upstream/main
   description: string;
   actor?: string;
   timestamp: number; // unix seconds
   txHash?: string;
+<<<<<<< HEAD
+=======
+  /** Version number produced by this event, if applicable. */
+  version?: number;
+  /** Human-readable reason supplied for an amendment. */
+  amendmentReason?: string;
+  /** Optional free-form comment accompanying an amendment. */
+  amendmentComment?: string;
+>>>>>>> upstream/main
 }
 
 interface Props {
@@ -27,9 +46,13 @@ interface Props {
 }
 
 const STELLAR_EXPERT_BASE =
+<<<<<<< HEAD
   process.env.NEXT_PUBLIC_STELLAR_NETWORK === 'mainnet'
     ? 'https://stellar.expert/explorer/public/tx'
     : 'https://stellar.expert/explorer/testnet/tx';
+=======
+  getActiveNetwork().explorerTxBase;
+>>>>>>> upstream/main
 
 const EVENT_META: Record<
   InvoiceEvent['type'],
@@ -44,6 +67,11 @@ const EVENT_META: Record<
   DisputeResolved: { icon: '🤝', color: 'text-green-400', dot: 'bg-green-500' },
   Frozen: { icon: '🧊', color: 'text-orange-400', dot: 'bg-orange-500' },
   Archived: { icon: '📦', color: 'text-gray-400', dot: 'bg-gray-500' },
+<<<<<<< HEAD
+=======
+  Amended: { icon: '✏️', color: 'text-indigo-400', dot: 'bg-indigo-500' },
+  VersionRestored: { icon: '⏪', color: 'text-purple-400', dot: 'bg-purple-500' },
+>>>>>>> upstream/main
 };
 
 async function fetchEvents(invoiceId: string, cursor?: string): Promise<{ events: InvoiceEvent[]; nextCursor?: string }> {
@@ -150,7 +178,16 @@ export default function InvoiceTimeline({ invoiceId }: Props) {
         {events.map((evt, i) => {
           const meta = EVENT_META[evt.type] ?? EVENT_META.Created;
           const isExpanded = expandedIndices.has(i);
+<<<<<<< HEAD
           const hasDetails = evt.actor || evt.txHash;
+=======
+          const hasDetails =
+            evt.actor ||
+            evt.txHash ||
+            evt.version !== undefined ||
+            evt.amendmentReason ||
+            evt.amendmentComment;
+>>>>>>> upstream/main
           return (
             <li key={i} className="pl-6 relative">
               {/* dot */}
@@ -162,9 +199,25 @@ export default function InvoiceTimeline({ invoiceId }: Props) {
                 <span className={`font-medium text-sm ${meta.color}`}>
                   {meta.icon} {evt.type.replace(/([A-Z])/g, ' $1').trim()}
                 </span>
+<<<<<<< HEAD
                 <RelativeTime iso={new Date(evt.timestamp * 1000).toISOString()} className="text-xs text-gray-500 cursor-default" />
               </div>
               <p className="text-xs text-gray-400 mt-0.5">{evt.description}</p>
+=======
+                {evt.version !== undefined && (
+                  <span className="text-xs font-mono text-gray-500 bg-gray-800 border border-gray-700 rounded px-1.5 py-0.5">
+                    v{evt.version}
+                  </span>
+                )}
+                <RelativeTime iso={new Date(evt.timestamp * 1000).toISOString()} className="text-xs text-gray-500 cursor-default" />
+              </div>
+              <p className="text-xs text-gray-400 mt-0.5">{evt.description}</p>
+              {evt.amendmentReason && (
+                <p className="text-xs text-indigo-300 mt-1">
+                  <span className="text-gray-500">Reason:</span> {evt.amendmentReason}
+                </p>
+              )}
+>>>>>>> upstream/main
 
               {hasDetails && (
                 <button
@@ -184,6 +237,14 @@ export default function InvoiceTimeline({ invoiceId }: Props) {
                 }}
                 className={`timeline-details ${isExpanded ? 'expanded' : 'collapsed'}`}
               >
+<<<<<<< HEAD
+=======
+                {evt.amendmentComment && (
+                  <div className="mt-2 text-xs text-gray-400 bg-gray-800/60 border border-gray-700 rounded-lg px-3 py-2 whitespace-pre-wrap">
+                    {evt.amendmentComment}
+                  </div>
+                )}
+>>>>>>> upstream/main
                 {evt.actor && (
                   <div className="mt-2">
                     <WalletAddress address={evt.actor} truncate showCopy />

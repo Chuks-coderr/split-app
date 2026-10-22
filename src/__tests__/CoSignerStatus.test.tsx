@@ -1,5 +1,9 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
+<<<<<<< HEAD
+=======
+import { vi } from "vitest";
+>>>>>>> upstream/main
 import userEvent from "@testing-library/user-event";
 import CoSignerSection from "@/components/invoice/CoSignerSection";
 import type { CoSigner } from "@/hooks/useSplitCalculator";
@@ -58,6 +62,12 @@ describe("CoSignerSection & Co-Signer Status Logic", () => {
     const checkbox = screen.getByLabelText(/Enable co-signer approvals/i);
     fireEvent.click(checkbox);
 
+<<<<<<< HEAD
+=======
+    expect(onChange).toHaveBeenCalledTimes(1); // Enable call
+    onChange.mockClear(); // Reset after enable
+
+>>>>>>> upstream/main
     const input = screen.getByRole("textbox", { name: /Add Co-Signer Stellar Address/i });
     await user.type(input, "InvalidShortKey");
 
@@ -65,7 +75,11 @@ describe("CoSignerSection & Co-Signer Status Logic", () => {
     fireEvent.click(addButton);
 
     expect(screen.getByText(/Invalid Stellar public key/i)).toBeInTheDocument();
+<<<<<<< HEAD
     expect(onChange).not.toHaveBeenCalled();
+=======
+    expect(onChange).toHaveBeenCalledTimes(0); // No call on invalid add
+>>>>>>> upstream/main
   });
 
   it("removes a co-signer and updates threshold appropriately", () => {

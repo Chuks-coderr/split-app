@@ -1,6 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+<<<<<<< HEAD
+=======
+import Link from "next/link";
+>>>>>>> upstream/main
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { splitClient, payWithNonce } from "@/lib/stellar";
@@ -24,6 +28,10 @@ import PaymentMethodSelector from "@/components/PaymentMethodSelector";
 import DeadlineCountdown from "@/components/DeadlineCountdown";
 import CopyLinkButton from "@/components/CopyLinkButton";
 import CopyButton from "@/components/CopyButton";
+<<<<<<< HEAD
+=======
+import AccessCodeGate from "@/components/invoice/AccessCodeGate";
+>>>>>>> upstream/main
 import TxConfirmModal from "@/components/TxConfirmModal";
 import CancelModal from "@/components/CancelModal";
 import AchievementCard from "@/components/AchievementCard";
@@ -75,8 +83,22 @@ import CommentThread from "@/components/invoice/CommentThread";
 import { loadPermissions } from "@/components/CoCreatorPanel";
 import InvoiceTimeline from "@/components/InvoiceTimeline";
 import HistoryLog from "@/components/invoice/HistoryLog";
+<<<<<<< HEAD
 import InvoiceExportButton from "@/components/InvoiceExportButton";
 import ReleaseBanner from "@/components/ReleaseBanner";
+=======
+import AdvancedStatusTimeline from "@/components/invoice/AdvancedStatusTimeline";
+import InvoiceSentiment from "@/components/invoice/InvoiceSentiment";
+import FraudRiskPanel from "@/components/invoice/FraudRiskPanel";
+import PayerWalletHealth from "@/components/invoice/PayerWalletHealth";
+import ReconciliationPanel from "@/components/invoice/ReconciliationPanel";
+import { detectAnomalies } from "@/lib/anomalyDetector";
+import InvoiceExportButton from "@/components/InvoiceExportButton";
+// Only rendered once an invoice transitions to "released", and pulls in the
+// canvas-confetti animation library — load it on demand instead of in the
+// page's initial bundle.
+const ReleaseBanner = dynamic(() => import("@/components/ReleaseBanner"), { ssr: false });
+>>>>>>> upstream/main
 import { cancelReminder, setReminder } from "@/lib/reminders";
 import { recordCooldown } from "@/lib/cooldown";
 import { exportTimelineAsImage } from "@/lib/timelineImageExport";
@@ -494,6 +516,19 @@ export default function InvoiceDetailPage({ params }: Props) {
     : false;
   const canDownloadPDF = isCreator || isContributor;
   const canAct = isCreator || isRecipient;
+<<<<<<< HEAD
+=======
+  const invoicePayerHistory = new Map<string, number>(
+    invoice.payments.map((payment) => [payment.payer, 1] as const),
+  );
+  const anomalyFlags = invoice.payments
+    .flatMap((payment) => detectAnomalies(payment, invoice, invoicePayerHistory))
+    .filter((flag, index, flags) =>
+      flags.findIndex((candidate) =>
+        candidate.type === flag.type && candidate.payer === flag.payer,
+      ) === index,
+    );
+>>>>>>> upstream/main
   const recipientShare = publicKey
     ? invoice.recipients.find((recipient) => recipient.address === publicKey)
     : undefined;
@@ -785,6 +820,7 @@ export default function InvoiceDetailPage({ params }: Props) {
       </section>
       </InvoiceSection>
 
+<<<<<<< HEAD
       {canAct && invoice && (
         <SplitSummaryCard
           totalAmount={Number(total)}
@@ -899,6 +935,107 @@ export default function InvoiceDetailPage({ params }: Props) {
         </div>
       )}
 
+=======
+      {/* Payments */}
+      <section className="mb-8">
+        <h2 className="text-lg font-semibold text-white mb-3">
+          Payments ({invoice.payments.length})
+        </h2>
+        {invoice.payments.length === 0 ? (
+          <p className="text-gray-500 text-sm bg-gray-800/40 border border-gray-700 rounded-xl px-4 py-6 text-center">
+            No payments yet. Be the first to pay!
+          </p>
+        ) : (
+          <div className="bg-gray-800/40 border border-gray-700 rounded-xl overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-700 text-gray-400 text-xs uppercase tracking-wide">
+                  <th className="text-left px-4 py-2 font-medium">Payer</th>
+                  <th className="text-right px-4 py-2 font-medium">Amount</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-700/50">
+                {invoice.payments.map((p, i) => (
+                  <tr key={i} className="hover:bg-gray-700/30 transition-colors">
+                    <td className="px-4 py-2 font-mono text-gray-300 truncate max-w-[200px]" title={p.payer}>
+                      {truncateAddress(p.payer)}
+                    </td>
+                    <td className="px-4 py-2 text-right text-indigo-300 font-medium">
+                      <AmountDisplay amount={p.amount} inline />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+      </InvoiceSection>
+
+      {invoice.status === "Pending" && isRecipient && (
+        <div className="flex flex-col gap-6">
+          {publicKey && (
+            <form onSubmit={handlePay} className="flex flex-col gap-4">
+              <h2 className="text-lg font-semibold">Pay with Freighter</h2>
+              {recipientShare && (
+                <button
+                  type="button"
+                  onClick={() => setPayAmount(formatAmount(recipientShare.amount))}
+                  className="self-start rounded-lg bg-gray-700 px-3 py-1.5 text-sm text-white hover:bg-gray-600"
+                >
+                  Pay my share
+                </button>
+              )}
+              <input
+                type="number"
+                step="0.0000001"
+                min="0.0000001"
+                placeholder="Amount in USDC"
+                value={payAmount}
+                onChange={(e) => setPayAmount(e.target.value)}
+                onFocus={() => setFocusedField("pay-amount-freighter")}
+                onBlur={() => {
+                  if (focusedField === "pay-amount-freighter") {
+                    emitFieldBlur();
+                  }
+                }}
+                required
+                aria-label="Amount in USDC"
+                className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+              <CursorOverlay cursors={remoteCursors} fieldName="pay-amount-freighter" />
+              {error && <p className="text-red-400 text-sm">{error}</p>}
+              {txHash && (
+                <p className="text-green-400 text-sm">
+                  Payment sent! Tx: {txHash.slice(0, 12)}…
+                </p>
+              )}
+              <button
+                type="submit"
+                disabled={paying}
+                className="px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 font-semibold transition-colors disabled:opacity-50"
+              >
+                {paying ? "Sending…" : "Pay"}
+              </button>
+            </form>
+          )}
+
+          {/* ── Divider ───────────────────────────────────────────────── */}
+          <div className="flex items-center gap-3 text-gray-600 text-xs">
+            <div className="flex-1 border-t border-gray-700" />
+            <span>or</span>
+            <div className="flex-1 border-t border-gray-700" />
+          </div>
+
+          {/* ── Option 2: Pay from Another Chain ──────────────────────── */}
+          <CrossChainPayment
+            invoiceId={id}
+            stellarDestination={stellarDestination}
+          />
+        </div>
+      )}
+
+>>>>>>> upstream/main
       {/* Recipients Section */}
       <InvoiceSection
         sectionId="recipients"
@@ -1140,6 +1277,23 @@ export default function InvoiceDetailPage({ params }: Props) {
         />
       )}
 
+<<<<<<< HEAD
+=======
+      {/* Invoice insights: status timeline, sentiment, payer health, reconciliation */}
+      <div className="mb-8 grid grid-cols-1 gap-4">
+        <AdvancedStatusTimeline invoice={invoice} />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <InvoiceSentiment invoice={invoice} />
+          <ReconciliationPanel invoice={invoice} />
+        </div>
+        <FraudRiskPanel
+          invoice={invoice}
+          anomalyFlags={anomalyFlags}
+        />
+        <PayerWalletHealth payments={invoice.payments} />
+      </div>
+
+>>>>>>> upstream/main
       {/* Activity Timeline */}
       <section className="mb-8" aria-labelledby="activity-timeline-heading">
         <HistoryLog invoiceId={id} />
@@ -1210,7 +1364,11 @@ export default function InvoiceDetailPage({ params }: Props) {
       {showCancelModal && (
         <CancelModal
           invoiceId={id}
+<<<<<<< HEAD
           invoiceTitle={(invoice as any).title || loadedSplitMeta?.title || `Invoice #${id}`}
+=======
+          invoiceTitle={(invoice as any).title || `Invoice #${id}`}
+>>>>>>> upstream/main
           payments={invoice.payments}
           onConfirm={async () => {
             await (splitClient as any).cancelInvoice(id);

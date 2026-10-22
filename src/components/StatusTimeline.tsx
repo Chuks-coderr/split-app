@@ -3,6 +3,29 @@
 import type { Invoice } from "@stellar-split/sdk";
 import RelativeTime from "@/components/ui/RelativeTime";
 
+<<<<<<< HEAD
+=======
+export interface MilestoneRecord {
+  id: string;
+  title: string;
+  conditionMet?: boolean;
+  evidenceSubmitted?: boolean;
+  released?: boolean;
+  releasedAt?: number | null;
+  evidenceAt?: number | null;
+  conditionMetAt?: number | null;
+}
+
+export interface DisputeRecord {
+  id: string;
+  status: "Open" | "Evidence" | "Resolved" | "Enforced" | string;
+  openedAt?: number | null;
+  evidenceAt?: number | null;
+  resolvedAt?: number | null;
+  enforcedAt?: number | null;
+}
+
+>>>>>>> upstream/main
 interface TimelineEvent {
   key: string;
   icon: string;
@@ -15,6 +38,162 @@ function truncate(addr: string) {
   return addr.length > 12 ? `${addr.slice(0, 6)}…${addr.slice(-4)}` : addr;
 }
 
+<<<<<<< HEAD
+=======
+function buildEvents(
+  invoice: Invoice,
+  total: bigint,
+  milestones: MilestoneRecord[] = [],
+  disputes: DisputeRecord[] = [],
+): TimelineEvent[] {
+  const events: TimelineEvent[] = [];
+
+  // Created — use deadline as a proxy anchor; SDK Invoice has no createdAt
+  events.push({
+    key: "created",
+    icon: "📄",
+    label: "Invoice Created",
+    timestamp: null,
+    actor: invoice.creator,
+  });
+
+  if (invoice.funded > 0n) {
+    events.push({
+      key: "first-payment",
+      icon: "💳",
+      label: "First Payment",
+      timestamp: null,
+    });
+  }
+
+  const milestone = total > 0n ? (total * 50n) / 100n : 0n;
+  if (invoice.funded >= milestone && milestone > 0n) {
+    events.push({
+      key: "milestone",
+      icon: "🏁",
+      label: "Milestone Reached (50%)",
+      timestamp: null,
+    });
+  }
+
+  if (total > 0n && invoice.funded >= total) {
+    events.push({
+      key: "fully-funded",
+      icon: "✅",
+      label: "Fully Funded",
+      timestamp: null,
+    });
+  }
+
+  // Milestone condition events
+  for (const m of milestones) {
+    if (m.conditionMet) {
+      events.push({
+        key: `milestone-${m.id}-condition`,
+        icon: "🎯",
+        label: `Condition Met: ${m.title}`,
+        timestamp: m.conditionMetAt ?? null,
+      });
+    }
+    if (m.evidenceSubmitted) {
+      events.push({
+        key: `milestone-${m.id}-evidence`,
+        icon: "📎",
+        label: `Evidence Submitted: ${m.title}`,
+        timestamp: m.evidenceAt ?? null,
+      });
+    }
+    if (m.released) {
+      events.push({
+        key: `milestone-${m.id}-released`,
+        icon: "🔓",
+        label: `Milestone Released: ${m.title}`,
+        timestamp: m.releasedAt ?? null,
+      });
+    }
+  }
+
+  // Dispute lifecycle events
+  for (const d of disputes) {
+    events.push({
+      key: `dispute-${d.id}-opened`,
+      icon: "⚠️",
+      label: "Dispute Opened",
+      timestamp: d.openedAt ?? null,
+    });
+    if (d.evidenceAt != null || d.status === "Evidence" || d.status === "Resolved" || d.status === "Enforced") {
+      events.push({
+        key: `dispute-${d.id}-evidence`,
+        icon: "📑",
+        label: "Dispute Evidence Submitted",
+        timestamp: d.evidenceAt ?? null,
+      });
+    }
+    if (d.status === "Resolved" || d.status === "Enforced") {
+      events.push({
+        key: `dispute-${d.id}-resolved`,
+        icon: "⚖️",
+        label: "Dispute Resolved",
+        timestamp: d.resolvedAt ?? null,
+      });
+    }
+    if (d.status === "Enforced") {
+      events.push({
+        key: `dispute-${d.id}-enforced`,
+        icon: "🔒",
+        label: "Resolution Enforced",
+        timestamp: d.enforcedAt ?? null,
+      });
+    }
+  }
+
+  if (invoice.status === "Released") {
+    events.push({
+      key: "released",
+      icon: "🚀",
+      label: "Funds Released",
+      timestamp: null,
+    });
+  }
+
+  const now = Math.floor(Date.now() / 1000);
+  if (invoice.status === "Pending" && invoice.deadline <= now) {
+    events.push({
+      key: "expired",
+      icon: "⏰",
+      label: "Invoice Expired",
+      timestamp: invoice.deadline,
+    });
+  }
+
+  return events;
+}
+
+interface TimelineEvent {
+  key: string;
+  icon: string;
+  label: string;
+  timestamp: number | null;
+  actor?: string;
+}
+
+function relativeTime(ts: number): string {
+  const diff = Math.floor((Date.now() / 1000) - ts);
+  if (diff < 60) return "just now";
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  return `${Math.floor(diff / 86400)}d ago`;
+}
+
+function absoluteTime(ts: number): string {
+  return new Date(ts * 1000).toLocaleString();
+}
+
+function truncate(addr: string) {
+  return addr.length > 12 ? `${addr.slice(0, 6)}…${addr.slice(-4)}` : addr;
+}
+
+>>>>>>> upstream/main
 function buildEvents(invoice: Invoice, total: bigint): TimelineEvent[] {
   const events: TimelineEvent[] = [];
 
@@ -80,13 +259,22 @@ function buildEvents(invoice: Invoice, total: bigint): TimelineEvent[] {
 interface Props {
   invoice: Invoice;
   total: bigint;
+<<<<<<< HEAD
+=======
+  milestones?: MilestoneRecord[];
+  disputes?: DisputeRecord[];
+>>>>>>> upstream/main
 }
 
 export default function StatusTimeline({ invoice, total }: Props) {
   const events = buildEvents(invoice, total);
 
   // ── Mobile: horizontal stepper ─────────────────────────────────────────────
+<<<<<<< HEAD
   const STEPS = ["Created", "Partially Funded", "Funded", "Released / Refunded"] as const;
+=======
+  const STEPS = ["Created", "Partially Funded", "Fully Funded", "Released / Refunded"] as const;
+>>>>>>> upstream/main
 
   function getActiveStep(): number {
     if (invoice.status === "Released" || invoice.status === "Refunded") return 3;
@@ -106,7 +294,11 @@ export default function StatusTimeline({ invoice, total }: Props) {
           const current = i === active;
           const label = i === 3 && invoice.status !== "Pending" ? invoice.status : step;
           return (
+<<<<<<< HEAD
             <div key={step} className={`flex-1 flex flex-col items-center min-w-0 px-1${current ? " text-white font-semibold" : ""}`}>
+=======
+            <div key={step} className="flex-1 flex flex-col items-center min-w-0 px-1">
+>>>>>>> upstream/main
               <div className="flex items-center w-full">
                 {i > 0 && <div className={`flex-1 h-0.5 ${done || current ? "bg-indigo-500" : "bg-gray-700"}`} />}
                 <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 ${done ? "bg-indigo-500 border-indigo-500" : current ? "bg-white border-indigo-400" : "bg-gray-800 border-gray-600"}`} />
@@ -153,8 +345,16 @@ export default function StatusTimeline({ invoice, total }: Props) {
                     </p>
                   )}
                   {ev.timestamp ? (
+<<<<<<< HEAD
                     <p className="text-xs text-gray-500 mt-0.5 cursor-default">
                       <RelativeTime iso={new Date(ev.timestamp * 1000).toISOString()} />
+=======
+                    <p
+                      className="text-xs text-gray-500 mt-0.5 cursor-default"
+                      title={absoluteTime(ev.timestamp)}
+                    >
+                      {relativeTime(ev.timestamp)}
+>>>>>>> upstream/main
                     </p>
                   ) : (
                     <p className="text-xs text-gray-600 mt-0.5 italic">timestamp pending</p>

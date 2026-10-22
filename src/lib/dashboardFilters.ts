@@ -1,9 +1,13 @@
 import type { Invoice } from "@stellar-split/sdk";
 
+<<<<<<< HEAD
 /** Dashboard view model for an invoice. Currently a direct alias of the SDK type. */
 export type DashboardInvoice = Invoice;
 
 export type DashboardPresetId = "all" | "active" | "funded" | "refunded" | "expired" | "draft" | "overdue";
+=======
+export type DashboardPresetId = "all" | "active" | "funded" | "refunded" | "expired" | "draft";
+>>>>>>> upstream/main
 export type DashboardSortId = "newest" | "oldest" | "amount-desc" | "amount-asc" | "deadline";
 
 export const SORT_OPTIONS: { id: DashboardSortId; label: string }[] = [
@@ -67,7 +71,10 @@ export const DASHBOARD_PRESETS: DashboardPresetDefinition[] = [
   { id: "refunded", label: "Refunded", emptyState: "No refunded invoices." },
   { id: "expired",  label: "Expired",  emptyState: "No expired invoices right now." },
   { id: "draft",    label: "Draft",    emptyState: "No draft invoices." },
+<<<<<<< HEAD
   { id: "overdue",  label: "Overdue",  emptyState: "No overdue installments right now." },
+=======
+>>>>>>> upstream/main
 ];
 
 export function matchesDashboardPreset(
@@ -89,12 +96,15 @@ export function matchesDashboardPreset(
       return invoice.status === "Pending" && invoice.deadline <= now;
     case "draft":
       return (invoice as any).status === "Draft";
+<<<<<<< HEAD
     case "overdue":
       if (invoice.status !== "Pending") return false;
       const installments = splitMeta?.installments ?? [];
       return installments.some(
         (m) => m.status !== "paid" && m.dueDate < now
       );
+=======
+>>>>>>> upstream/main
     default:
       return false;
   }

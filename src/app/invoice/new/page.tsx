@@ -1,6 +1,11 @@
 "use client";
 
+<<<<<<< HEAD
 import { useState, useEffect, useCallback, useMemo, Suspense } from "react";
+=======
+import { useState, useEffect, useCallback, useMemo, useRef, Suspense } from "react";
+import { useRegisterShortcuts } from "@/context/ShortcutRegistry";
+>>>>>>> upstream/main
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import Stepper, { type Step } from "@/components/ui/Stepper";
@@ -18,6 +23,7 @@ import { useI18n } from "@/components/I18nProvider";
 import DeadlineSuggester from "@/components/DeadlineSuggester";
 import { validateDeadline } from "@/components/DuplicateModal";
 import { decodeTemplate } from "@/lib/templateSharing";
+<<<<<<< HEAD
 import type { ImportedTxData } from "@/lib/txImport";
 import {
   generateRetroactiveInvoiceId,
@@ -48,6 +54,9 @@ import CursorOverlay from "@/components/CursorOverlay";
 import PresencePill from "@/components/PresencePill";
 import ReconnectionBanner from "@/components/ReconnectionBanner";
 
+=======
+import DraftCollaborationPanel from "@/components/DraftCollaborationPanel";
+>>>>>>> upstream/main
 
 const RecipientForm = dynamic(() => import("@/components/RecipientForm"), { ssr: false });
 const TemplateManager = dynamic(() => import("@/components/TemplateManager"), { ssr: false });
@@ -84,7 +93,11 @@ function useToasts() {
   return { toasts, addToast };
 }
 
+<<<<<<< HEAD
 const STEPS = ["Basic Info", "Recipients", "Options", "Review & Submit"];
+=======
+const STEPS = WIZARD_STEPS.map((s) => s.label);
+>>>>>>> upstream/main
 
 /** Clamp an arbitrary `?step=` value onto a real step index. */
 function parseStep(raw: string | null): number {
@@ -156,6 +169,11 @@ function NewInvoiceForm() {
 
   const fromId = searchParams.get("from");
   const deadlineParam = searchParams.get("deadline");
+<<<<<<< HEAD
+=======
+  const draftId =
+    searchParams.get("draft") ?? fromId ?? "new-invoice-draft";
+>>>>>>> upstream/main
   const [cloneSourceId, setCloneSourceId] = useState<string | null>(null);
   const [originalToken, setOriginalToken] = useState<string | null>(null);
   const [originalRecipients, setOriginalRecipients] = useState<RecipientRow[] | null>(null);
@@ -222,6 +240,7 @@ function NewInvoiceForm() {
     }
   }, [recipients, token, deadlineDays, tags, hasUserInteracted]);
 
+<<<<<<< HEAD
   const draftSnapshot = {
     recipients,
     token,
@@ -413,8 +432,321 @@ function NewInvoiceForm() {
   const [publicKey, setPublicKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [txModal, setTxModal] = useState<{ txHash: string; invoiceId: string } | null>(null);
+=======
+>>>>>>> upstream/main
   const [equalSplit, setEqualSplit] = useState(false);
   const [totalAmount, setTotalAmount] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [autofilled, setAutofilled] = useState(false);
+  const [stepErrors, setStepErrors] = useState<Record<number, string | null>>({});
+  const [previousRecipientsForUndo, setPreviousRecipientsForUndo] = useState<RecipientRow[] | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string | null>>({});
+  const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
+  const [showUnsavedModal, setShowUnsavedModal] = useState(false);
+  const [pendingNavigationHref, setPendingNavigationHref] = useState<string | null>(null);
+  const { feeBreakdown, isLoading: feeLoading, error: feeError, refetch: refetchFees } = useNetworkFeeBreakdown();
+
+  // Denomination toggle state (XLM / USDC)
+  type Denomination = "XLM" | "USDC";
+  const [amountDenom, setAmountDenom] = useState<Denomination>("USDC");
+  const xlmUsdcRate = useXlmUsdcRate();
+
+  const {
+    remoteCursors,
+    remotePresence,
+    isConnected: collabConnected,
+    focusedField,
+    setFocusedField,
+    emitFieldBlur,
+  } = useInvoiceCollaboration({
+    invoiceId: draftId ?? "new",
+    currentAddress: publicKey,
+    hasWritePermission: true,
+  });
+
+  /** Convert an amount string from current denomination to USDC for on-chain use */
+  const toUsdc = useCallback(
+    (amount: string): string => {
+      if (amountDenom === "USDC" || !xlmUsdcRate) return amount;
+      const n = parseFloat(amount);
+      if (isNaN(n)) return amount;
+      return (n * xlmUsdcRate).toFixed(7).replace(/\.?0+$/, "");
+    },
+    [amountDenom, xlmUsdcRate],
+  );
+
+  useEffect(() => {
+    getFreighterPublicKey().then(setPublicKey).catch(() => null);
+  }, []);
+
+  useEffect(() => {
+    if (fromId || sessionStorage.getItem("invoiceTemplate") || searchParams.get("address")) return;
+
+    getFreighterPublicKey()
+      // as any: getInvoicesByCreator is not yet declared in the published @stellar-split/sdk types
+      .then((pk) => (splitClient as any).getInvoicesByCreator(pk))
+      .then((invoices: import("@stellar-split/sdk").Invoice[]) => {
+        if (!invoices || invoices.length === 0) return;
+        const recent = invoices.slice(-5);
+        const latestToken = recent[recent.length - 1].token;
+        const now = Math.floor(Date.now() / 1000);
+        const daysList = recent
+          .map((inv) => Math.round((inv.deadline - now) / 86400))
+          .filter((d) => d > 0)
+          .sort((a, b) => a - b);
+        const medianDays =
+          daysList.length > 0
+            ? daysList[Math.floor(daysList.length / 2)]
+            : null;
+        const lastRecipients = recent[recent.length - 1].recipients.map((r) => ({
+          address: r.address,
+          amount: formatAmount(r.amount),
+        }));
+        setToken(latestToken);
+        if (medianDays !== null) setDeadlineDays(medianDays);
+        setRecipients(lastRecipients.length > 0 ? lastRecipients : [{ address: "", amount: "" }]);
+        setAutofilled(true);
+      })
+      .catch(() => null);
+  }, []);
+
+  useEffect(() => {
+    if (!fromId) return;
+    setLoading(true);
+    splitClient
+      .getInvoice(fromId)
+      .then((invoice) => {
+        const recipientRows = invoice.recipients.map((r) => ({
+          address: r.address,
+          amount: formatAmount(r.amount),
+        }));
+        setRecipients(recipientRows);
+        setOriginalRecipients(recipientRows);
+        setToken(invoice.token);
+        setOriginalToken(invoice.token);
+        setCloneSourceId(fromId);
+        if (deadlineParam) {
+          const err = validateDeadline(deadlineParam);
+          if (err) setDeadlineError(err);
+          setCloneDeadlineIso(deadlineParam);
+        }
+      })
+      .catch((err) => {
+        setError(`Failed to load source invoice: ${err}`);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [fromId]);
+
+  const draftSnapshot: DraftFormData = {
+    recipients,
+    token,
+    deadlineDays,
+    recurring,
+    intervalDays,
+    step,
+    equalSplit,
+    totalAmount,
+    tags,
+    splitMeta,
+    installments,
+    cosigners,
+    cosignerThreshold,
+  };
+
+  // Only autosave once the user has actually typed something, so an
+  // untouched form never shows up as a "recovered draft" on the next visit.
+  const { isOffline: draftOffline, lastSavedAt, discardDraft } = useOfflineDraftAutosave(
+    draftUserId ?? "",
+    formMode === "create" && !cloneSourceId && hasUserInteracted ? draftId ?? "" : "",
+    draftSnapshot
+  );
+
+  const handleRestoreDraft = () => {
+    if (!recoveredDraft) return;
+    const data = recoveredDraft.data;
+    setRecipients(data.recipients);
+    setToken(data.token);
+    setDeadlineDays(data.deadlineDays);
+    setRecurring(data.recurring);
+    setIntervalDays(data.intervalDays);
+    if (data.splitMeta) setSplitMeta(data.splitMeta);
+    if (data.equalSplit !== undefined) setEqualSplit(data.equalSplit);
+    if (data.totalAmount !== undefined) setTotalAmount(data.totalAmount);
+    if (data.tags) setTags(data.tags);
+    if (data.installments) setInstallments(data.installments);
+    if (data.cosigners) setCosigners(data.cosigners);
+    if (data.cosignerThreshold !== undefined) setCosignerThreshold(data.cosignerThreshold);
+    if (draftUserId) {
+      import("@/lib/offlineDraftDB").then(({ deleteDraft }) =>
+        deleteDraft(draftUserId, recoveredDraft.draftId)
+      );
+    }
+    setRecoveredDraft(null);
+    setHasUserInteracted(true);
+    // Resume where the user left off; the review step is excluded so a
+    // restored draft is always re-checked before it can be submitted.
+    if (data.step !== undefined && data.step > 0 && data.step < REVIEW_STEP) {
+      goToStep(data.step);
+    }
+    addToast("Draft restored", "success");
+  };
+
+  const handleDiscardDraft = () => {
+    if (recoveredDraft && draftUserId) {
+      import("@/lib/offlineDraftDB").then(({ deleteDraft }) =>
+        deleteDraft(draftUserId, recoveredDraft.draftId)
+      );
+    }
+    setRecoveredDraft(null);
+  };
+
+  const { toasts, addToast } = useToasts();
+
+  const handleSplitEqually = () => {
+    if (recipients.length <= 1) return;
+
+    setPreviousRecipientsForUndo([...recipients]);
+
+    const { perRecipient, remainder } = (() => {
+      const pp = Math.floor(100 / recipients.length);
+      const rem = 100 - (pp * recipients.length);
+      return { perRecipient: pp, remainder: rem };
+    })();
+
+    const newRecipients = recipients.map((r, index) => ({
+      ...r,
+      amount: (100 / recipients.length).toFixed(7),
+    }));
+
+    if (remainder > 0 && newRecipients.length > 0) {
+      const firstAmount = parseFloat(newRecipients[0].amount) + (remainder / recipients.length);
+      newRecipients[0].amount = firstAmount.toFixed(7);
+    }
+
+    setRecipients(newRecipients);
+    addToast("Split distributed equally", "success");
+  };
+
+  const handleUndoSplit = () => {
+    if (previousRecipientsForUndo) {
+      setRecipients(previousRecipientsForUndo);
+      setPreviousRecipientsForUndo(null);
+      addToast("Distribution undone", "success");
+    }
+  };
+
+  const markFieldTouched = (fieldName: string) => {
+    setTouchedFields((prev) => new Set([...prev, fieldName]));
+  };
+
+  /**
+   * Validate one field against the wizard rules, using `patch` for the value
+   * that just changed (state updates are not visible until the next render).
+   */
+  const validateField = (fieldName: string, patch: Partial<WizardState>): string | null => {
+    const state = { ...wizardState, ...patch };
+    if (patch.cloneDeadlineError === undefined && fieldName === "cloneDeadline") {
+      state.cloneDeadlineError = validateDeadline(cloneDeadlineIso);
+    }
+    for (let s = 0; s < REVIEW_STEP; s++) {
+      const error = validateWizardStep(s, state).fieldErrors[fieldName];
+      if (error) return error;
+    }
+    return null;
+  };
+
+  const handleFieldBlur = (fieldName: string, patch: Partial<WizardState> = {}) => {
+    markFieldTouched(fieldName);
+    setHasUserInteracted(true);
+    const error = validateField(fieldName, patch);
+    setFieldErrors((prev) => ({ ...prev, [fieldName]: error }));
+  };
+
+  const handleFieldChange = (fieldName: string, patch: Partial<WizardState>) => {
+    setHasUserInteracted(true);
+    if (touchedFields.has(fieldName)) {
+      const error = validateField(fieldName, patch);
+      setFieldErrors((prev) => ({ ...prev, [fieldName]: error }));
+    }
+  };
+
+  const handleImported = (data: ImportedTxData) => {
+    setImportedTx(data);
+    setRetroError(null);
+  };
+
+  const handleRetroactiveSubmit = async () => {
+    if (!importedTx) return;
+    setRetroSubmitting(true);
+    setRetroError(null);
+    try {
+      const creator = await getFreighterPublicKey().catch(() => importedTx.recipients[0]?.address ?? "unknown");
+      const recipients = importedTx.recipients.map((r) => ({
+        address: r.address,
+        amount: parseAmount(r.amount),
+      }));
+      const total = recipients.reduce((s, r) => s + r.amount, 0n);
+      const id = generateRetroactiveInvoiceId(importedTx.txHash);
+      const record: RetroactiveInvoice = {
+        id,
+        creator,
+        recipients,
+        token: importedTx.recipients[0]?.asset ?? "XLM",
+        deadline: 0,
+        funded: total,
+        status: "Released",
+        payments: [{ payer: creator, amount: total }],
+        retroactive: true,
+        sourceTxHash: importedTx.txHash,
+        memo: importedTx.memo,
+        createdAt: importedTx.createdAt,
+      };
+      saveRetroactiveInvoice(record);
+      addToast(`Retroactive invoice #${id} created`, "success");
+      router.push(`/invoice/${id}`);
+    } catch (err) {
+      setRetroError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setRetroSubmitting(false);
+    }
+  };
+
+  useEffect(() => {
+    const address = searchParams.get("address");
+    const templateParam = searchParams.get("template");
+
+    if (address) {
+      setRecipients([{ address, amount: "" }]);
+      return;
+    }
+
+    if (templateParam) {
+      const decoded = decodeTemplate(templateParam);
+      if (decoded) {
+        setRecipients(decoded.recipients);
+        setToken(decoded.token);
+        addToast("Shared template loaded successfully", "success");
+      } else {
+        addToast("Failed to decode shared template: invalid format", "error");
+      }
+      return;
+    }
+
+    const template = sessionStorage.getItem("invoiceTemplate");
+    if (template) {
+      const parsed: InvoiceTemplate = JSON.parse(template);
+      setRecipients(parsed.recipients);
+      setDeadlineDays(parsed.deadlineDays);
+      setToken(parsed.token);
+      sessionStorage.removeItem("invoiceTemplate");
+    }
+  }, [searchParams, addToast]);
+
+  const [publicKey, setPublicKey] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [txModal, setTxModal] = useState<{ txHash: string; invoiceId: string } | null>(null);
   const [loading, setLoading] = useState(false);
   const [autofilled, setAutofilled] = useState(false);
   const [stepErrors, setStepErrors] = useState<Record<number, string | null>>({});
@@ -534,6 +866,7 @@ function NewInvoiceForm() {
 
   const tokenChanged = !!originalToken && token !== originalToken;
 
+<<<<<<< HEAD
   const validateStep = (s: number): boolean => {
     switch (s) {
       case 0: {
@@ -590,6 +923,8 @@ function NewInvoiceForm() {
     }
   };
 
+=======
+>>>>>>> upstream/main
   /**
    * Reason the split is not submittable, or null when it is. Drives both the
    * disabled state and the tooltip on the create button so the user can see
@@ -605,6 +940,40 @@ function NewInvoiceForm() {
     return validation.isValid ? null : validation.errorMessage ?? "Split configuration is invalid";
   }, [splitMeta]);
 
+<<<<<<< HEAD
+=======
+  const wizardState: WizardState = {
+    token,
+    deadlineDays,
+    isClone: !!cloneSourceId,
+    cloneDeadlineError: cloneSourceId ? validateDeadline(cloneDeadlineIso) : null,
+    recurring,
+    intervalDays,
+    recipients,
+    equalSplit,
+    totalAmount,
+    splitError: splitBlockReason,
+    cosigners,
+    cosignerThreshold,
+  };
+
+  /**
+   * Validate step `s`, surfacing the summary above the step and the
+   * per-field messages inline. Returns whether the step is valid.
+   */
+  const validateStep = (s: number): boolean => {
+    const { valid, message, fieldErrors: errors } = validateWizardStep(s, wizardState);
+    setStepErrors((prev) => ({ ...prev, [s]: message }));
+    const fields = Object.keys(errors);
+    if (fields.length > 0) {
+      setTouchedFields((prev) => new Set([...prev, ...fields]));
+      setFieldErrors((prev) => ({ ...prev, ...errors }));
+    }
+    if (s === 0 && errors.cloneDeadline) setDeadlineError(errors.cloneDeadline);
+    return valid;
+  };
+
+>>>>>>> upstream/main
   const handleNext = () => {
     if (validateStep(step)) {
       goToStep(Math.min(step + 1, STEPS.length - 1));
@@ -650,9 +1019,51 @@ function NewInvoiceForm() {
     };
   };
 
+<<<<<<< HEAD
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateStep(step)) return;
+=======
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // Cmd/Ctrl+Enter from anywhere in the wizard submits the form — on the
+  // review step this creates the invoice, on earlier steps it advances to
+  // the next step (handleSubmit already implements that distinction).
+  useRegisterShortcuts(
+    [
+      {
+        id: "invoice-new:submit",
+        keys: ["Cmd", "Enter"],
+        description: "Submit / go to next step",
+        group: "Invoices",
+        handler: (e) => {
+          if (e.key !== "Enter") return;
+          if (!(e.metaKey || e.ctrlKey) || e.altKey || e.shiftKey) return;
+          e.preventDefault();
+          formRef.current?.requestSubmit();
+        },
+      },
+    ],
+    [],
+  );
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    // Pressing Enter inside a field on an earlier step should advance the
+    // wizard, never create the invoice.
+    if (step !== REVIEW_STEP) {
+      handleNext();
+      return;
+    }
+    // Re-check every step: a deep link to ?step=4 or a restored draft must
+    // not be able to skip validation on earlier steps.
+    const invalid = firstInvalidStep(wizardState);
+    if (invalid !== -1) {
+      validateStep(invalid);
+      goToStep(invalid);
+      return;
+    }
+>>>>>>> upstream/main
     setError(null);
 
     if (cloneSourceId && cloneDeadlineIso) {
@@ -759,6 +1170,7 @@ function NewInvoiceForm() {
     }
     goToStep(targetStep);
   };
+<<<<<<< HEAD
 
   const renderStepIndicator = () => (
     <Stepper steps={stepperSteps} onStepClick={handleStepClick} className="mb-8" />
@@ -767,6 +1179,63 @@ function NewInvoiceForm() {
   const renderBasicInfo = () => (
     <div className="flex flex-col gap-6">
       <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Basic Info</h2>
+=======
+
+  const progressPercent = Math.round(((step + 1) / STEPS.length) * 100);
+
+  const renderStepIndicator = () => (
+    <div className="mb-8">
+      <Stepper steps={stepperSteps} onStepClick={handleStepClick} />
+      <div
+        role="progressbar"
+        aria-label="Invoice creation progress"
+        aria-valuemin={1}
+        aria-valuemax={STEPS.length}
+        aria-valuenow={step + 1}
+        aria-valuetext={`Step ${step + 1} of ${STEPS.length}: ${STEPS[step]}`}
+        className="mt-3 h-1.5 w-full rounded-full bg-gray-700 overflow-hidden"
+      >
+        <div
+          className="h-full rounded-full bg-indigo-500 transition-all duration-300"
+          style={{ width: `${progressPercent}%` }}
+        />
+      </div>
+      <div className="mt-2 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+        <span>
+          Step {step + 1} of {STEPS.length}
+        </span>
+        {lastSavedAt && !cloneSourceId && (
+          <span role="status" aria-live="polite">
+            Draft saved {new Date(lastSavedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+
+  /** Small "Edit" link on the review step that jumps back to step `s`. */
+  const renderEditButton = (s: number) => (
+    <button
+      type="button"
+      onClick={() => goToStep(s)}
+      aria-label={`Edit ${STEPS[s]}`}
+      className="text-xs font-medium text-indigo-400 hover:text-indigo-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+    >
+      Edit
+    </button>
+  );
+
+  /** Heading plus one-line explanation of what the current step is for. */
+  const renderStepHeader = (s: number) => (
+    <div>
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{WIZARD_STEPS[s].label}</h2>
+      <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{WIZARD_STEPS[s].description}</p>
+    </div>
+  );
+
+  const renderBasicInfo = () => (
+    <div className="flex flex-col gap-6">
+      {renderStepHeader(0)}
 
       {!cloneSourceId && (
         <TemplateManager
@@ -776,6 +1245,356 @@ function NewInvoiceForm() {
         />
       )}
 
+      <ChangedField changed={tokenChanged}>
+        <FormField
+          id="token-address"
+          label={t("invoiceNew.tokenAddress")}
+          error={touchedFields.has('token') ? fieldErrors['token'] : null}
+          helperText={FIELD_HELP.token}
+          required
+        >
+          <input
+            type="text"
+            aria-label="Token address"
+            value={token}
+            onChange={(e) => {
+              setToken(e.target.value);
+              handleFieldChange('token', { token: e.target.value });
+            }}
+            onFocus={() => setFocusedField("token-address")}
+            onBlur={() => {
+              handleFieldBlur('token');
+              if (focusedField === "token-address") emitFieldBlur();
+            }}
+            required
+            placeholder="C..."
+            className={`w-full min-h-11 bg-gray-800 border rounded-lg px-4 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+              touchedFields.has('token') && fieldErrors['token']
+                ? 'border-red-500'
+                : 'border-gray-700'
+            }`}
+          />
+          <CursorOverlay cursors={remoteCursors} fieldName="token-address" />
+        </FormField>
+      </ChangedField>
+
+      {cloneSourceId ? (
+        <FormField
+          id="clone-deadline"
+          label={t("invoiceNew.deadline")}
+          error={touchedFields.has('cloneDeadline') ? fieldErrors['cloneDeadline'] : null}
+          helperText={FIELD_HELP.cloneDeadline}
+          required
+        >
+          <input
+            type="datetime-local"
+            value={cloneDeadlineIso.slice(0, 16)}
+            onChange={(e) => {
+              setCloneDeadlineIso(e.target.value);
+              handleFieldChange('cloneDeadline', { cloneDeadlineError: validateDeadline(e.target.value) });
+            }}
+            onBlur={(e) => handleFieldBlur('cloneDeadline', { cloneDeadlineError: validateDeadline(e.target.value) })}
+            className={`w-full min-h-11 bg-gray-800 border rounded-lg px-4 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+              touchedFields.has('cloneDeadline') && fieldErrors['cloneDeadline']
+                ? 'border-red-500'
+                : 'border-gray-700'
+            }`}
+          />
+        </FormField>
+      ) : (
+        <FormField
+          id="deadline-days"
+          label={t("invoiceNew.deadline")}
+          error={touchedFields.has('deadlineDays') ? fieldErrors['deadlineDays'] : null}
+          helperText={FIELD_HELP.deadlineDays}
+          required
+        >
+          <input
+            type="number"
+            min={1}
+            max={365}
+            value={deadlineDays}
+            onChange={(e) => {
+              setDeadlineDays(Number(e.target.value));
+              handleFieldChange('deadlineDays', { deadlineDays: Number(e.target.value) });
+            }}
+            onFocus={() => setFocusedField("deadline-days")}
+            onBlur={() => {
+              handleFieldBlur('deadlineDays');
+              if (focusedField === "deadline-days") emitFieldBlur();
+            }}
+            required
+            className={`w-full min-h-11 bg-gray-800 border rounded-lg px-4 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+              touchedFields.has('deadlineDays') && fieldErrors['deadlineDays']
+                ? 'border-red-500'
+                : 'border-gray-700'
+            }`}
+          />
+          <CursorOverlay cursors={remoteCursors} fieldName="deadline-days" />
+        </FormField>
+      )}
+
+      {!cloneSourceId && (
+        <DeadlineSuggester
+          totalAmount={
+            equalSplit
+              ? totalAmount
+              : recipients
+                  .reduce((sum, r) => sum + parseFloat(r.amount || "0"), 0)
+                  .toString()
+          }
+          recipientCount={recipients.filter((r) => r.address).length}
+          onUseSuggestion={(days: number) => setDeadlineDays(days)}
+        />
+      )}
+
+      {!cloneSourceId && (
+        <div className="flex items-center justify-between gap-4 rounded-lg bg-gray-800 border border-gray-700 px-4 py-3">
+          <div>
+            <label htmlFor="recurring-toggle" className="text-sm font-medium text-gray-300 cursor-pointer">
+              Recurring invoice
+            </label>
+            <p id="recurring-help" className="text-xs text-gray-400 mt-0.5">
+              {FIELD_HELP.recurring}
+            </p>
+          </div>
+          <button
+            id="recurring-toggle"
+            type="button"
+            role="switch"
+            aria-checked={recurring}
+            aria-describedby="recurring-help"
+            onClick={() => setRecurring((v) => !v)}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+              recurring ? "bg-indigo-600" : "bg-gray-600"
+            }`}
+          >
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                recurring ? "translate-x-6" : "translate-x-1"
+              }`}
+            />
+          </button>
+        </div>
+      )}
+
+      {recurring && !cloneSourceId && (
+        <div>
+          <label htmlFor="interval-days" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Repeat every
+          </label>
+          <select
+            id="interval-days"
+            value={intervalDays}
+            onChange={(e) => setIntervalDays(Number(e.target.value) as 7 | 30)}
+            aria-describedby="interval-days-help"
+            className="w-full min-h-11 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            <option value={7}>7 days</option>
+            <option value={30}>30 days</option>
+          </select>
+          <p id="interval-days-help" className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            {FIELD_HELP.intervalDays}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+
+  const renderRecipients = () => (
+    <div className="flex flex-col gap-6">
+      {renderStepHeader(1)}
+
+      {!cloneSourceId && (
+        <>
+          <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between rounded-lg bg-gray-800 border border-gray-700 px-4 py-3">
+            <div>
+              <label htmlFor="equal-split-toggle" className="text-sm font-medium text-gray-300 cursor-pointer">
+                {t("invoiceNew.equalSplit")}
+              </label>
+              <p id="equal-split-help" className="text-xs text-gray-400 mt-0.5">
+                {FIELD_HELP.equalSplit}
+              </p>
+            </div>
+            <button
+              id="equal-split-toggle"
+              type="button"
+              role="switch"
+              aria-checked={equalSplit}
+              aria-label="Toggle equal split mode"
+              aria-describedby="equal-split-help"
+              onClick={() => setEqualSplit((v) => !v)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                equalSplit ? "bg-indigo-600" : "bg-gray-300 dark:bg-gray-600"
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  equalSplit ? "translate-x-6" : "translate-x-1"
+                }`}
+              />
+            </button>
+          </div>
+
+          {!equalSplit && (
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={handleSplitEqually}
+                disabled={recipients.length <= 1}
+                aria-label="Distribute all amounts equally among recipients"
+                className="min-h-11 px-4 py-2 rounded-lg bg-indigo-700 hover:bg-indigo-600 text-sm text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                Split equally
+              </button>
+              {previousRecipientsForUndo && (
+                <button
+                  type="button"
+                  onClick={handleUndoSplit}
+                  aria-label="Undo the equal split distribution"
+                  className="min-h-11 px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm text-gray-200 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                  ↶ Undo
+                </button>
+              )}
+            </div>
+          )}
+        </>
+      )}
+
+      {equalSplit && !cloneSourceId && (
+        <FormField
+          id="total-amount"
+          label={t("invoiceNew.totalAmount")}
+          error={touchedFields.has('totalAmount') ? fieldErrors['totalAmount'] : null}
+          helperText={FIELD_HELP.totalAmount}
+          required
+        >
+          <input
+            type="number"
+            placeholder="0.00"
+            step="0.0000001"
+            min="0.0000001"
+            value={totalAmount}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setTotalAmount(e.target.value);
+              handleFieldChange('totalAmount', { totalAmount: e.target.value });
+            }}
+            onFocus={() => setFocusedField("total-amount")}
+            onBlur={() => {
+              handleFieldBlur('totalAmount');
+              if (focusedField === "total-amount") emitFieldBlur();
+            }}
+            required
+            className={`w-full min-h-11 bg-gray-800 border rounded-lg px-4 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+              touchedFields.has('totalAmount') && fieldErrors['totalAmount']
+                ? 'border-red-500'
+                : 'border-gray-700'
+            }`}
+          />
+          <CursorOverlay cursors={remoteCursors} fieldName="total-amount" />
+          {perRecipientAmount && (
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+              {perRecipientAmount} {t("invoiceNew.perRecipient")}
+            </p>
+          )}
+        </FormField>
+      )}
+
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <span className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              {equalSplit ? t("invoiceNew.recipients") : t("invoiceNew.recipientsAndAmounts")}
+            </span>
+            <p id="recipients-help" className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+              {FIELD_HELP.recipients}
+            </p>
+          </div>
+          {!equalSplit && !cloneSourceId && (
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-gray-500">Amounts in:</span>
+              <button
+                type="button"
+                onClick={() => setAmountDenom((d) => d === "XLM" ? "USDC" : "XLM")}
+                aria-label={`Switch amount denomination to ${amountDenom === "XLM" ? "USDC" : "XLM"}`}
+                title={xlmUsdcRate ? `1 XLM ≈ ${xlmUsdcRate.toFixed(4)} USDC` : "Rate unavailable"}
+                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold border transition-colors ${
+                  amountDenom === "XLM"
+                    ? "bg-yellow-500/15 border-yellow-500/40 text-yellow-300 hover:bg-yellow-500/25"
+                    : "bg-blue-500/15 border-blue-500/40 text-blue-300 hover:bg-blue-500/25"
+                }`}
+              >
+                <span aria-hidden="true">{amountDenom === "XLM" ? "✦" : "$"}</span>
+                {amountDenom}
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
+                </svg>
+              </button>
+              {xlmUsdcRate && (
+                <span className="text-xs text-gray-500">1 XLM ≈ {xlmUsdcRate.toFixed(4)} USDC</span>
+              )}
+            </div>
+          )}
+        </div>
+        <ChangedField changed={recipientsChanged}>
+          <RecipientForm
+            recipients={recipients}
+            onChange={setRecipients}
+            equalSplit={equalSplit}
+            amountOverride={perRecipientAmount}
+          />
+        </ChangedField>
+        {touchedFields.has('recipients') && fieldErrors['recipients'] && (
+          <p className="text-sm text-red-600 dark:text-red-400 mt-2">{fieldErrors['recipients']}</p>
+        )}
+      </div>
+
+      <SplitCalculator
+        initialTotal={equalSplit ? totalAmount : recipients.reduce((s, r) => s + parseFloat(r.amount || "0"), 0).toFixed(7)}
+        onSplitMetaChange={setSplitMeta}
+      />
+    </div>
+  );
+
+  const renderOptions = () => {
+    const total = recipients.reduce((s, r) => s + parseFloat(r.amount || "0"), 0);
+    return (
+    <div className="flex flex-col gap-6">
+      {renderStepHeader(2)}
+
+      <div>
+        <TagInput
+          value={tags}
+          onChange={setTags}
+          suggestions={allTags}
+          placeholder="e.g. design, q3-retainer"
+        />
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{FIELD_HELP.tags}</p>
+      </div>
+
+      {cloneSourceId && (
+        <div className="flex items-center gap-2 text-sm bg-indigo-950/60 border border-indigo-700 text-indigo-300 rounded-lg px-3 py-2">
+          <span>Cloned from</span>
+          <a
+            href={`/invoice/${cloneSourceId}`}
+            className="underline hover:text-indigo-200 font-mono"
+          >
+            #{cloneSourceId}
+          </a>
+        </div>
+      )}
+>>>>>>> upstream/main
+
+      {!cloneSourceId && (
+        <TemplateManager
+          recipients={recipients}
+          token={token}
+          onLoad={handleLoadTemplate}
+        />
+      )}
+
+<<<<<<< HEAD
       <ChangedField changed={tokenChanged}>
         <FormField
           id="token-address"
@@ -1027,8 +1846,110 @@ function NewInvoiceForm() {
               {xlmUsdcRate && (
                 <span className="text-xs text-gray-500">1 XLM ≈ {xlmUsdcRate.toFixed(4)} USDC</span>
               )}
+=======
+      {autofilled && !cloneSourceId && (
+        <p className="text-xs text-indigo-400 bg-indigo-950/50 border border-indigo-800 rounded-lg px-3 py-2">
+          Autofilled from history — you can override any value below.
+        </p>
+      )}
+
+      {recurring && !cloneSourceId && (
+        <div className="rounded-lg bg-gray-800 border border-gray-700 px-4 py-3">
+          <p className="text-sm text-gray-300">
+            This invoice will repeat every <span className="font-semibold text-indigo-300">{intervalDays} days</span>
+          </p>
+        </div>
+      )}
+
+      <InstallmentPlanBuilder
+        totalAmount={total}
+        installments={installments}
+        assetCode={token === (process.env.NEXT_PUBLIC_USDC_ADDRESS ?? "") ? "USDC" : "XLM"}
+        onChange={setInstallments}
+      />
+
+      <div>
+        <CoSignerSection
+          cosigners={cosigners}
+          threshold={cosignerThreshold}
+          onChange={(signers, thresh) => {
+            setCosigners(signers);
+            setCosignerThreshold(thresh);
+          }}
+        />
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{FIELD_HELP.cosigners}</p>
+        {touchedFields.has('cosigners') && fieldErrors['cosigners'] && (
+          <p className="text-sm text-red-600 dark:text-red-400 mt-1">{fieldErrors['cosigners']}</p>
+        )}
+      </div>
+    </div>
+    );
+  };
+
+  const renderReview = () => {
+    const total = recipients.reduce((s, r) => s + parseFloat(r.amount || "0"), 0);
+    return (
+      <div className="flex flex-col gap-6">
+        {renderStepHeader(3)}
+
+        {cloneSourceId && (
+          <div className="flex items-center gap-2 text-sm bg-indigo-950/60 border border-indigo-700 text-indigo-300 rounded-lg px-3 py-2">
+            <span>Cloned from</span>
+            <a href={`/invoice/${cloneSourceId}`} className="underline hover:text-indigo-200 font-mono">
+              #{cloneSourceId}
+            </a>
+          </div>
+        )}
+
+        <div className="rounded-lg bg-gray-800 border border-gray-700 divide-y divide-gray-700">
+          <div className="px-4 py-2 flex items-center justify-between">
+            <span className="text-xs font-medium text-gray-400">Details</span>
+            {renderEditButton(0)}
+          </div>
+          <div className="px-4 py-3 flex justify-between">
+            <span className="text-sm text-gray-400">Token</span>
+            <span className="text-sm text-gray-200 font-mono truncate ml-2">{token}</span>
+          </div>
+          <div className="px-4 py-3 flex justify-between">
+            <span className="text-sm text-gray-400">Deadline</span>
+            <span className="text-sm text-gray-200">
+              {cloneSourceId
+                ? new Date(cloneDeadlineIso).toLocaleString()
+                : `${deadlineDays} days`}
+            </span>
+          </div>
+          {recurring && !cloneSourceId && (
+            <div className="px-4 py-3 flex justify-between">
+              <span className="text-sm text-gray-400">Recurring</span>
+              <span className="text-sm text-gray-200">Every {intervalDays} days</span>
+>>>>>>> upstream/main
             </div>
           )}
+          <div className="px-4 py-3 flex justify-between">
+            <span className="text-sm text-gray-400">Recipients</span>
+            <span className="text-sm text-gray-200">{recipients.length}</span>
+          </div>
+          {cosigners.length > 0 && (
+            <div className="px-4 py-3 flex justify-between">
+              <span className="text-sm text-gray-400">Co-Signers</span>
+              <span className="text-sm text-gray-200">
+                {cosignerThreshold} of {cosigners.length} approvals required
+              </span>
+            </div>
+          )}
+          <div className="px-4 py-3 flex justify-between">
+            <span className="text-sm text-gray-400">Total</span>
+            <FeeTooltip
+              feeBreakdown={feeBreakdown}
+              isLoading={feeLoading}
+              error={feeError}
+              onRefresh={refetchFees}
+            >
+              <span className="text-sm text-gray-200 font-semibold cursor-help hover:text-indigo-300 transition-colors">
+                {equalSplit ? totalAmount : total.toFixed(7)} USDC
+              </span>
+            </FeeTooltip>
+          </div>
         </div>
         <ChangedField changed={recipientsChanged}>
           <RecipientForm
@@ -1040,6 +1961,7 @@ function NewInvoiceForm() {
         </ChangedField>
       </div>
 
+<<<<<<< HEAD
       <SplitCalculator
         initialTotal={equalSplit ? totalAmount : recipients.reduce((s, r) => s + parseFloat(r.amount || "0"), 0).toFixed(7)}
         onSplitMetaChange={setSplitMeta}
@@ -1193,6 +2115,28 @@ function NewInvoiceForm() {
     );
   };
 
+=======
+        <div className="rounded-lg bg-gray-800 border border-gray-700">
+          <div className="px-4 py-2 flex items-center justify-between border-b border-gray-700">
+            <span className="text-xs font-medium text-gray-400">Recipients</span>
+            {renderEditButton(1)}
+          </div>
+          <ul className="divide-y divide-gray-700">
+            {recipients.map((r, i) => (
+              <li key={i} className="px-4 py-2 flex justify-between items-center gap-2">
+                <span className="text-sm font-mono text-gray-300 truncate">{r.address}</span>
+                <span className="text-sm text-indigo-300 shrink-0">
+                  {equalSplit ? perRecipientAmount : r.amount} USDC
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    );
+  };
+
+>>>>>>> upstream/main
   return (
     <main className="max-w-xl mx-auto w-full px-4 sm:px-6 py-16 overflow-x-hidden">
       {/* Collaboration presence */}
@@ -1250,6 +2194,7 @@ function NewInvoiceForm() {
         )}
       </div>
 
+<<<<<<< HEAD
       {recoveredDraft && (
         <DraftRecoveryBanner
           updatedAt={recoveredDraft.updatedAt}
@@ -1328,6 +2273,10 @@ function NewInvoiceForm() {
         </div>
       ) : (
       <>
+=======
+      <DraftCollaborationPanel draftId={draftId} />
+
+>>>>>>> upstream/main
       {/* Cloned-from banner */}
       {cloneSourceId && (
         <div className="mb-6 flex items-center gap-2 text-sm bg-indigo-950/60 border border-indigo-700 text-indigo-300 rounded-lg px-3 py-2">
@@ -1367,7 +2316,11 @@ function NewInvoiceForm() {
         </p>
       )}
 
+<<<<<<< HEAD
       <form onSubmit={handleSubmit} className="flex flex-col gap-6" aria-label="Create invoice form">
+=======
+      <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-6" aria-label="Create invoice form">
+>>>>>>> upstream/main
         {step === 0 && !loading && renderBasicInfo()}
         {step === 1 && !loading && renderRecipients()}
         {step === 2 && !loading && renderOptions()}

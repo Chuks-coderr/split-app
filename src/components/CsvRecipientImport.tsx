@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 
+<<<<<<< HEAD
 export interface CsvValidationError {
   row: number;
   column: string;
@@ -9,6 +10,8 @@ export interface CsvValidationError {
   message: string;
 }
 
+=======
+>>>>>>> upstream/main
 export interface CsvRow {
   address: string;
   /** percentage (0-100) or absolute amount string */
@@ -16,8 +19,11 @@ export interface CsvRow {
   amount?: string;
   /** validation error message, if any */
   error?: string;
+<<<<<<< HEAD
   /** structured validation errors for this row, if any */
   errors?: CsvValidationError[];
+=======
+>>>>>>> upstream/main
 }
 
 interface Props {
@@ -26,7 +32,10 @@ interface Props {
 }
 
 const MAX_RECIPIENTS = 20;
+<<<<<<< HEAD
 const MAX_ERRORS = 20;
+=======
+>>>>>>> upstream/main
 
 function isValidStellarAddress(addr: string) {
   return addr.startsWith("G") && addr.length >= 50;
@@ -67,6 +76,7 @@ function validateRows(
   const tooMany = totalAfterImport > MAX_RECIPIENTS;
 
   let pctSum = 0;
+<<<<<<< HEAD
   let errorCount = 0;
 
   return rows.map((row, idx): CsvRow => {
@@ -83,6 +93,16 @@ function validateRows(
       pushError("address", row.address, "Address must be a valid Stellar address");
     } else if (seen.has(row.address)) {
       pushError("address", row.address, "Address is a duplicate of an earlier row");
+=======
+
+  return rows.map((row, idx): CsvRow => {
+    const errors: string[] = [];
+
+    if (!isValidStellarAddress(row.address)) {
+      errors.push("Invalid Stellar address");
+    } else if (seen.has(row.address)) {
+      errors.push("Duplicate address");
+>>>>>>> upstream/main
     } else {
       seen.add(row.address);
     }
@@ -90,21 +110,34 @@ function validateRows(
     if (usePercent) {
       const pct = parseFloat(row.percentage ?? "");
       if (isNaN(pct) || pct <= 0) {
+<<<<<<< HEAD
         pushError("percentage", row.percentage ?? "", "Percentage must be a positive number");
       } else {
         pctSum += pct;
         if (pctSum > 100) {
           pushError("percentage", row.percentage ?? "", "Percentage total exceeds 100%");
+=======
+        errors.push("Percentage must be > 0");
+      } else {
+        pctSum += pct;
+        if (pctSum > 100) {
+          errors.push("Percentage total exceeds 100%");
+>>>>>>> upstream/main
         }
       }
     } else {
       const amt = parseFloat(row.amount ?? "");
       if (isNaN(amt) || amt <= 0) {
+<<<<<<< HEAD
         pushError("amount", row.amount ?? "", "Amount must be a positive number");
+=======
+        errors.push("Amount must be > 0");
+>>>>>>> upstream/main
       }
     }
 
     if (tooMany && existingCount + idx + 1 > MAX_RECIPIENTS) {
+<<<<<<< HEAD
       pushError("address", row.address, `Maximum of ${MAX_RECIPIENTS} recipients allowed`);
     }
 
@@ -113,6 +146,12 @@ function validateRows(
       errors: errors.length > 0 ? errors : undefined,
       error: errors.length > 0 ? errors.map((e) => e.message).join("; ") : undefined,
     };
+=======
+      errors.push(`Max ${MAX_RECIPIENTS} recipients`);
+    }
+
+    return { ...row, error: errors.length > 0 ? errors.join("; ") : undefined };
+>>>>>>> upstream/main
   });
 }
 
@@ -254,6 +293,77 @@ export default function CsvRecipientImport({ onImport, existingCount = 0 }: Prop
                         value={row.address}
                         onChange={(e) => handleUpdateRow(i, "address", e.target.value)}
                         aria-label={`Row ${i + 1} address`}
+<<<<<<< HEAD
                         className="w-full bg-transparent font-mon
 
 /* … truncated 2722 chars — edit only what you need near the top … */
+=======
+                        className="w-full bg-transparent font-mono text-xs focus:outline-none focus-visible:ring-1 focus-visible:ring-indigo-500 rounded"
+                      />
+                    </td>
+                    <td className="px-3 py-1.5">
+                      <input
+                        type="number"
+                        step="0.0000001"
+                        min="0"
+                        value={usePercent ? (row.percentage ?? "") : (row.amount ?? "")}
+                        onChange={(e) =>
+                          handleUpdateRow(i, usePercent ? "percentage" : "amount", e.target.value)
+                        }
+                        aria-label={`Row ${i + 1} ${usePercent ? "percentage" : "amount"}`}
+                        className="w-full bg-transparent text-xs focus:outline-none focus-visible:ring-1 focus-visible:ring-indigo-500 rounded"
+                      />
+                    </td>
+                    <td className="px-3 py-1.5 text-center">
+                      {row.error && (
+                        <span
+                          title={row.error}
+                          aria-label={`Error: ${row.error}`}
+                          className="text-red-400 text-xs cursor-help"
+                        >
+                          ⚠
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Error details */}
+          {hasErrors && (
+            <ul className="text-xs text-red-400 flex flex-col gap-0.5">
+              {rows
+                .filter((r) => r.error)
+                .map((r, i) => (
+                  <li key={i}>
+                    Row {rows.indexOf(r) + 1}: {r.error}
+                  </li>
+                ))}
+            </ul>
+          )}
+
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={handleConfirm}
+              disabled={validCount === 0}
+              className="min-h-10 px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-sm font-semibold text-white transition-colors disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+            >
+              Import {validCount} recipient{validCount !== 1 ? "s" : ""}
+            </button>
+            <button
+              type="button"
+              onClick={() => { setRows([]); setOpen(false); }}
+              className="min-h-10 px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+>>>>>>> upstream/main
