@@ -7,6 +7,7 @@ import { splitClient } from "@/lib/stellar";
 import { getFreighterPublicKey } from "@/lib/freighter";
 import { generateCsv, type CsvRow } from "@/lib/csvExport";
 import type { Invoice } from "@stellar-split/sdk";
+import ReconciliationReport from "@/components/analytics/ReconciliationReport";
 
 const STROOPS = 10_000_000;
 
@@ -478,6 +479,10 @@ export default function AnalyticsPage() {
             </div>
           )}
         </div>
+
+          <div className="mb-8">
+            <ReconciliationReport />
+          </div>
 
         <Link
           href="/dashboard"
