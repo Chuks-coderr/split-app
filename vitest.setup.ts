@@ -1,6 +1,10 @@
 import '@testing-library/jest-dom';
+<<<<<<< HEAD
+import { vi } from 'vitest';
+=======
 import { vi, beforeEach, afterEach } from 'vitest';
 import 'fake-indexeddb/auto';
+>>>>>>> upstream/main
 
 (globalThis as any).jest = vi as any;
 
@@ -36,6 +40,8 @@ vi.mock('@stellar/freighter-api', () => ({
   }),
   WatchWalletChanges: vi.fn().mockReturnValue({ unsubscribe: vi.fn() }),
 }));
+<<<<<<< HEAD
+=======
 
 // ---------------------------------------------------------------------------
 // Reliability feature test setup (error handling, retry, offline queue)
@@ -80,3 +86,4 @@ afterEach(() => {
   onlineStatus = true;
   vi.clearAllMocks();
 });
+>>>>>>> upstream/main

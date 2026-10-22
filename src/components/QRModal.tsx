@@ -3,6 +3,9 @@
 import { useEffect, useRef } from "react";
 import FocusTrap from "./FocusTrap";
 import { QRCodeCanvas } from "qrcode.react";
+<<<<<<< HEAD
+import { isWalletConnected } from "@/lib/freighter";
+=======
 
 export type WalletConnectStatus =
   | "idle"
@@ -11,10 +14,17 @@ export type WalletConnectStatus =
   | "session_approved"
   | "timeout"
   | "error";
+>>>>>>> upstream/main
 
 type QRModalProps = {
   open: boolean;
   uri: string;
+<<<<<<< HEAD
+  onClose: () => void;
+  onCopied?: () => void;
+  onConnected?: () => void;
+  pollingInterval?: number;
+=======
   status?: WalletConnectStatus;
   errorMessage?: string;
   onClose: () => void;
@@ -30,11 +40,21 @@ const STATUS_TEXT: Record<WalletConnectStatus, string> = {
   session_approved: "Session approved. Closing…",
   timeout: "Connection timed out. The QR code may have expired.",
   error: "Something went wrong while connecting.",
+>>>>>>> upstream/main
 };
 
 export default function QRModal({
   open,
   uri,
+<<<<<<< HEAD
+  onClose,
+  onCopied,
+  onConnected,
+  pollingInterval = 2000,
+}: QRModalProps) {
+  const firedRef = useRef(false);
+
+=======
   status = "awaiting_scan",
   errorMessage,
   onClose,
@@ -45,11 +65,30 @@ export default function QRModal({
   const firedRef = useRef(false);
 
   // Close the modal once the parent reports a successful session approval.
+>>>>>>> upstream/main
   useEffect(() => {
     if (!open) {
       firedRef.current = false;
       return;
     }
+<<<<<<< HEAD
+
+    const id = setInterval(async () => {
+      if (firedRef.current) return;
+      const connected = await isWalletConnected();
+      if (connected) {
+        firedRef.current = true;
+        clearInterval(id);
+        onConnected?.();
+      }
+    }, pollingInterval);
+
+    return () => clearInterval(id);
+  }, [open, onConnected, pollingInterval]);
+
+  if (!open) return null;
+
+=======
     if (status === "session_approved" && !firedRef.current) {
       firedRef.current = true;
       onConnected?.();
@@ -67,6 +106,7 @@ export default function QRModal({
   const statusText = isError && errorMessage ? errorMessage : STATUS_TEXT[status];
 ======
 
+>>>>>>> upstream/main
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(uri);
@@ -104,6 +144,33 @@ export default function QRModal({
 
         <div className="px-4 py-5">
           <div className="flex flex-col items-center gap-4">
+<<<<<<< HEAD
+            <div className="bg-white rounded-xl p-3 w-[260px] max-w-full">
+              <QRCodeCanvas
+                value={uri}
+                size={240}
+                level="M"
+                includeMargin={false}
+              />
+            </div>
+
+            <div className="w-full">
+              <button
+                onClick={handleCopy}
+                className="w-full px-4 py-3 rounded-lg bg-gray-800 hover:bg-gray-700 text-sm font-semibold transition-colors"
+              >
+                Copy URI
+              </button>
+
+              <p className="mt-3 text-xs text-gray-400 break-all font-mono">
+                {uri}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="px-4 py-3 border-t border-gray-800">
+=======
             {canShowQR ? (
               <div className="relative bg-white rounded-xl p-3 w-[260px] max-w-full">
                 <QRCodeCanvas
@@ -167,11 +234,16 @@ export default function QRModal({
               Retry
             </button>
           )}
+>>>>>>> upstream/main
           <button
             onClick={onClose}
             className="w-full px-4 py-3 rounded-lg bg-transparent hover:bg-gray-800 border border-gray-800 text-sm font-semibold text-gray-200 transition-colors"
           >
+<<<<<<< HEAD
+            Dismiss
+=======
             {isTimeout || isError ? "Cancel" : "Dismiss"}
+>>>>>>> upstream/main
           </button>
         </div>
       </div>

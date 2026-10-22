@@ -1,6 +1,10 @@
 /**
  * Reminder system — stores invoice reminders in localStorage and fires
  * browser Notification API alerts when the reminder time is reached.
+<<<<<<< HEAD
+ */
+
+=======
  *
  * Also provides a scheduling/escalation engine for payment reminders:
  * escalation levels keyed on invoice age, template-based messages,
@@ -11,6 +15,7 @@ import { sendPaymentReceiptEmail } from "./paymentReceiptEmailer";
 import { sendPushNotification } from "./pushNotifications";
 import { addNotification } from "./notifications";
 
+>>>>>>> upstream/main
 export interface Reminder {
   invoiceId: string;
   reminderDate: string; // ISO 8601
@@ -19,6 +24,8 @@ export interface Reminder {
 
 const STORAGE_KEY = "stellarsplit_reminders";
 
+<<<<<<< HEAD
+=======
 // ---------------------------------------------------------------------------
 // Escalation levels & scheduling
 // ---------------------------------------------------------------------------
@@ -352,6 +359,7 @@ export function getReminderMetrics(invoiceId?: string): ReminderMetrics {
   return metrics;
 }
 
+>>>>>>> upstream/main
 export function getReminders(): Reminder[] {
   if (typeof window === "undefined") return [];
   try {
@@ -414,7 +422,10 @@ export async function checkAndFireReminders(): Promise<void> {
   const fired: string[] = [];
 
   for (const reminder of reminders) {
+<<<<<<< HEAD
+=======
     if (isReminderSuppressed(reminder.invoiceId)) continue;
+>>>>>>> upstream/main
     if (new Date(reminder.reminderDate) <= now) {
       if (Notification.permission === "granted") {
         new Notification(`StellarSplit Reminder — Invoice #${reminder.invoiceId}`, {

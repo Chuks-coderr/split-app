@@ -1,26 +1,40 @@
 "use client";
 
+<<<<<<< HEAD
+import { useState } from "react";
+=======
 import { useMemo, useState } from "react";
+>>>>>>> upstream/main
 import FocusTrap from "./FocusTrap";
 import { splitClient, payWithNonce } from "@/lib/stellar";
 import { parseAmount } from "@stellar-split/sdk";
 import type { Invoice } from "@stellar-split/sdk";
+<<<<<<< HEAD
+=======
 import type { InvoiceBundle } from "@/lib/bundles";
 import { PaymentAggregator } from "@/lib/paymentAggregator";
+>>>>>>> upstream/main
 
 interface Props {
   invoices: Invoice[];
   publicKey: string;
   onClose: () => void;
+<<<<<<< HEAD
+=======
   /** When provided, the modal operates in bundle mode. */
   bundle?: InvoiceBundle;
   /** Called after a bundle's unified payment completes successfully. */
   onBundleComplete?: (bundleId: string, txHash: string) => void;
+>>>>>>> upstream/main
 }
 
 /**
  * BatchPayModal — shows an amount input per selected invoice and calls
  * splitClient.batchPay() with all (invoiceId, amount) pairs on confirm.
+<<<<<<< HEAD
+ */
+export default function BatchPayModal({ invoices, publicKey, onClose }: Props) {
+=======
  *
  * When a `bundle` is supplied the modal switches to bundle mode: it renders a
  * summary/preview of every bundled item with totals, collects a single unified
@@ -35,6 +49,7 @@ export default function BatchPayModal({
   onBundleComplete,
 }: Props) {
   const isBundleMode = Boolean(bundle);
+>>>>>>> upstream/main
   const [amounts, setAmounts] = useState<Record<string, string>>(
     Object.fromEntries(invoices.map((inv) => [inv.id, ""]))
   );
@@ -42,6 +57,9 @@ export default function BatchPayModal({
   const [txHash, setTxHash] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+<<<<<<< HEAD
+  const handleConfirm = async () => {
+=======
   const bundleTotals = useMemo(() => {
     if (!bundle) return null;
     const items = bundle.items ?? [];
@@ -71,6 +89,7 @@ export default function BatchPayModal({
       await handleBundleConfirm();
       return;
     }
+>>>>>>> upstream/main
     setError(null);
     setPaying(true);
     try {
@@ -110,7 +129,11 @@ export default function BatchPayModal({
         <div className="bg-gray-900 rounded-2xl w-full max-w-md p-6 flex flex-col gap-5">
         <div className="flex items-center justify-between">
           <h2 id="batch-pay-title" className="text-xl font-bold">
+<<<<<<< HEAD
+            Batch Pay
+=======
             {isBundleMode ? "Pay Bundle" : "Batch Pay"}
+>>>>>>> upstream/main
           </h2>
           <button
             onClick={onClose}
@@ -121,6 +144,36 @@ export default function BatchPayModal({
           </button>
         </div>
 
+<<<<<<< HEAD
+        <p className="text-sm text-gray-400">
+          Enter the amount you want to pay toward each invoice.
+        </p>
+
+        <ul className="flex flex-col gap-3 max-h-64 overflow-y-auto">
+          {invoices.map((inv) => (
+            <li key={inv.id} className="flex items-center gap-3">
+              <span className="text-sm text-gray-300 w-24 shrink-0">
+                Invoice #{inv.id}
+              </span>
+              <label htmlFor={`batch-amount-${inv.id}`} className="sr-only">
+                Amount for Invoice #{inv.id} in USDC
+              </label>
+              <input
+                id={`batch-amount-${inv.id}`}
+                type="number"
+                step="0.0000001"
+                min="0.0000001"
+                placeholder="USDC amount"
+                value={amounts[inv.id]}
+                onChange={(e) =>
+                  setAmounts((prev) => ({ ...prev, [inv.id]: e.target.value }))
+                }
+                className="flex-1 min-h-11 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 min-w-0"
+              />
+            </li>
+          ))}
+        </ul>
+=======
         {isBundleMode && bundleTotals ? (
           <div className="flex flex-col gap-3">
             <p className="text-sm text-gray-400">
@@ -179,14 +232,19 @@ export default function BatchPayModal({
             </ul>
           </>
         )}
+>>>>>>> upstream/main
 
         {error && <p className="text-red-400 text-sm">{error}</p>}
 
         {txHash ? (
           <div className="flex flex-col gap-3">
             <p className="text-green-400 text-sm">
+<<<<<<< HEAD
+              Batch payment sent! Tx: {txHash.slice(0, 16)}…
+=======
               {isBundleMode ? "Bundle payment sent!" : "Batch payment sent!"} Tx:{" "}
               {txHash.slice(0, 16)}…
+>>>>>>> upstream/main
             </p>
             <button
               onClick={onClose}
@@ -209,11 +267,15 @@ export default function BatchPayModal({
               title={!publicKey ? "Connect your wallet to continue" : undefined}
               className="flex-1 min-h-11 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-sm font-semibold transition-colors disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
             >
+<<<<<<< HEAD
+              {paying ? "Sending…" : "Confirm Payment"}
+=======
               {paying
                 ? "Sending…"
                 : isBundleMode
                   ? "Pay Bundle"
                   : "Confirm Payment"}
+>>>>>>> upstream/main
             </button>
           </div>
         )}

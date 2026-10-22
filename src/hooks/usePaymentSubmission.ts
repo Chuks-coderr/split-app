@@ -2,10 +2,13 @@
 
 import { useState, useCallback } from "react";
 import { simulateTransaction, SimulationResult } from "@/lib/simulateTx";
+<<<<<<< HEAD
+=======
 import { retryWithBackoff } from "@/lib/retryWithBackoff";
 import { toAppError } from "@/lib/appError";
 import { useToast } from "@/context/ToastContext";
 import { useOfflineQueue } from "@/hooks/useOfflineQueue";
+>>>>>>> upstream/main
 
 interface PaymentSubmissionState {
   showSimulationPreview: boolean;
@@ -32,9 +35,12 @@ export function usePaymentSubmission(): UsePaymentSubmissionReturn {
     simulationError: null,
   });
 
+<<<<<<< HEAD
+=======
   const { notify } = useToast();
   const { enqueue } = useOfflineQueue();
 
+>>>>>>> upstream/main
   const initiateDemoPayment = useCallback(
     async (
       transactionXdr: string,
@@ -49,6 +55,9 @@ export function usePaymentSubmission(): UsePaymentSubmissionReturn {
       }));
 
       try {
+<<<<<<< HEAD
+        const result = await simulateTransaction(transactionXdr);
+=======
         const result = await retryWithBackoff(
           () => simulateTransaction(transactionXdr),
           {
@@ -60,12 +69,25 @@ export function usePaymentSubmission(): UsePaymentSubmissionReturn {
             },
           }
         );
+>>>>>>> upstream/main
         setState((prev) => ({
           ...prev,
           isSimulating: false,
           simulationResult: result,
         }));
       } catch (error) {
+<<<<<<< HEAD
+        const errorMessage =
+          error instanceof Error ? error.message : "Failed to simulate transaction";
+        setState((prev) => ({
+          ...prev,
+          isSimulating: false,
+          simulationError: errorMessage,
+        }));
+      }
+    },
+    []
+=======
         const appError = toAppError(error);
         setState((prev) => ({
           ...prev,
@@ -75,11 +97,26 @@ export function usePaymentSubmission(): UsePaymentSubmissionReturn {
       }
     },
     [notify]
+>>>>>>> upstream/main
   );
 
   const handleProceed = useCallback(
     async (onConfirm: () => Promise<any>) => {
       try {
+<<<<<<< HEAD
+        await onConfirm();
+        resetState();
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Payment failed";
+        setState((prev) => ({
+          ...prev,
+          simulationError: errorMessage,
+        }));
+      }
+    },
+    []
+=======
         await retryWithBackoff(() => onConfirm(), {
           onRetry: (attempt, error) => {
             notify({
@@ -106,6 +143,7 @@ export function usePaymentSubmission(): UsePaymentSubmissionReturn {
       }
     },
     [notify, enqueue]
+>>>>>>> upstream/main
   );
 
   const handleCancel = useCallback((onCancel: () => void) => {
@@ -116,6 +154,20 @@ export function usePaymentSubmission(): UsePaymentSubmissionReturn {
   const handleSkip = useCallback(
     async (onConfirm: () => Promise<any>) => {
       try {
+<<<<<<< HEAD
+        await onConfirm();
+        resetState();
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Payment failed";
+        setState((prev) => ({
+          ...prev,
+          simulationError: errorMessage,
+        }));
+      }
+    },
+    []
+=======
         await retryWithBackoff(() => onConfirm(), {
           onRetry: (attempt, error) => {
             notify({
@@ -142,6 +194,7 @@ export function usePaymentSubmission(): UsePaymentSubmissionReturn {
       }
     },
     [notify, enqueue]
+>>>>>>> upstream/main
   );
 
   const resetState = useCallback(() => {

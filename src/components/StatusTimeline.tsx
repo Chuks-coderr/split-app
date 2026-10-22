@@ -3,6 +3,8 @@
 import type { Invoice } from "@stellar-split/sdk";
 import RelativeTime from "@/components/ui/RelativeTime";
 
+<<<<<<< HEAD
+=======
 export interface MilestoneRecord {
   id: string;
   title: string;
@@ -23,6 +25,7 @@ export interface DisputeRecord {
   enforcedAt?: number | null;
 }
 
+>>>>>>> upstream/main
 interface TimelineEvent {
   key: string;
   icon: string;
@@ -35,6 +38,8 @@ function truncate(addr: string) {
   return addr.length > 12 ? `${addr.slice(0, 6)}…${addr.slice(-4)}` : addr;
 }
 
+<<<<<<< HEAD
+=======
 function buildEvents(
   invoice: Invoice,
   total: bigint,
@@ -188,6 +193,7 @@ function truncate(addr: string) {
   return addr.length > 12 ? `${addr.slice(0, 6)}…${addr.slice(-4)}` : addr;
 }
 
+>>>>>>> upstream/main
 function buildEvents(invoice: Invoice, total: bigint): TimelineEvent[] {
   const events: TimelineEvent[] = [];
 
@@ -253,15 +259,22 @@ function buildEvents(invoice: Invoice, total: bigint): TimelineEvent[] {
 interface Props {
   invoice: Invoice;
   total: bigint;
+<<<<<<< HEAD
+=======
   milestones?: MilestoneRecord[];
   disputes?: DisputeRecord[];
+>>>>>>> upstream/main
 }
 
 export default function StatusTimeline({ invoice, total }: Props) {
   const events = buildEvents(invoice, total);
 
   // ── Mobile: horizontal stepper ─────────────────────────────────────────────
+<<<<<<< HEAD
+  const STEPS = ["Created", "Partially Funded", "Funded", "Released / Refunded"] as const;
+=======
   const STEPS = ["Created", "Partially Funded", "Fully Funded", "Released / Refunded"] as const;
+>>>>>>> upstream/main
 
   function getActiveStep(): number {
     if (invoice.status === "Released" || invoice.status === "Refunded") return 3;
@@ -281,7 +294,11 @@ export default function StatusTimeline({ invoice, total }: Props) {
           const current = i === active;
           const label = i === 3 && invoice.status !== "Pending" ? invoice.status : step;
           return (
+<<<<<<< HEAD
+            <div key={step} className={`flex-1 flex flex-col items-center min-w-0 px-1${current ? " text-white font-semibold" : ""}`}>
+=======
             <div key={step} className="flex-1 flex flex-col items-center min-w-0 px-1">
+>>>>>>> upstream/main
               <div className="flex items-center w-full">
                 {i > 0 && <div className={`flex-1 h-0.5 ${done || current ? "bg-indigo-500" : "bg-gray-700"}`} />}
                 <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 ${done ? "bg-indigo-500 border-indigo-500" : current ? "bg-white border-indigo-400" : "bg-gray-800 border-gray-600"}`} />
@@ -328,11 +345,16 @@ export default function StatusTimeline({ invoice, total }: Props) {
                     </p>
                   )}
                   {ev.timestamp ? (
+<<<<<<< HEAD
+                    <p className="text-xs text-gray-500 mt-0.5 cursor-default">
+                      <RelativeTime iso={new Date(ev.timestamp * 1000).toISOString()} />
+=======
                     <p
                       className="text-xs text-gray-500 mt-0.5 cursor-default"
                       title={absoluteTime(ev.timestamp)}
                     >
                       {relativeTime(ev.timestamp)}
+>>>>>>> upstream/main
                     </p>
                   ) : (
                     <p className="text-xs text-gray-600 mt-0.5 italic">timestamp pending</p>

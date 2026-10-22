@@ -15,6 +15,8 @@ interface Props {
   onConfirm: () => void;
   onBack: () => void;
   confirming?: boolean;
+<<<<<<< HEAD
+=======
   /** Currency the invoice was issued in (e.g. "USD", "EUR"). Defaults to USDC. */
   invoiceCurrency?: string;
   /** Converted XLM amount for the payment, if a conversion applies. */
@@ -25,6 +27,7 @@ interface Props {
   rateLocked?: boolean;
   /** Unix timestamp (ms) when the locked rate expires. */
   rateLockExpiresAt?: number;
+>>>>>>> upstream/main
 }
 
 export default function PaymentBreakdownModal({
@@ -34,6 +37,9 @@ export default function PaymentBreakdownModal({
   onConfirm,
   onBack,
   confirming = false,
+<<<<<<< HEAD
+}: Props) {
+=======
   invoiceCurrency = "USDC",
   convertedXlm,
   exchangeRate,
@@ -44,6 +50,7 @@ export default function PaymentBreakdownModal({
   const rateLockExpired =
     rateLockExpiresAt !== undefined && Date.now() >= rateLockExpiresAt;
   const rateLockActive = rateLocked && !rateLockExpired;
+>>>>>>> upstream/main
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60"
@@ -65,18 +72,37 @@ export default function PaymentBreakdownModal({
               <tr className="border-b border-gray-700">
                 <td className="px-4 py-3 text-gray-300">Gross Amount</td>
                 <td className="px-4 py-3 text-right text-indigo-300 font-semibold">
+<<<<<<< HEAD
+                  {formatAmount(feeBreakdown.gross)} USDC
+=======
                   {formatAmount(feeBreakdown.gross)} {invoiceCurrency}
+>>>>>>> upstream/main
                 </td>
               </tr>
               <tr className="border-b border-gray-700">
                 <td className="px-4 py-3 text-gray-300">Protocol Fee</td>
                 <td className="px-4 py-3 text-right text-red-400 font-semibold">
+<<<<<<< HEAD
+                  -{formatAmount(feeBreakdown.fee)} USDC
+=======
                   -{formatAmount(feeBreakdown.fee)} {invoiceCurrency}
+>>>>>>> upstream/main
                 </td>
               </tr>
               <tr className="border-b border-gray-700">
                 <td className="px-4 py-3 text-gray-300">Net to Recipients</td>
                 <td className="px-4 py-3 text-right text-green-400 font-semibold">
+<<<<<<< HEAD
+                  {formatAmount(feeBreakdown.net)} USDC
+                </td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 text-gray-300">Stellar Tx Fee</td>
+                <td className="px-4 py-3 text-right text-gray-400 text-xs">
+                  ~{formatAmount(stellarFee)} USDC
+                </td>
+              </tr>
+=======
                   {formatAmount(feeBreakdown.net)} {invoiceCurrency}
                 </td>
               </tr>
@@ -94,10 +120,13 @@ export default function PaymentBreakdownModal({
                   </td>
                 </tr>
               )}
+>>>>>>> upstream/main
             </tbody>
           </table>
         </div>
 
+<<<<<<< HEAD
+=======
         {/* Exchange rate & lock status */}
         {hasConversion && (
           <div className="bg-gray-800/50 rounded-lg p-3 text-xs flex flex-col gap-1">
@@ -125,6 +154,7 @@ export default function PaymentBreakdownModal({
           </div>
         )}
 
+>>>>>>> upstream/main
         {/* Fee explanation */}
         <div className="bg-gray-800/50 rounded-lg p-3 text-xs text-gray-400">
           <p>
@@ -145,7 +175,11 @@ export default function PaymentBreakdownModal({
           <button
             type="button"
             onClick={onConfirm}
+<<<<<<< HEAD
+            disabled={confirming}
+=======
             disabled={confirming || rateLockExpired}
+>>>>>>> upstream/main
             className="flex-1 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-sm font-semibold transition-colors disabled:opacity-50"
           >
             {confirming ? "Waiting for signature…" : "Confirm & Pay"}

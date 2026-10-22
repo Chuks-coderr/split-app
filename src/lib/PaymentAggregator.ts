@@ -8,6 +8,8 @@ export interface TopPayer {
   sharePct: number;
 }
 
+<<<<<<< HEAD
+=======
 /** Per-invoice aggregation snapshot used when bundling invoices. */
 export interface InvoiceAggregate {
   invoiceId: string;
@@ -43,6 +45,7 @@ function progressPctFor(funded: bigint, total: bigint): number {
   return Math.min(100, Math.max(0, raw));
 }
 
+>>>>>>> upstream/main
 /**
  * Aggregates payments for a single invoice into derived display data.
  * Initialise with existing payments, then call applyPayment as new ones arrive.
@@ -99,6 +102,8 @@ export class PaymentAggregator {
     return this._lastPaymentAt;
   }
 
+<<<<<<< HEAD
+=======
   /** Snapshot of this invoice's aggregation, for use in bundle summaries. */
   toAggregate(invoiceId: string): InvoiceAggregate {
     return {
@@ -147,6 +152,7 @@ export class PaymentAggregator {
     };
   }
 
+>>>>>>> upstream/main
   /** Top payers sorted by total amount descending */
   get topPayers(): TopPayer[] {
     const entries = Array.from(this._amountByPayer.entries());

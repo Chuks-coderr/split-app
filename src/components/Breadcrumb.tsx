@@ -7,6 +7,9 @@ export interface BreadcrumbItem {
 }
 
 interface Props {
+<<<<<<< HEAD
+  items: BreadcrumbItem[];
+=======
   items?: BreadcrumbItem[];
 }
 
@@ -48,6 +51,7 @@ export function buildBreadcrumbTrail(
   });
 
   return trail;
+>>>>>>> upstream/main
 }
 
 export default function Breadcrumb({ items }: Props) {
@@ -56,6 +60,38 @@ export default function Breadcrumb({ items }: Props) {
 
   if (isHome) return null;
 
+<<<<<<< HEAD
+  // Mobile: show only last 2 items
+  const displayItems = items.length > 2 ? items.slice(-2) : items;
+  const showEllipsis = items.length > 2;
+
+  return (
+    <nav
+      className="flex items-center gap-1 text-sm text-gray-400 px-4 sm:px-6 py-2 border-b border-gray-800"
+      aria-label="Breadcrumb"
+    >
+      <ol className="flex items-center gap-1">
+        {showEllipsis && (
+          <>
+            <li>
+              <Link
+                href="/"
+                className="hover:text-gray-200 transition-colors"
+              >
+                Home
+              </Link>
+            </li>
+            <li aria-hidden="true" className="text-gray-600">
+              …
+            </li>
+          </>
+        )}
+        {displayItems.map((item, i) => {
+          const isLast = i === displayItems.length - 1;
+          return (
+            <li key={item.label} className="flex items-center gap-1">
+              {!isLast && i > 0 && (
+=======
   const trail = items && items.length > 0 ? items : buildBreadcrumbTrail(pathname);
 
   // Avoid duplicate Home entries (e.g. when items already start with Home)
@@ -76,11 +112,47 @@ export default function Breadcrumb({ items }: Props) {
           return (
             <li key={`${item.label}-${i}`} className="flex items-center gap-1">
               {i > 0 && (
+>>>>>>> upstream/main
                 <span aria-hidden="true" className="text-gray-600">
                   /
                 </span>
               )}
               {isLast ? (
+<<<<<<< HEAD
+                <span className="text-gray-300 font-medium" aria-current="page">{item.label}</span>
+              ) : (
+                <>
+                  {i === 0 && !showEllipsis && (
+                    <Link
+                      href="/"
+                      className="hover:text-gray-200 transition-colors"
+                    >
+                      Home
+                    </Link>
+                  )}
+                  {i > 0 && (
+                    <>
+                      <span aria-hidden="true" className="text-gray-600">
+                        /
+                      </span>
+                      <Link
+                        href={item.href || "#"}
+                        className="hover:text-gray-200 transition-colors"
+                      >
+                        {item.label}
+                      </Link>
+                    </>
+                  )}
+                  {i === 0 && !showEllipsis && (
+                    <>
+                      <span aria-hidden="true" className="text-gray-600">
+                        /
+                      </span>
+                      <span className="text-gray-300">{item.label}</span>
+                    </>
+                  )}
+                </>
+=======
                 <span className="text-gray-300 font-medium" aria-current="page">
                   {item.label}
                 </span>
@@ -91,6 +163,7 @@ export default function Breadcrumb({ items }: Props) {
                 >
                   {item.label}
                 </Link>
+>>>>>>> upstream/main
               )}
             </li>
           );

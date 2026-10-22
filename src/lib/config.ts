@@ -15,6 +15,8 @@ export const RPC_URL =
 /** StellarSplit contract ID used for on-chain calls and event filtering. */
 export const contractId = process.env.NEXT_PUBLIC_CONTRACT_ID ?? "";
 
+<<<<<<< HEAD
+=======
 /**
  * Analytics configuration.
  *
@@ -84,12 +86,19 @@ export const backupConfig = {
   alertWebhook: BACKUP_ALERT_WEBHOOK,
 } as const;
 
+>>>>>>> upstream/main
 export const config = {
   network: STELLAR_NETWORK,
   rpcUrl: RPC_URL,
   contractId,
+<<<<<<< HEAD
+} as const;
+
+export default config;
+=======
   analytics: analyticsConfig,
   backup: backupConfig,
 } as const;
 
 export default config;
+>>>>>>> upstream/main

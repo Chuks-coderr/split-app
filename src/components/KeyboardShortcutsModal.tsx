@@ -1,7 +1,11 @@
 "use client";
 
+<<<<<<< HEAD
+import { useMemo } from "react";
+=======
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
+>>>>>>> upstream/main
 import FocusTrap from "@/components/FocusTrap";
 import { useShortcutRegistry, type ShortcutDefinition } from "@/context/ShortcutRegistry";
 
@@ -11,6 +15,21 @@ interface Props {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
+<<<<<<< HEAD
+/**
+ * Group shortcuts by their `group` field.
+ * Groups are returned in the order they first appear in the registry,
+ * with "General" always first when present.
+ */
+function groupShortcuts(
+  shortcuts: ShortcutDefinition[],
+): Array<{ group: string; entries: ShortcutDefinition[] }> {
+  const map = new Map<string, ShortcutDefinition[]>();
+
+  // Always seed General first so it stays at the top
+  map.set("General", []);
+
+=======
 /** Fallback category for shortcuts that do not declare a `group`. */
 const GENERAL_GROUP = "General";
 
@@ -41,15 +60,26 @@ function groupShortcuts(
 ): Array<{ group: string; id: string; entries: ShortcutDefinition[] }> {
   const map = new Map<string, ShortcutDefinition[]>();
 
+>>>>>>> upstream/main
   for (const s of shortcuts) {
     // Hide internal chord-activation entries from the overlay
     if (s.id === "global:g-chord") continue;
 
+<<<<<<< HEAD
+    const group = s.group ?? "General";
+=======
     const group = s.group?.trim() || GENERAL_GROUP;
+>>>>>>> upstream/main
     if (!map.has(group)) map.set(group, []);
     map.get(group)!.push(s);
   }
 
+<<<<<<< HEAD
+  // Remove empty groups
+  return Array.from(map.entries())
+    .filter(([, entries]) => entries.length > 0)
+    .map(([group, entries]) => ({ group, entries }));
+=======
   const rank = (group: string): number => {
     const lead = LEAD_CATEGORIES.indexOf(group as (typeof LEAD_CATEGORIES)[number]);
     if (lead !== -1) return lead;
@@ -64,6 +94,7 @@ function groupShortcuts(
       return diff !== 0 ? diff : a.localeCompare(b);
     })
     .map(([group, entries]) => ({ group, id: groupDomId(group), entries }));
+>>>>>>> upstream/main
 }
 
 // ── Kbd chip ──────────────────────────────────────────────────────────────────
@@ -82,13 +113,19 @@ function KbdKey({ label }: { label: string }) {
  * KeyboardShortcutsModal
  *
  * A help overlay that lists **all shortcuts registered via ShortcutRegistry**.
+<<<<<<< HEAD
+ * Shortcuts are grouped by their `group` field (defaults to "General").
+=======
  * Shortcuts are grouped by their `group` field (defaults to "General") and the
  * categories lead in a stable order (Navigation, Invoices, Payments, …, General).
+>>>>>>> upstream/main
  *
  * Triggered by pressing `?` outside text inputs, or clicking the `?` icon in
  * the header. Closed by pressing Escape (handled in useKeyboardShortcuts) or
  * clicking the backdrop / close button.
  *
+<<<<<<< HEAD
+=======
  * The overlay is rendered through a portal into `document.body`. It is mounted
  * from the header (`HeaderShortcutsButton` → `Navbar`), and that header sets a
  * `backdrop-blur`, which makes the header a containing block for `position:
@@ -96,12 +133,17 @@ function KbdKey({ label }: { label: string }) {
  * to the header box instead of the viewport, so the dialog appeared clipped and
  * the backdrop never covered the page.
  *
+>>>>>>> upstream/main
  * Components register shortcuts with `useRegisterShortcuts` — the overlay
  * automatically reflects additions and removals without any manual wiring.
  */
 export default function KeyboardShortcutsModal({ onClose }: Props) {
   const { shortcuts } = useShortcutRegistry();
   const grouped = useMemo(() => groupShortcuts(shortcuts), [shortcuts]);
+<<<<<<< HEAD
+
+  return (
+=======
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -112,6 +154,7 @@ export default function KeyboardShortcutsModal({ onClose }: Props) {
   if (!mounted || typeof document === "undefined") return null;
 
   return createPortal(
+>>>>>>> upstream/main
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4"
       role="dialog"
@@ -185,10 +228,17 @@ export default function KeyboardShortcutsModal({ onClose }: Props) {
               </p>
             ) : (
               <div className="flex flex-col gap-5">
+<<<<<<< HEAD
+                {grouped.map(({ group, entries }) => (
+                  <section key={group} aria-labelledby={`kbd-group-${group}`}>
+                    <h3
+                      id={`kbd-group-${group}`}
+=======
                 {grouped.map(({ group, id, entries }) => (
                   <section key={group} aria-labelledby={id}>
                     <h3
                       id={id}
+>>>>>>> upstream/main
                       className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-1"
                     >
                       {group}
@@ -237,7 +287,11 @@ export default function KeyboardShortcutsModal({ onClose }: Props) {
           </div>
         </div>
       </FocusTrap>
+<<<<<<< HEAD
+    </div>
+=======
     </div>,
     document.body,
+>>>>>>> upstream/main
   );
 }

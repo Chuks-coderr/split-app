@@ -5,6 +5,17 @@ import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import type { Invoice } from "@stellar-split/sdk";
 import { formatAmount } from "@stellar-split/sdk";
 import { getInvoiceDisplayStatus } from "@/lib/dashboardFilters";
+<<<<<<< HEAD
+
+// ── Column definitions ────────────────────────────────────────────────────────
+
+export type SortColumn = "id" | "amount" | "status" | "deadline" | "funded";
+
+type ColumnKey = "id" | "status" | "amount" | "funded" | "deadline" | "tags" | "recipients";
+
+const DEFAULT_COLUMNS: Record<ColumnKey, boolean> = {
+  id: true, status: true, amount: true, funded: true, deadline: true, tags: true, recipients: true,
+=======
 import {
   AGING_BUCKETS,
   getAgingBucket,
@@ -20,10 +31,15 @@ type ColumnKey = "id" | "status" | "amount" | "funded" | "deadline" | "aging" | 
 
 const DEFAULT_COLUMNS: Record<ColumnKey, boolean> = {
   id: true, status: true, amount: true, funded: true, deadline: true, aging: false, tags: true, recipients: true,
+>>>>>>> upstream/main
 };
 
 const COLUMN_LABELS: Record<ColumnKey, string> = {
   id: "ID", status: "Status", amount: "Amount", funded: "Funded",
+<<<<<<< HEAD
+  deadline: "Deadline", tags: "Tags", recipients: "Recipients",
+};
+=======
   deadline: "Deadline", aging: "Aging", tags: "Tags", recipients: "Recipients",
 };
 
@@ -31,6 +47,7 @@ const BUCKET_ORDER: Record<AgingBucketKey, number> = AGING_BUCKETS.reduce(
   (acc, b, i) => ({ ...acc, [b.key]: i }),
   {} as Record<AgingBucketKey, number>,
 );
+>>>>>>> upstream/main
 export type SortDir = "asc" | "desc";
 
 export interface InvoiceTableSortState {
@@ -85,6 +102,8 @@ function sortInvoices(
       });
     case "deadline":
       return list.sort((a, b) => mul * (a.deadline - b.deadline));
+<<<<<<< HEAD
+=======
     case "aging": {
       const now = Math.floor(Date.now() / 1000);
       return list.sort((a, b) => {
@@ -94,6 +113,7 @@ function sortInvoices(
         return mul * (getDaysOverdue(a, now) - getDaysOverdue(b, now));
       });
     }
+>>>>>>> upstream/main
     case "status": {
       const now = Math.floor(Date.now() / 1000);
       return list.sort(
@@ -148,6 +168,9 @@ function SortHeader({ column, label, sort, onSort, className = "" }: SortHeaderP
     isActive ? (sort.dir === "asc" ? "↑" : "↓") : "↕";
 
   return (
+<<<<<<< HEAD
+    <th scope="col" className={`text-left px-4 py-3 ${className}`}>
+=======
     <th
       scope="col"
       className={`text-left px-4 py-3 ${className}`}
@@ -155,6 +178,7 @@ function SortHeader({ column, label, sort, onSort, className = "" }: SortHeaderP
         isActive ? (sort.dir === "asc" ? "ascending" : "descending") : "none"
       }
     >
+>>>>>>> upstream/main
       <button
         type="button"
         onClick={() => onSort(column)}
@@ -164,6 +188,12 @@ function SortHeader({ column, label, sort, onSort, className = "" }: SortHeaderP
             ? "text-indigo-400"
             : "text-gray-500 hover:text-gray-200",
         ].join(" ")}
+<<<<<<< HEAD
+        aria-sort={
+          isActive ? (sort.dir === "asc" ? "ascending" : "descending") : "none"
+        }
+=======
+>>>>>>> upstream/main
       >
         <span>{label}</span>
         <span aria-hidden="true" className="text-[10px]">
@@ -187,8 +217,11 @@ interface InvoiceTableProps {
   onSort?: (sort: InvoiceTableSortState) => void;
   /** Content to render in each row's action column */
   rowAction?: (inv: Invoice) => React.ReactNode;
+<<<<<<< HEAD
+=======
   /** When set, only invoices in this aging bucket are shown */
   agingFilter?: AgingBucketKey | null;
+>>>>>>> upstream/main
 }
 
 /**
@@ -206,7 +239,10 @@ export default function InvoiceTable({
   sort: externalSort,
   onSort: externalOnSort,
   rowAction,
+<<<<<<< HEAD
+=======
   agingFilter = null,
+>>>>>>> upstream/main
 }: InvoiceTableProps) {
   const [internalSort, setInternalSort] =
     useState<InvoiceTableSortState>(DEFAULT_SORT);
@@ -262,6 +298,9 @@ export default function InvoiceTable({
     [sort, externalOnSort],
   );
 
+<<<<<<< HEAD
+  const sorted = useMemo(() => sortInvoices(invoices, sort), [invoices, sort]);
+=======
   const now = Math.floor(Date.now() / 1000);
 
   const filtered = useMemo(
@@ -273,6 +312,7 @@ export default function InvoiceTable({
   );
 
   const sorted = useMemo(() => sortInvoices(filtered, sort), [filtered, sort]);
+>>>>>>> upstream/main
 
   if (invoices.length === 0) {
     return (
@@ -282,6 +322,11 @@ export default function InvoiceTable({
     );
   }
 
+<<<<<<< HEAD
+  const now = Math.floor(Date.now() / 1000);
+
+=======
+>>>>>>> upstream/main
   return (
     <div>
       {/* Gear button + column settings dropdown */}
@@ -343,9 +388,12 @@ export default function InvoiceTable({
               {colVisible.deadline && (
                 <SortHeader column="deadline" label="Deadline" sort={sort} onSort={handleSort} className="w-36" />
               )}
+<<<<<<< HEAD
+=======
               {colVisible.aging && (
                 <SortHeader column="aging" label="Aging" sort={sort} onSort={handleSort} className="w-32" />
               )}
+>>>>>>> upstream/main
               {colVisible.tags && (
                 <th scope="col" className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
                   Tags
@@ -450,6 +498,8 @@ export default function InvoiceTable({
                     </td>
                   )}
 
+<<<<<<< HEAD
+=======
                   {colVisible.aging && (() => {
                     const bucket = getAgingBucket(inv, now);
                     const days = getDaysOverdue(inv, now);
@@ -471,6 +521,7 @@ export default function InvoiceTable({
                     );
                   })()}
 
+>>>>>>> upstream/main
                   {colVisible.tags && (
                     <td className="px-4 py-3">
                       {tags.length > 0 ? (

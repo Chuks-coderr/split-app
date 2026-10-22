@@ -1,6 +1,11 @@
+<<<<<<< HEAD
+import { useState } from "react";
+import { splitClient } from "@/lib/stellar";
+=======
 "use client";
 
 import { useState } from "react";
+>>>>>>> upstream/main
 import type { Invoice } from "@stellar-split/sdk";
 import {
   archiveInvoices,
@@ -8,6 +13,8 @@ import {
   isInvoiceArchived,
   getUndoTimeout,
 } from "@/lib/archiveInvoices";
+<<<<<<< HEAD
+=======
 import {
   exportInvoicesBulk,
   getBulkInvoiceAudit,
@@ -16,14 +23,19 @@ import {
   type BulkInvoiceOperation,
   type BulkExportFormat,
 } from "@/lib/bulkInvoiceOps";
+>>>>>>> upstream/main
 
 interface Props {
   selectedCount: number;
   selectedInvoices: Invoice[];
   onCancel: () => void;
   onBulkCancel: () => Promise<void>;
+<<<<<<< HEAD
+  onBulkExport: () => void;
+=======
   /** @deprecated Use the built-in export; kept for backward-compat. */
   onBulkExport?: () => void;
+>>>>>>> upstream/main
   onSelectAll: () => void;
   onDeselectAll: () => void;
   totalCount: number;
@@ -33,10 +45,14 @@ interface Props {
 
 /**
  * BulkActionBar — toolbar for bulk operations on selected invoices.
+<<<<<<< HEAD
+ * Supports: cancel, export, archive, unarchive operations.
+=======
  *
  * Supports: cancel, export (CSV / JSON), print, archive, unarchive.
  *
  * Issue #810: extended with print and multi-format export.
+>>>>>>> upstream/main
  */
 export default function BulkActionBar({
   selectedCount,
@@ -56,11 +72,14 @@ export default function BulkActionBar({
     isArchive: boolean;
   } | null>(null);
   const [showUndoToast, setShowUndoToast] = useState(false);
+<<<<<<< HEAD
+=======
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [pendingOperation, setPendingOperation] = useState<BulkInvoiceOperation | null>(null);
   const [operationError, setOperationError] = useState<string | null>(null);
   const [auditEntries, setAuditEntries] = useState<ReturnType<typeof getBulkInvoiceAudit>>([]);
   const [showAudit, setShowAudit] = useState(false);
+>>>>>>> upstream/main
 
   const pendingCount = selectedInvoices.filter(
     (inv) => inv.status === "Pending",
@@ -70,8 +89,11 @@ export default function BulkActionBar({
     isInvoiceArchived(inv.id),
   ).length;
 
+<<<<<<< HEAD
+=======
   // ── Archive ────────────────────────────────────────────────────────────────
 
+>>>>>>> upstream/main
   const handleArchive = async () => {
     const idsToArchive = selectedInvoices
       .filter((inv) => !isInvoiceArchived(inv.id))
@@ -84,6 +106,17 @@ export default function BulkActionBar({
       archiveInvoices(idsToArchive);
       setUndoAction({ ids: idsToArchive, isArchive: true });
       setShowUndoToast(true);
+<<<<<<< HEAD
+
+      setTimeout(() => {
+        setShowUndoToast(false);
+      }, getUndoTimeout());
+
+      onArchiveChange?.();
+    } finally {
+      setArchiveLoading(false);
+    }
+=======
       setTimeout(() => setShowUndoToast(false), getUndoTimeout());
       onArchiveChange?.();
       setPendingOperation(null);
@@ -103,6 +136,7 @@ export default function BulkActionBar({
     } catch (error) {
       setOperationError(`Invoices were archived, but the audit entry could not be saved: ${String(error)}`);
     }
+>>>>>>> upstream/main
   };
 
   const handleUnarchive = async () => {
@@ -117,6 +151,17 @@ export default function BulkActionBar({
       unarchiveInvoices(idsToUnarchive);
       setUndoAction({ ids: idsToUnarchive, isArchive: false });
       setShowUndoToast(true);
+<<<<<<< HEAD
+
+      setTimeout(() => {
+        setShowUndoToast(false);
+      }, getUndoTimeout());
+
+      onArchiveChange?.();
+    } finally {
+      setArchiveLoading(false);
+    }
+=======
       setTimeout(() => setShowUndoToast(false), getUndoTimeout());
       onArchiveChange?.();
       setPendingOperation(null);
@@ -136,15 +181,25 @@ export default function BulkActionBar({
     } catch (error) {
       setOperationError(`Invoices were unarchived, but the audit entry could not be saved: ${String(error)}`);
     }
+>>>>>>> upstream/main
   };
 
   const handleUndo = () => {
     if (!undoAction) return;
+<<<<<<< HEAD
+
+=======
+>>>>>>> upstream/main
     if (undoAction.isArchive) {
       unarchiveInvoices(undoAction.ids);
     } else {
       archiveInvoices(undoAction.ids);
     }
+<<<<<<< HEAD
+
+    setShowUndoToast(false);
+    onArchiveChange?.();
+=======
     setShowUndoToast(false);
     onArchiveChange?.();
     try {
@@ -227,12 +282,16 @@ export default function BulkActionBar({
   const handlePrint = () => {
     if (selectedInvoices.length === 0) return;
     printInvoicesBulk(selectedInvoices, { showRecipients: true });
+>>>>>>> upstream/main
   };
 
   return (
     <>
       <div className="sticky bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 p-4 flex flex-wrap items-center justify-between gap-3 z-30">
+<<<<<<< HEAD
+=======
         {/* Left: selection info */}
+>>>>>>> upstream/main
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-sm font-semibold text-gray-300">
             {selectedCount} selected
@@ -251,6 +310,14 @@ export default function BulkActionBar({
           </button>
         </div>
 
+<<<<<<< HEAD
+        <div className="flex items-center gap-2 flex-wrap">
+          {pendingCount > 0 && (
+            <button
+              type="button"
+              onClick={onBulkCancel}
+              className="text-xs px-3 py-1.5 rounded-lg bg-red-700 hover:bg-red-600 text-white font-semibold transition-colors"
+=======
         {/* Right: actions */}
         <div className="flex items-center gap-2 flex-wrap">
           {/* Cancel pending invoices */}
@@ -263,11 +330,42 @@ export default function BulkActionBar({
               }}
               disabled={archiveLoading}
               className="text-xs px-3 py-1.5 rounded-lg bg-red-700 hover:bg-red-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold transition-colors"
+>>>>>>> upstream/main
             >
               Cancel ({pendingCount})
             </button>
           )}
 
+<<<<<<< HEAD
+          {!archivedOnly && archivedCount < selectedCount && (
+            <button
+              type="button"
+              onClick={handleArchive}
+              disabled={archiveLoading}
+              className="text-xs px-3 py-1.5 rounded-lg bg-amber-700 hover:bg-amber-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold transition-colors"
+            >
+              {archiveLoading ? "Archiving..." : `Archive (${selectedCount - archivedCount})`}
+            </button>
+          )}
+
+          {archivedCount > 0 && (
+            <button
+              type="button"
+              onClick={handleUnarchive}
+              disabled={archiveLoading}
+              className="text-xs px-3 py-1.5 rounded-lg bg-blue-700 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold transition-colors"
+            >
+              {archiveLoading ? "Unarchiving..." : `Unarchive (${archivedCount})`}
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={onBulkExport}
+            className="text-xs px-3 py-1.5 rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-200 font-semibold transition-colors"
+          >
+            Export CSV
+=======
           {/* Archive */}
           {!archivedOnly && archivedCount < selectedCount && (
             <button
@@ -377,6 +475,7 @@ export default function BulkActionBar({
             aria-expanded={showAudit}
           >
             {showAudit ? "Hide audit" : "Audit trail"}
+>>>>>>> upstream/main
           </button>
           <button
             type="button"
@@ -388,6 +487,13 @@ export default function BulkActionBar({
         </div>
       </div>
 
+<<<<<<< HEAD
+      {/* Undo toast */}
+      {showUndoToast && undoAction && (
+        <div className="fixed bottom-4 right-4 bg-gray-800 border border-gray-700 rounded-lg p-3 shadow-lg z-40 flex items-center gap-3">
+          <span className="text-sm text-gray-200">
+            {undoAction.isArchive ? "Invoices archived" : "Invoices unarchived"}
+=======
       {operationError && (
         <p role="alert" className="fixed bottom-20 left-4 z-50 max-w-lg rounded-lg border border-red-800 bg-red-950 px-4 py-3 text-sm text-red-200 shadow-xl">
           {operationError}
@@ -484,6 +590,7 @@ export default function BulkActionBar({
             {undoAction.isArchive
               ? "Invoices archived"
               : "Invoices unarchived"}
+>>>>>>> upstream/main
           </span>
           <button
             type="button"

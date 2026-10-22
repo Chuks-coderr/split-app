@@ -20,7 +20,10 @@ function readCache(address: string): BrandSettings | null {
         logoUrl: parsed.logoUrl ?? null,
         accentColor: parsed.accentColor ?? null,
         tagline: parsed.tagline ?? null,
+<<<<<<< HEAD
+=======
         fontFamily: parsed.fontFamily ?? null,
+>>>>>>> upstream/main
         updatedAt: parsed.updatedAt ?? "",
       };
     }
@@ -69,12 +72,16 @@ export async function fetchBrandSettings(address: string): Promise<BrandSettings
 /** Persists brand settings for an account via the settings API. */
 export async function saveBrandSettingsRemote(
   address: string,
+<<<<<<< HEAD
+  settings: { logoUrl: string | null; accentColor: string | null; tagline: string | null },
+=======
   settings: {
     logoUrl: string | null;
     accentColor: string | null;
     tagline: string | null;
     fontFamily: BrandSettings["fontFamily"];
   },
+>>>>>>> upstream/main
 ): Promise<BrandSettings> {
   const res = await fetch("/api/settings/branding", {
     method: "PUT",

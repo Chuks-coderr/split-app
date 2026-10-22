@@ -29,6 +29,19 @@ junit.xml
 # ── OS files ──────────────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
+<<<<<<< HEAD
+
+# ── Editor / IDE ──────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+=======
 *.DS_Store
 
 # Test artifacts
@@ -39,12 +52,26 @@ playwright-report/
 test-results/
 junit.xml
 *.lcov
+>>>>>>> upstream/main
 
 # ── Logs ──────────────────────────────────────────────────────────────────
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+<<<<<<< HEAD
+pnpm-debug.log*
+
+# ── Misc ──────────────────────────────────────────────────────────────────
+.vercel/
+.turbo/
+.cache/
+.eslintcache
+*.tgz
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat
+=======
 
 # Editor
 .vscode/
@@ -58,3 +85,4 @@ yarn-error.log*
 .cache/
 *.tgz
 dist/
+>>>>>>> upstream/main

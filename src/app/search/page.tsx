@@ -32,6 +32,8 @@ import {
   isLastColumn,
   type SearchColumn,
 } from '@/lib/searchColumns';
+<<<<<<< HEAD
+=======
 import {
   searchInvoices,
   getStoredSearches,
@@ -43,6 +45,7 @@ import {
   removeSavedSearch,
   type SavedSearch,
 } from '@/lib/invoiceSearch';
+>>>>>>> upstream/main
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -80,6 +83,8 @@ function hasActiveFilters(c: FilterCriteria): boolean {
   });
 }
 
+<<<<<<< HEAD
+=======
 /** Counts how many individual filter dimensions are currently active (for a filter-count badge). */
 function countActiveFilters(c: FilterCriteria): number {
   return Object.keys(c).reduce((count, k) => {
@@ -89,6 +94,7 @@ function countActiveFilters(c: FilterCriteria): number {
   }, 0);
 }
 
+>>>>>>> upstream/main
 // ── Status badge styles ───────────────────────────────────────────────────────
 
 const STATUS_STYLES: Record<string, string> = {
@@ -97,6 +103,9 @@ const STATUS_STYLES: Record<string, string> = {
   Refunded: 'bg-gray-500/20 text-gray-300',
 };
 
+<<<<<<< HEAD
+// ── ColumnPicker ──────────────────────────────────────────────────────────────
+=======
 // ── Highlight ───────────────────────────────────────────────────────────────
 
 function escapeRegExp(s: string): string {
@@ -344,6 +353,7 @@ function SearchHistoryPanel({
     </div>
   );
 }
+>>>>>>> upstream/main
 
 function ColumnPicker({
   visibleColumns,
@@ -419,11 +429,17 @@ function ColumnPicker({
 function InvoiceRow({
   invoice,
   visibleColumns,
+<<<<<<< HEAD
+}: {
+  invoice: Invoice;
+  visibleColumns: SearchColumn[];
+=======
   highlightQuery,
 }: {
   invoice: Invoice;
   visibleColumns: SearchColumn[];
   highlightQuery?: string;
+>>>>>>> upstream/main
 }) {
   const total = invoice.recipients.reduce((s, r) => s + r.amount, 0n);
   const fundedPct = total > 0n ? Number((invoice.funded * 100n) / total) : 0;
@@ -432,7 +448,11 @@ function InvoiceRow({
     <div className="bg-gray-900 rounded-xl p-4 hover:bg-gray-800 transition-colors cursor-pointer">
       <div className="flex flex-wrap items-center gap-3">
         <span className="text-sm font-semibold text-gray-300 shrink-0">
+<<<<<<< HEAD
+          Invoice #{invoice.id}
+=======
           Invoice #{highlightQuery ? highlightMatch(String(invoice.id), highlightQuery) : invoice.id}
+>>>>>>> upstream/main
         </span>
 
         {visibleColumns.includes('amount') && (
@@ -445,7 +465,11 @@ function InvoiceRow({
           <span
             className={`text-xs px-2 py-0.5 rounded-full font-semibold ${STATUS_STYLES[invoice.status] ?? ''}`}
           >
+<<<<<<< HEAD
+            {invoice.status}
+=======
             {highlightQuery ? highlightMatch(invoice.status, highlightQuery) : invoice.status}
+>>>>>>> upstream/main
           </span>
         )}
 
@@ -457,9 +481,13 @@ function InvoiceRow({
 
         {visibleColumns.includes('creator') && (
           <span className="text-xs text-gray-500 font-mono">
+<<<<<<< HEAD
+            {truncateAddress(invoice.creator)}
+=======
             {highlightQuery
               ? highlightMatch(truncateAddress(invoice.creator), highlightQuery)
               : truncateAddress(invoice.creator)}
+>>>>>>> upstream/main
           </span>
         )}
 
@@ -484,10 +512,16 @@ function InvoiceRow({
 interface VirtualListProps {
   items: Invoice[];
   visibleColumns: SearchColumn[];
+<<<<<<< HEAD
+}
+
+function VirtualList({ items, visibleColumns }: VirtualListProps) {
+=======
   highlightQuery?: string;
 }
 
 function VirtualList({ items, visibleColumns, highlightQuery }: VirtualListProps) {
+>>>>>>> upstream/main
   const [scrollTop, setScrollTop] = useState(0);
 
   const startIdx = Math.floor(scrollTop / ITEM_HEIGHT_PX);
@@ -512,7 +546,11 @@ function VirtualList({ items, visibleColumns, highlightQuery }: VirtualListProps
             className="mb-4"
           >
             <Link href={`/invoice/${inv.id}`}>
+<<<<<<< HEAD
+              <InvoiceRow invoice={inv} visibleColumns={visibleColumns} />
+=======
               <InvoiceRow invoice={inv} visibleColumns={visibleColumns} highlightQuery={highlightQuery} />
+>>>>>>> upstream/main
             </Link>
           </div>
         ))}
@@ -597,6 +635,8 @@ function SearchPageInner() {
   const [draftCreator, setDraftCreator] = useState(criteria.creator ?? '');
   const [draftRecipient, setDraftRecipient] = useState(criteria.recipient ?? '');
 
+<<<<<<< HEAD
+=======
   // Full-text search state
   const [fullTextQuery, setFullTextQuery] = useState('');
   const [showHistory, setShowHistory] = useState(false);
@@ -604,6 +644,7 @@ function SearchPageInner() {
   const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([]);
   const fullTextInputRef = useRef<HTMLInputElement | null>(null);
 
+>>>>>>> upstream/main
   // Share status feedback
   const [shareStatus, setShareStatus] = useState<string | null>(null);
 
@@ -634,6 +675,8 @@ function SearchPageInner() {
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [knownTokens, setKnownTokens] = useState<string[]>(DEFAULT_TOKENS);
 
+<<<<<<< HEAD
+=======
   // ── Load search history from localStorage ────────────────────────────────
 
   useEffect(() => {
@@ -677,6 +720,7 @@ function SearchPageInner() {
     setSavedSearches(getSavedSearches());
   }, [fullTextQuery]);
 
+>>>>>>> upstream/main
   // ── Sync URL back to state on changes ──────────────────────────────────────
 
   const searchParamsString = searchParams.toString();
@@ -738,7 +782,10 @@ function SearchPageInner() {
     setDraftFundedMax('');
     setDraftCreator('');
     setDraftRecipient('');
+<<<<<<< HEAD
+=======
     setFullTextQuery('');
+>>>>>>> upstream/main
     router.replace('/search', { scroll: false });
   }, [router]);
 
@@ -840,6 +887,12 @@ function SearchPageInner() {
 
   const results = useMemo(() => {
     const compiled = compileFilter(criteria);
+<<<<<<< HEAD
+    return FilterIndex.queryIndex(allInvoices, compiled);
+  }, [allInvoices, criteria]);
+
+  const filtersActive = hasActiveFilters(criteria);
+=======
     const filtered = FilterIndex.queryIndex(allInvoices, compiled);
     // Apply full-text search on top of structured filters
     if (fullTextQuery.trim()) {
@@ -849,6 +902,7 @@ function SearchPageInner() {
   }, [allInvoices, criteria, fullTextQuery]);
 
   const filtersActive = hasActiveFilters(criteria) || !!fullTextQuery.trim();
+>>>>>>> upstream/main
 
   // ── Input handlers ─────────────────────────────────────────────────────────
 
@@ -897,6 +951,8 @@ function SearchPageInner() {
             <span>{shareStatus || 'Share search'}</span>
           </button>
           <ColumnPicker visibleColumns={visibleColumns} onToggle={handleToggleColumn} />
+<<<<<<< HEAD
+=======
           {countActiveFilters(criteria) > 0 && (
             <span
               className="text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-semibold"
@@ -906,6 +962,7 @@ function SearchPageInner() {
               {countActiveFilters(criteria)} filter{countActiveFilters(criteria) !== 1 ? 's' : ''}
             </span>
           )}
+>>>>>>> upstream/main
           {filtersActive && (
             <button
               type="button"
@@ -923,6 +980,8 @@ function SearchPageInner() {
         <p className="text-red-400 mb-6" role="alert">{fetchError}</p>
       )}
 
+<<<<<<< HEAD
+=======
       {/* Full-text search bar */}
       <div className="relative mb-4">
         <FullTextSearchBar
@@ -983,6 +1042,7 @@ function SearchPageInner() {
         )}
       </div>
 
+>>>>>>> upstream/main
       {/* Filter panel */}
       <div
         className="bg-gray-900 rounded-lg p-6 mb-8 space-y-6"
@@ -1248,7 +1308,11 @@ function SearchPageInner() {
       ) : results.length === 0 ? (
         <EmptyState hasInvoices={allInvoices.length > 0} hasFilters={filtersActive} />
       ) : (
+<<<<<<< HEAD
+        <VirtualList items={results} visibleColumns={visibleColumns} />
+=======
         <VirtualList items={results} visibleColumns={visibleColumns} highlightQuery={fullTextQuery} />
+>>>>>>> upstream/main
       )}
     </main>
   );

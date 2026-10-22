@@ -7,7 +7,10 @@ import { searchRecipients, touchRecipient, type RecipientEntry } from "@/lib/rec
 import { truncateAddress } from "@stellar-split/sdk";
 import CsvRecipientImport from "@/components/CsvRecipientImport";
 import { useEmailValidation } from "@/hooks/useEmailValidation";
+<<<<<<< HEAD
+=======
 import { useAddressValidation } from "@/hooks/useAddressValidation";
+>>>>>>> upstream/main
 import LineItemRow from "@/components/LineItemRow";
 
 export interface RecipientRow {
@@ -114,6 +117,8 @@ export default function RecipientForm({
 
   const savedRecipients = useMemo(() => searchRecipients(savedSearchQuery), [savedSearchQuery]);
 
+<<<<<<< HEAD
+=======
   // Validate every recipient address and resolve federation/ENS names.
   const addressValidation = useAddressValidation(recipients.map((r) => r.address));
   const hasInvalidAddress = recipients.some((r, i) => {
@@ -121,6 +126,7 @@ export default function RecipientForm({
     return !!r.address.trim() && (!result || !result.valid || result.resolving);
   });
 
+>>>>>>> upstream/main
   // Contact emails come from localStorage, so they can only be resolved after
   // mount; the deterministic avatar renders identically on both passes.
   const [mounted, setMounted] = useState(false);
@@ -197,8 +203,11 @@ export default function RecipientForm({
           onAmountSuggestionSelect={(amount) => selectAmountSuggestion(i, amount)}
           onRemove={() => removeRow(i)}
           onEmailChange={(email) => updateRow(i, row.address, row.label, email)}
+<<<<<<< HEAD
+=======
           validation={addressValidation[i]}
           onResolvedAddress={(address) => updateRow(i, address)}
+>>>>>>> upstream/main
         />
       ))}
 

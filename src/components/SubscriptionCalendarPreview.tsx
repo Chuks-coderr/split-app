@@ -3,13 +3,19 @@
 import { useMemo, useState } from "react";
 import { computeUpcomingDates } from "@/lib/subscriptions";
 
+<<<<<<< HEAD
+=======
 export type SubscriptionStatus = "active" | "paused" | "cancelled";
 
+>>>>>>> upstream/main
 interface Props {
   intervalDays: number;
   count?: number;
   fromDate?: Date;
+<<<<<<< HEAD
+=======
   status?: SubscriptionStatus;
+>>>>>>> upstream/main
 }
 
 const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -22,11 +28,15 @@ export default function SubscriptionCalendarPreview({
   intervalDays,
   count = 6,
   fromDate,
+<<<<<<< HEAD
+}: Props) {
+=======
   status = "active",
 }: Props) {
   const isPaused = status === "paused";
   const isCancelled = status === "cancelled";
 
+>>>>>>> upstream/main
   const upcomingDates = useMemo(
     () => computeUpcomingDates(intervalDays, count, fromDate),
     [intervalDays, count, fromDate]
@@ -67,6 +77,10 @@ export default function SubscriptionCalendarPreview({
   for (let i = 0; i < firstDayOfWeek; i++) cells.push(null);
   for (let d = 1; d <= daysInMonth; d++) cells.push(d);
 
+<<<<<<< HEAD
+  return (
+    <div className="bg-gray-900 rounded-lg p-4 border border-gray-800">
+=======
   const statusBanner = isPaused
     ? {
         text: "Subscription paused — no invoices will be charged until resumed.",
@@ -107,6 +121,7 @@ export default function SubscriptionCalendarPreview({
           {statusBanner.text}
         </div>
       )}
+>>>>>>> upstream/main
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-semibold text-gray-300">
           Upcoming Invoice Dates
@@ -155,7 +170,13 @@ export default function SubscriptionCalendarPreview({
               <div
                 key={day}
                 className={`text-center text-xs py-1 rounded ${
+<<<<<<< HEAD
+                  isInvoiceDay
+                    ? "bg-indigo-600 text-white font-bold"
+                    : "text-gray-500"
+=======
                   isInvoiceDay ? invoiceDayClass : "text-gray-500"
+>>>>>>> upstream/main
                 }`}
               >
                 {day}
@@ -167,8 +188,13 @@ export default function SubscriptionCalendarPreview({
 
       <div className="mt-3 flex items-center gap-4 text-xs text-gray-500">
         <div className="flex items-center gap-1">
+<<<<<<< HEAD
+          <span className="w-3 h-3 rounded bg-indigo-600" />
+          Invoice date
+=======
           <span className={`w-3 h-3 rounded ${legendSwatchClass}`} />
           {legendLabel}
+>>>>>>> upstream/main
         </div>
         <div>Next {count} dates shown</div>
       </div>

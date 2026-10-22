@@ -53,6 +53,8 @@ The initial audit surfaced the following categories of critical/serious violatio
 - **Browser coverage locally vs. CI.** A fresh dev sandbox may only have the Chromium Playwright browser installed. CI installs Chromium, Firefox, and WebKit via `npx playwright install --with-deps`, so the merge gate is multi-engine even when a local run (`npx playwright test --grep @a11y`) only exercises Chromium.
 - **Moderate/minor axe findings are not gated on.** Only `critical`/`serious` impact violations fail the build, per the acceptance criteria. Any moderate/minor findings surfaced by axe during a run are not currently tracked separately.
 
+<<<<<<< HEAD
+=======
 ## Component-level automated testing
 
 In addition to the page-level Playwright + `@axe-core/playwright` gate
@@ -95,6 +97,7 @@ release cycle and whenever a new page/flow is added to the audit scope:
    "Known limitations" section until fixed. Once fixed, add a short note to
    the "What was fixed" section above so the audit trail stays complete.
 
+>>>>>>> upstream/main
 ## Extending the audit
 
 To add a new page to the gate, add an entry to the `PAGES` array in `e2e/a11y.spec.ts` — the shared `runAxe()` helper and assertion are reused automatically. For flows that require user interaction (opening a modal, completing a multi-step form), follow the pattern in the two targeted tests at the bottom of that file: drive the interaction with Playwright, then call `runAxe(page)` and assert on `critical`/`serious` violations.

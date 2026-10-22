@@ -25,6 +25,8 @@ export interface UseAddressValidationOptions {
 }
 
 const DEBOUNCE_MS = 300;
+<<<<<<< HEAD
+=======
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 const CACHE_STORAGE_KEY = 'stellar:address-resolution-cache:v1';
 
@@ -86,6 +88,7 @@ function setCachedResolution(address: string, entry: Omit<CacheEntry, 'timestamp
 }
 
 readCacheFromStorage();
+>>>>>>> upstream/main
 
 /**
  * Hook for validating Stellar addresses with federation lookup and on-network verification
@@ -153,6 +156,15 @@ export function useAddressValidation(options: UseAddressValidationOptions = {}) 
           return;
         }
 
+<<<<<<< HEAD
+        try {
+          const resolved = await resolveFederationAddress(address);
+          if (!resolved) {
+            setValidationState({
+              isValid: false,
+              isLoading: false,
+              error: `Federation address could not be resolved. Please verify the address is correct.`,
+=======
         const cached = getCachedResolution(address);
         if (cached) {
           resolvedAddr = cached.resolvedAddress;
@@ -197,10 +209,37 @@ export function useAddressValidation(options: UseAddressValidationOptions = {}) 
               isLoading: false,
               error:
                 'We could not reach the federation server for this address. Please check the address or try again later.',
+>>>>>>> upstream/main
               errorReason: null,
             });
             return;
           }
+<<<<<<< HEAD
+          resolvedAddr = resolved;
+
+          // Try to extract memo info from federation resolution
+          try {
+            const { Federation } = await import('@stellar/stellar-sdk');
+            const federationResult = await Federation.Server.resolve(address);
+            if (federationResult.memo) {
+              federationMemoId = federationResult.memo;
+            }
+            if (federationResult.memo_type) {
+              federationMemoType = federationResult.memo_type;
+            }
+          } catch {
+            // Memo extraction failed, continue with address validation
+          }
+        } catch (error) {
+          setValidationState({
+            isValid: false,
+            isLoading: false,
+            error: 'Failed to resolve federation address',
+            errorReason: null,
+          });
+          return;
+=======
+>>>>>>> upstream/main
         }
       }
 
@@ -224,6 +263,9 @@ export function useAddressValidation(options: UseAddressValidationOptions = {}) 
       }
 
       // Check if account exists and is funded
+<<<<<<< HEAD
+      const { isFunded, requiresMemo } = await validateFederationAddress(resolvedAddr);
+=======
       let isFunded = false;
       let requiresMemo = false;
       try {
@@ -233,6 +275,7 @@ export function useAddressValidation(options: UseAddressValidationOptions = {}) 
       } catch {
         // Network verification failed; the address format is still valid
       }
+>>>>>>> upstream/main
 
       setValidationState({
         isValid: true,
@@ -250,10 +293,14 @@ export function useAddressValidation(options: UseAddressValidationOptions = {}) 
       setValidationState({
         isValid: false,
         isLoading: false,
+<<<<<<< HEAD
+        error: error instanceof Error ? error.message : 'Error validating address',
+=======
         error:
           error instanceof Error && error.message
             ? error.message
             : 'Something went wrong while validating this address. Please try again.',
+>>>>>>> upstream/main
         errorReason: null,
       });
     }

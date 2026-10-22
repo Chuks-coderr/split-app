@@ -3,16 +3,25 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import type { Invoice } from '@stellar-split/sdk';
 import type { StellarSplitClient } from '@stellar-split/sdk';
+<<<<<<< HEAD
+
+export interface InvoiceStreamEvent {
+  type: 'PaymentReceived' | 'InvoiceReleased' | 'InvoiceRefunded';
+=======
 import { getActiveNetwork } from "@/lib/networks";
 
 export interface InvoiceStreamEvent {
   type: 'PaymentReceived' | 'InvoiceReleased' | 'InvoiceRefunded' | 'CoSignerApproved';
+>>>>>>> upstream/main
   /** Payer address for PaymentReceived events */
   payer?: string;
   /** Amount in stroops for PaymentReceived events */
   amount?: bigint;
+<<<<<<< HEAD
+=======
   /** Co-signer address for CoSignerApproved events */
   coSigner?: string;
+>>>>>>> upstream/main
   /** Raw event data */
   raw: unknown;
 }
@@ -22,10 +31,13 @@ export interface UseInvoiceStreamResult {
   latestEvent: InvoiceStreamEvent | null;
   isConnected: boolean;
   error: string | null;
+<<<<<<< HEAD
+=======
   /** Increments whenever a co-signer approval event is observed. */
   coSignerApprovalCount: number;
   /** Latest co-signer address that approved, if any. */
   lastApprovedCoSigner: string | null;
+>>>>>>> upstream/main
 }
 
 const POLL_INTERVAL_MS = 3_000;
@@ -50,8 +62,11 @@ export function useInvoiceStream(invoiceId: string): UseInvoiceStreamResult {
   const [latestEvent, setLatestEvent] = useState<InvoiceStreamEvent | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
+<<<<<<< HEAD
+=======
   const [coSignerApprovalCount, setCoSignerApprovalCount] = useState(0);
   const [lastApprovedCoSigner, setLastApprovedCoSigner] = useState<string | null>(null);
+>>>>>>> upstream/main
 
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const reconnectDelayRef = useRef(1_000);
@@ -95,10 +110,17 @@ export function useInvoiceStream(invoiceId: string): UseInvoiceStreamResult {
   const pollEvents = useCallback(async () => {
     try {
       const { rpc } = await import('@stellar/stellar-sdk');
+<<<<<<< HEAD
+      const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL ?? 'https://soroban-testnet.stellar.org';
+      const server = new rpc.Server(rpcUrl, { allowHttp: rpcUrl.startsWith('http://') });
+
+      const contractId = process.env.NEXT_PUBLIC_CONTRACT_ID ?? '';
+=======
       const rpcUrl = getActiveNetwork().rpcUrl;
       const server = new rpc.Server(rpcUrl, { allowHttp: rpcUrl.startsWith('http://') });
 
       const contractId = getActiveNetwork().contractId;
+>>>>>>> upstream/main
       if (!contractId) return;
 
       const params: any = {
@@ -157,6 +179,8 @@ export function useInvoiceStream(invoiceId: string): UseInvoiceStreamResult {
                   type: 'InvoiceRefunded',
                   raw: event,
                 });
+<<<<<<< HEAD
+=======
               } else if (
                 eventName.includes('CoSignerApproved') ||
                 eventName.includes('CosignerApproved')
@@ -169,6 +193,7 @@ export function useInvoiceStream(invoiceId: string): UseInvoiceStreamResult {
                 });
                 setCoSignerApprovalCount((count) => count + 1);
                 setLastApprovedCoSigner(coSigner || null);
+>>>>>>> upstream/main
               }
             } catch {
               // Skip unparseable events
@@ -189,8 +214,11 @@ export function useInvoiceStream(invoiceId: string): UseInvoiceStreamResult {
     mountedRef.current = true;
     lastEventCursorRef.current = null;
     lastStatusRef.current = null;
+<<<<<<< HEAD
+=======
     setCoSignerApprovalCount(0);
     setLastApprovedCoSigner(null);
+>>>>>>> upstream/main
 
     // Initial fetch
     fetchInvoice();
@@ -228,6 +256,9 @@ export function useInvoiceStream(invoiceId: string): UseInvoiceStreamResult {
     return () => clearTimeout(retryTimer);
   }, [isConnected, fetchInvoice]);
 
+<<<<<<< HEAD
+  return { invoice, latestEvent, isConnected, error };
+=======
   return {
     invoice,
     latestEvent,
@@ -236,4 +267,5 @@ export function useInvoiceStream(invoiceId: string): UseInvoiceStreamResult {
     coSignerApprovalCount,
     lastApprovedCoSigner,
   };
+>>>>>>> upstream/main
 }

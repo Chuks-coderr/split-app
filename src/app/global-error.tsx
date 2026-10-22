@@ -3,12 +3,15 @@
 import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
 
+<<<<<<< HEAD
+=======
 import {
   classifyError,
   getErrorTemplate,
   logError,
 } from "@/lib/errors";
 
+>>>>>>> upstream/main
 export default function GlobalError({
   error,
   reset,
@@ -16,6 +19,11 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+<<<<<<< HEAD
+  useEffect(() => {
+    Sentry.captureException(error);
+  }, [error]);
+=======
   const errorType = classifyError(error);
   const template = getErrorTemplate(errorType);
 
@@ -27,6 +35,7 @@ export default function GlobalError({
       digest: error.digest,
     });
   }, [error, errorType]);
+>>>>>>> upstream/main
 
   return (
     <html lang="en">
@@ -39,6 +48,15 @@ export default function GlobalError({
           color: "#fff",
           fontFamily: "system-ui, sans-serif",
         }}>
+<<<<<<< HEAD
+          <div style={{ textAlign: "center", padding: "2rem" }}>
+            <h2 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: "0.5rem" }}>
+              Something went wrong
+            </h2>
+            <p style={{ color: "#9ca3af", marginBottom: "1.5rem" }}>
+              An unexpected error occurred. Our team has been notified.
+            </p>
+=======
           <div style={{ textAlign: "center", padding: "2rem", maxWidth: "32rem" }}>
             <h2 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: "0.5rem" }}>
               {template.title}
@@ -64,6 +82,7 @@ export default function GlobalError({
                 ))}
               </ul>
             )}
+>>>>>>> upstream/main
             <button
               onClick={reset}
               style={{
@@ -76,6 +95,10 @@ export default function GlobalError({
                 fontSize: "0.875rem",
               }}
             >
+<<<<<<< HEAD
+              Try again
+            </button>
+=======
               {template.recoveryLabel}
             </button>
             {error.digest && (
@@ -83,9 +106,14 @@ export default function GlobalError({
                 Reference: {error.digest}
               </p>
             )}
+>>>>>>> upstream/main
           </div>
         </div>
       </body>
     </html>
   );
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> upstream/main

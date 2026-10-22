@@ -1,5 +1,9 @@
 "use client";
 
+<<<<<<< HEAD
+import { useState } from "react";
+import { formatAmount } from "@stellar-split/sdk";
+=======
 import { useEffect, useMemo, useState } from "react";
 import { formatAmount } from "@stellar-split/sdk";
 import {
@@ -11,6 +15,7 @@ import {
   recordEngagement,
   type ReminderChannel,
 } from "../lib/reminders";
+>>>>>>> upstream/main
 
 interface ReminderSenderProps {
   invoiceId: string;
@@ -19,6 +24,46 @@ interface ReminderSenderProps {
   verifyUrl: string;
 }
 
+<<<<<<< HEAD
+function buildReminderText(
+  invoiceId: string,
+  amount: bigint,
+  deadline: number,
+  verifyUrl: string
+): string {
+  const deadlineStr =
+    deadline > 0
+      ? new Date(deadline * 1000).toLocaleDateString(undefined, {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        })
+      : "N/A";
+  return `Reminder: Invoice #${invoiceId} needs your payment of ${formatAmount(amount)} USDC by ${deadlineStr}. Pay here: ${verifyUrl}`;
+}
+
+const SCHEDULED_REMINDERS_KEY = "stellarsplit_scheduled_reminders";
+
+interface ScheduledReminder {
+  invoiceId: string;
+  sendAt: number; // unix ms
+  text: string;
+}
+
+function scheduleReminder(reminder: ScheduledReminder) {
+  if (typeof window === "undefined") return;
+  try {
+    const raw = localStorage.getItem(SCHEDULED_REMINDERS_KEY);
+    const existing: ScheduledReminder[] = raw ? JSON.parse(raw) : [];
+    existing.push(reminder);
+    localStorage.setItem(SCHEDULED_REMINDERS_KEY, JSON.stringify(existing));
+  } catch {
+    // best-effort persistence
+  }
+}
+
+=======
+>>>>>>> upstream/main
 export default function ReminderSender({
   invoiceId,
   amount,
@@ -30,6 +75,13 @@ export default function ReminderSender({
   const [sendAt, setSendAt] = useState("");
   const [sendAtError, setSendAtError] = useState<string | null>(null);
   const [scheduled, setScheduled] = useState(false);
+<<<<<<< HEAD
+
+  const reminderText = buildReminderText(invoiceId, amount, deadline, verifyUrl);
+  const encodedText = encodeURIComponent(reminderText);
+  const isScheduling = sendAt.trim().length > 0;
+
+=======
   const [suppressed, setSuppressedState] = useState(false);
 
   useEffect(() => {
@@ -62,6 +114,7 @@ export default function ReminderSender({
     recordEngagement(invoiceId, "sent", channel);
   };
 
+>>>>>>> upstream/main
   const whatsappUrl = `https://wa.me/?text=${encodedText}`;
   const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(verifyUrl)}&text=${encodeURIComponent(
     `Reminder: Invoice #${invoiceId} needs your payment of ${formatAmount(amount)} USDC. Pay here:`
@@ -93,7 +146,11 @@ export default function ReminderSender({
       setSendAtError("Send time cannot be in the past");
       return;
     }
+<<<<<<< HEAD
+    scheduleReminder({ invoiceId, sendAt: selected, text: reminderText });
+=======
     recordEngagement(invoiceId, "scheduled", "manual", { sendAt: selected });
+>>>>>>> upstream/main
     setScheduled(true);
   };
 
@@ -147,6 +204,8 @@ export default function ReminderSender({
         </button>
       </div>
 
+<<<<<<< HEAD
+=======
       {/* Escalation status */}
       <div className="flex flex-wrap items-center gap-2 mb-3 text-xs">
         <span className="px-2 py-1 rounded-full bg-amber-900/60 text-amber-200 font-semibold">
@@ -172,6 +231,7 @@ export default function ReminderSender({
         </div>
       ) : (
         <>
+>>>>>>> upstream/main
       {/* Reminder text preview */}
       <div className="bg-gray-800 rounded-lg p-3 mb-4 text-sm text-gray-200 break-words leading-relaxed">
         {reminderText}
@@ -214,10 +274,14 @@ export default function ReminderSender({
       <div className="flex flex-wrap gap-2">
         <button
           type="button"
+<<<<<<< HEAD
+          onClick={handleCopy}
+=======
           onClick={() => {
             handleDispatch("copy");
             void handleCopy();
           }}
+>>>>>>> upstream/main
           disabled={isScheduling}
           className="min-h-11 flex-1 sm:flex-none px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-sm font-semibold transition-colors"
           aria-live="polite"
@@ -230,6 +294,9 @@ export default function ReminderSender({
           target="_blank"
           rel="noopener noreferrer"
           aria-disabled={isScheduling}
+<<<<<<< HEAD
+          onClick={(e) => { if (isScheduling) e.preventDefault(); }}
+=======
           onClick={(e) => {
             if (isScheduling) {
               e.preventDefault();
@@ -237,6 +304,7 @@ export default function ReminderSender({
             }
             handleDispatch("whatsapp");
           }}
+>>>>>>> upstream/main
           className={`min-h-11 flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-green-700 hover:bg-green-600 text-sm font-semibold transition-colors ${
             isScheduling ? "opacity-40 cursor-not-allowed pointer-events-none" : ""
           }`}
@@ -259,6 +327,9 @@ export default function ReminderSender({
           target="_blank"
           rel="noopener noreferrer"
           aria-disabled={isScheduling}
+<<<<<<< HEAD
+          onClick={(e) => { if (isScheduling) e.preventDefault(); }}
+=======
           onClick={(e) => {
             if (isScheduling) {
               e.preventDefault();
@@ -266,6 +337,7 @@ export default function ReminderSender({
             }
             handleDispatch("telegram");
           }}
+>>>>>>> upstream/main
           className={`min-h-11 flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-sky-600 hover:bg-sky-500 text-sm font-semibold transition-colors ${
             isScheduling ? "opacity-40 cursor-not-allowed pointer-events-none" : ""
           }`}
@@ -283,6 +355,8 @@ export default function ReminderSender({
           Telegram
         </a>
       </div>
+<<<<<<< HEAD
+=======
 
       <div className="mt-4">
         <button
@@ -295,6 +369,7 @@ export default function ReminderSender({
       </div>
         </>
       )}
+>>>>>>> upstream/main
     </section>
   );
 }

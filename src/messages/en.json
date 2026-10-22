@@ -113,6 +113,8 @@
     "yourRank": "Your wallet is ranked #{rank}.",
     "notInTop": "(not in top 20)",
     "backToDashboard": "Back to dashboard"
+<<<<<<< HEAD
+=======
   },
   "versionHistory": {
     "title": "Version History",
@@ -194,5 +196,6 @@
     "collectionNameRequired": "Collection name is required",
     "collectionNameTooLong": "Name must be 40 characters or fewer",
     "collectionNameDuplicate": "A collection with this name already exists"
+>>>>>>> upstream/main
   }
 }

@@ -1,12 +1,20 @@
 'use client';
 
+<<<<<<< HEAD
+=======
 import { useCallback, useMemo, useState } from 'react';
+>>>>>>> upstream/main
 import { useInvoiceMeta } from './useInvoiceMeta';
 import { useLineItems } from './useLineItems';
 
 export type { LineItem } from './useLineItems';
 
 /**
+<<<<<<< HEAD
+ * Composes `useInvoiceMeta` (top-level invoice fields + validation) and
+ * `useLineItems` (item CRUD, totals, reordering) into the unified API
+ * existing callers already depend on. See #635.
+=======
  * Validates a Stellar public key (ed25519 account address).
  * Format: 'G' followed by 55 base32 characters (A-Z, 2-7).
  */
@@ -188,15 +196,21 @@ export function useCosigners(): CosignerSection {
  *
  * Also exposes the optional co-signer section (#383) via `cosigners`,
  * `cosignerThreshold`, and the `cosignerSection` helpers.
+>>>>>>> upstream/main
  */
 export function useInvoiceForm() {
   const meta = useInvoiceMeta();
   const lineItems = useLineItems();
+<<<<<<< HEAD
+=======
   const cosignerSection = useCosigners();
+>>>>>>> upstream/main
 
   return {
     ...meta,
     ...lineItems,
+<<<<<<< HEAD
+=======
     cosignerSection,
     cosigners: cosignerSection.cosigners,
     cosignerThreshold: cosignerSection.threshold,
@@ -209,5 +223,6 @@ export function useInvoiceForm() {
     resetCosigners: cosignerSection.resetCosigners,
     validateCosigners: cosignerSection.validateCosigners,
     cosignerPayload: cosignerSection.cosignerPayload,
+>>>>>>> upstream/main
   };
 }

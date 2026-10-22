@@ -9,13 +9,21 @@ interface QueueEntry {
   amount: string;
 }
 
+<<<<<<< HEAD
+=======
 type BundleItemStatus = "pending" | "paid" | "failed";
 
+>>>>>>> upstream/main
 interface Props {
   queue: QueueEntry[];
   onAmountChange: (invoiceId: string, value: string) => void;
   onRemove: (invoiceId: string) => void;
   onReorder?: (newQueue: QueueEntry[]) => void;
+<<<<<<< HEAD
+}
+
+export default function BatchPayQueue({ queue, onAmountChange, onRemove, onReorder }: Props) {
+=======
   bundleId?: string;
   bundleStatus?: "draft" | "collecting" | "completed" | "partial" | "failed";
   itemStatuses?: Record<string, BundleItemStatus>;
@@ -44,6 +52,7 @@ export default function BatchPayQueue({
   bundleStatus,
   itemStatuses,
 }: Props) {
+>>>>>>> upstream/main
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
   const runningTotal = queue.reduce((sum, entry) => {
@@ -51,12 +60,15 @@ export default function BatchPayQueue({
     return sum + (isNaN(parsed) ? 0 : parsed);
   }, 0);
 
+<<<<<<< HEAD
+=======
   const completedCount = itemStatuses
     ? queue.filter((entry) => itemStatuses[entry.invoice.id] === "paid").length
     : 0;
   const completionPercent = queue.length > 0 ? Math.round((completedCount / queue.length) * 100) : 0;
   const isBundle = Boolean(bundleId);
 
+>>>>>>> upstream/main
   const handleDrop = (targetIndex: number) => {
     if (draggedIndex === null || draggedIndex === targetIndex) return;
     const newQueue = [...queue];
@@ -90,6 +102,10 @@ export default function BatchPayQueue({
 
   return (
     <div className="flex flex-col gap-3">
+<<<<<<< HEAD
+      {queue.map(({ invoice, amount }, index) => {
+        const total = invoice.recipients.reduce((s, r) => s + r.amount, 0n);
+=======
       {isBundle && (
         <div className="flex flex-col gap-2 bg-gray-900/60 border border-gray-800 rounded-xl px-4 py-3">
           <div className="flex items-center justify-between gap-2">
@@ -128,6 +144,7 @@ export default function BatchPayQueue({
       {queue.map(({ invoice, amount }, index) => {
         const total = invoice.recipients.reduce((s, r) => s + r.amount, 0n);
         const itemStatus = itemStatuses?.[invoice.id];
+>>>>>>> upstream/main
         return (
           <div
             key={invoice.id}
@@ -144,6 +161,9 @@ export default function BatchPayQueue({
           >
             <span className="text-gray-500 text-xs select-none">⋮⋮</span>
             <div className="flex-1 min-w-0">
+<<<<<<< HEAD
+              <p className="text-sm font-semibold truncate">Invoice #{invoice.id}</p>
+=======
               <div className="flex items-center gap-2">
                 <p className="text-sm font-semibold truncate">Invoice #{invoice.id}</p>
                 {itemStatus && (
@@ -154,6 +174,7 @@ export default function BatchPayQueue({
                   </span>
                 )}
               </div>
+>>>>>>> upstream/main
               <p className="text-xs text-gray-500 mt-0.5">
                 Total: {formatAmount(total)} USDC · Status: {invoice.status}
               </p>
@@ -186,9 +207,13 @@ export default function BatchPayQueue({
       })}
 
       <div className="flex items-center justify-between px-1 pt-1 border-t border-gray-800">
+<<<<<<< HEAD
+        <span className="text-sm text-gray-400">Running total</span>
+=======
         <span className="text-sm text-gray-400">
           {isBundle ? "Bundle total" : "Running total"}
         </span>
+>>>>>>> upstream/main
         <span className="text-sm font-semibold text-indigo-300">
           {runningTotal.toFixed(7).replace(/\.?0+$/, "")} USDC
         </span>

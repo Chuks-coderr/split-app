@@ -7,8 +7,11 @@ import { splitClient } from "@/lib/stellar";
 import { getFreighterPublicKey } from "@/lib/freighter";
 import { SubscriptionListSkeleton } from "@/components/Skeleton";
 import SubscriptionCard from "@/components/SubscriptionCard";
+<<<<<<< HEAD
+=======
 import CancelModal from "@/components/CancelModal";
 import SubscriptionModifyModal from "@/components/SubscriptionModifyModal";
+>>>>>>> upstream/main
 import type { Subscription, SubscriptionStatus } from "@/types/subscription";
 import {
   loadSubscriptions,
@@ -16,6 +19,9 @@ import {
   pauseSubscription,
   resumeSubscription,
   cancelSubscription,
+<<<<<<< HEAD
+} from "@/lib/subscriptions";
+=======
   modifySubscription,
 } from "@/lib/subscriptions";
 import {
@@ -24,6 +30,7 @@ import {
   notifySubscriptionCancelled,
   notifySubscriptionModified,
 } from "@/lib/notifications";
+>>>>>>> upstream/main
 
 const POLL_INTERVAL_MS = 30_000;
 
@@ -33,8 +40,11 @@ const STATUS_FILTERS: { value: StatusFilter; label: string }[] = [
   { value: "all", label: "All" },
   { value: "active", label: "Active" },
   { value: "paused", label: "Paused" },
+<<<<<<< HEAD
+=======
   { value: "past_due", label: "Past Due" },
   { value: "expired", label: "Expired" },
+>>>>>>> upstream/main
   { value: "cancelled", label: "Cancelled" },
 ];
 
@@ -45,8 +55,11 @@ export default function SubscriptionsClient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+<<<<<<< HEAD
+=======
   const [cancelTarget, setCancelTarget] = useState<Subscription | null>(null);
   const [modifyTarget, setModifyTarget] = useState<Subscription | null>(null);
+>>>>>>> upstream/main
 
   useEffect(() => {
     getFreighterPublicKey()
@@ -111,8 +124,11 @@ export default function SubscriptionsClient() {
     setSubscriptions((prev) => {
       const updated = prev.map((s) => (s.id === id ? pauseSubscription(s) : s));
       saveSubscriptions(updated);
+<<<<<<< HEAD
+=======
       const paused = updated.find((s) => s.id === id);
       if (paused) notifySubscriptionPaused(paused);
+>>>>>>> upstream/main
       return updated;
     });
   };
@@ -121,12 +137,24 @@ export default function SubscriptionsClient() {
     setSubscriptions((prev) => {
       const updated = prev.map((s) => (s.id === id ? resumeSubscription(s) : s));
       saveSubscriptions(updated);
+<<<<<<< HEAD
+=======
       const resumed = updated.find((s) => s.id === id);
       if (resumed) notifySubscriptionResumed(resumed);
+>>>>>>> upstream/main
       return updated;
     });
   };
 
+<<<<<<< HEAD
+  const handleCancel = async (id: string) => {
+    if (!confirm("Are you sure you want to cancel this subscription?")) return;
+    setSubscriptions((prev) => {
+      const updated = prev.map((s) => (s.id === id ? cancelSubscription(s) : s));
+      saveSubscriptions(updated);
+      return updated;
+    });
+=======
   const handleCancel = (id: string) => {
     const target = subscriptions.find((s) => s.id === id) ?? null;
     setCancelTarget(target);
@@ -165,6 +193,7 @@ export default function SubscriptionsClient() {
       return updated;
     });
     setModifyTarget(null);
+>>>>>>> upstream/main
   };
 
   if (error) {
@@ -271,6 +300,14 @@ export default function SubscriptionsClient() {
                   </button>
                 )}
                 {sub.status !== "cancelled" && (
+<<<<<<< HEAD
+                  <button
+                    onClick={() => handleCancel(sub.id)}
+                    className="text-xs px-3 py-1 rounded border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors"
+                  >
+                    Cancel
+                  </button>
+=======
                   <>
                     <button
                       onClick={() => handleModify(sub.id)}
@@ -285,12 +322,15 @@ export default function SubscriptionsClient() {
                       Cancel
                     </button>
                   </>
+>>>>>>> upstream/main
                 )}
               </div>
             </div>
           ))}
         </div>
       )}
+<<<<<<< HEAD
+=======
 
       {cancelTarget && (
         <CancelModal
@@ -307,6 +347,7 @@ export default function SubscriptionsClient() {
           onClose={() => setModifyTarget(null)}
         />
       )}
+>>>>>>> upstream/main
     </main>
   );
 }

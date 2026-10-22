@@ -36,6 +36,8 @@ export function getRelativeAge(date: Date): string {
     day: "numeric",
   });
 }
+<<<<<<< HEAD
+=======
 
 /**
  * Supported recurring schedule frequencies.
@@ -246,3 +248,4 @@ export function hasScheduleConflict(
 ): boolean {
   return findOverlappingWindow(candidate, existing) !== null;
 }
+>>>>>>> upstream/main

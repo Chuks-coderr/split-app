@@ -152,6 +152,8 @@ export function filterPaymentsByDateRange(
   });
 }
 
+<<<<<<< HEAD
+=======
 export interface AgingReportRow {
   bucket: string;
   invoice_count: number;
@@ -256,6 +258,7 @@ export function generateAgingReportFilename(
   return `invoice-${reportType}-report-${date}.csv`;
 }
 
+>>>>>>> upstream/main
 export interface CsvRow {
   [key: string]: string | number;
 }

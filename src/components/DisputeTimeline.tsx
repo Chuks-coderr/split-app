@@ -5,6 +5,9 @@ import { splitClient } from "@/lib/stellar";
 import { truncateAddress } from "@stellar-split/sdk";
 
 interface DisputeEvent {
+<<<<<<< HEAD
+  type: "DisputeOpened" | "EvidenceSubmitted" | "VoteCast" | "DisputeResolved";
+=======
   type:
     | "DisputeOpened"
     | "EvidenceSubmitted"
@@ -12,6 +15,7 @@ interface DisputeEvent {
     | "VoteCast"
     | "DisputeResolved"
     | "ResolutionEnforced";
+>>>>>>> upstream/main
   timestamp: number;
   actor: string;
   metadata?: {
@@ -20,8 +24,11 @@ interface DisputeEvent {
     filename?: string;
     vote?: "Release" | "Refund";
     outcome?: "Release" | "Refund";
+<<<<<<< HEAD
+=======
     arbitrator?: string;
     enforcementTxHash?: string;
+>>>>>>> upstream/main
   };
 }
 
@@ -32,8 +39,11 @@ interface DisputeStatus {
   outcome?: "Release" | "Refund";
   reason?: string;
   initiator?: string;
+<<<<<<< HEAD
+=======
   enforced?: boolean;
   enforcementTxHash?: string;
+>>>>>>> upstream/main
 }
 
 interface Props {
@@ -61,6 +71,13 @@ export default function DisputeTimeline({ invoiceId, disputeStatus }: Props) {
   useEffect(() => {
     const loadEvents = async () => {
       try {
+<<<<<<< HEAD
+        // Fetch dispute events from the audit log or contract events
+        const log = await (splitClient as any).getDisputeEvents?.(invoiceId);
+        if (log && Array.isArray(log)) {
+          // Sort events chronologically
+          const sorted = log.sort((a: DisputeEvent, b: DisputeEvent) => a.timestamp - b.timestamp);
+=======
         // Prefer the persisted dispute record's append-only timeline.
         const record = await (splitClient as any).getDisputeRecord?.(invoiceId);
         if (record && Array.isArray(record.timeline)) {
@@ -77,6 +94,7 @@ export default function DisputeTimeline({ invoiceId, disputeStatus }: Props) {
           const sorted = [...log].sort(
             (a: DisputeEvent, b: DisputeEvent) => a.timestamp - b.timestamp,
           );
+>>>>>>> upstream/main
           setEvents(sorted);
         }
       } catch (err) {
@@ -184,6 +202,8 @@ export default function DisputeTimeline({ invoiceId, disputeStatus }: Props) {
                     </div>
                   )}
 
+<<<<<<< HEAD
+=======
                   {event.type === "ArbitratorSelected" && (
                     <div className="mt-3 bg-gray-800/50 rounded-lg p-3 border border-gray-700">
                       <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">
@@ -197,6 +217,7 @@ export default function DisputeTimeline({ invoiceId, disputeStatus }: Props) {
                     </div>
                   )}
 
+>>>>>>> upstream/main
                   {event.type === "VoteCast" && event.metadata?.vote && (
                     <div className="mt-3">
                       <span
@@ -235,6 +256,8 @@ export default function DisputeTimeline({ invoiceId, disputeStatus }: Props) {
                       </div>
                     </div>
                   )}
+<<<<<<< HEAD
+=======
 
                   {event.type === "ResolutionEnforced" && (
                     <div className="mt-3 bg-gray-800/50 rounded-lg p-3 border border-gray-700">
@@ -258,6 +281,7 @@ export default function DisputeTimeline({ invoiceId, disputeStatus }: Props) {
                       </div>
                     </div>
                   )}
+>>>>>>> upstream/main
                 </div>
               </li>
             );
@@ -274,14 +298,20 @@ function getEventIcon(type: DisputeEvent["type"]): string {
       return "⚠️";
     case "EvidenceSubmitted":
       return "📎";
+<<<<<<< HEAD
+=======
     case "ArbitratorSelected":
       return "🧑‍⚖️";
+>>>>>>> upstream/main
     case "VoteCast":
       return "⚖️";
     case "DisputeResolved":
       return "✓";
+<<<<<<< HEAD
+=======
     case "ResolutionEnforced":
       return "🔒";
+>>>>>>> upstream/main
     default:
       return "•";
   }
@@ -293,14 +323,20 @@ function getEventColor(type: DisputeEvent["type"]): string {
       return "border-red-500 bg-red-500 text-white";
     case "EvidenceSubmitted":
       return "border-blue-500 bg-blue-500 text-white";
+<<<<<<< HEAD
+=======
     case "ArbitratorSelected":
       return "border-purple-500 bg-purple-500 text-white";
+>>>>>>> upstream/main
     case "VoteCast":
       return "border-indigo-500 bg-indigo-500 text-white";
     case "DisputeResolved":
       return "border-green-500 bg-green-500 text-white";
+<<<<<<< HEAD
+=======
     case "ResolutionEnforced":
       return "border-emerald-500 bg-emerald-500 text-white";
+>>>>>>> upstream/main
     default:
       return "border-gray-600 bg-gray-900 text-gray-400";
   }
@@ -312,14 +348,20 @@ function getEventTitle(type: DisputeEvent["type"]): string {
       return "Dispute Opened";
     case "EvidenceSubmitted":
       return "Evidence Submitted";
+<<<<<<< HEAD
+=======
     case "ArbitratorSelected":
       return "Arbitrator Selected";
+>>>>>>> upstream/main
     case "VoteCast":
       return "Vote Cast";
     case "DisputeResolved":
       return "Dispute Resolved";
+<<<<<<< HEAD
+=======
     case "ResolutionEnforced":
       return "Resolution Enforced";
+>>>>>>> upstream/main
     default:
       return "Event";
   }

@@ -6,6 +6,11 @@ import { useI18n } from "@/components/I18nProvider";
 import type { Invoice } from "@stellar-split/sdk";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { Skeleton } from "@/components/Skeleton";
+<<<<<<< HEAD
+
+interface Props {
+  invoices: Invoice[];
+=======
 import {
   aggregateSubscriptionAnalytics,
   type Subscription,
@@ -14,6 +19,7 @@ import {
 interface Props {
   invoices: Invoice[];
   subscriptions?: Subscription[];
+>>>>>>> upstream/main
 }
 
 type RangePreset = "7d" | "30d" | "3m" | "custom";
@@ -31,7 +37,11 @@ const RANGE_OPTIONS: RangeOption[] = [
   { key: "custom", label: "Custom", days: null },
 ];
 
+<<<<<<< HEAD
+export default function AnalyticsPanel({ invoices }: Props) {
+=======
 export default function AnalyticsPanel({ invoices, subscriptions = [] }: Props) {
+>>>>>>> upstream/main
   const { t } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
   const [range, setRange] = useState<RangePreset>("30d");
@@ -101,6 +111,8 @@ export default function AnalyticsPanel({ invoices, subscriptions = [] }: Props) 
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([week, count]) => ({ week, invoices: count }));
 
+<<<<<<< HEAD
+=======
   // Subscription analytics (scoped to the same date window as invoices).
   const subscriptionAnalytics = useMemo(
     () => aggregateSubscriptionAnalytics(subscriptions, from, to),
@@ -115,6 +127,7 @@ export default function AnalyticsPanel({ invoices, subscriptions = [] }: Props) 
     [subscriptionAnalytics.cancellationReasons]
   );
 
+>>>>>>> upstream/main
   return (
     <div className="bg-gray-900 rounded-xl p-4 sm:p-5 mb-6">
       <button
@@ -222,6 +235,8 @@ export default function AnalyticsPanel({ invoices, subscriptions = [] }: Props) 
             </div>
           </div>
 
+<<<<<<< HEAD
+=======
           {/* Subscription Analytics */}
           <div className="space-y-3">
             <p className="text-sm text-gray-400">{t("dashboard.subscriptions")}</p>
@@ -293,6 +308,7 @@ export default function AnalyticsPanel({ invoices, subscriptions = [] }: Props) 
             )}
           </div>
 
+>>>>>>> upstream/main
           {/* Weekly Chart */}
           {chartData.length > 0 && (
             <div className="bg-gray-800 rounded-lg p-4 overflow-x-auto">

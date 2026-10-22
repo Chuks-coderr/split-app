@@ -2,7 +2,10 @@
 
 import type { Contrast, FontScale } from "@/contexts/AccessibilityContext";
 import { useAccessibility } from "@/contexts/AccessibilityContext";
+<<<<<<< HEAD
+=======
 import AccessibilityAuditPanel from "@/components/AccessibilityAuditPanel";
+>>>>>>> upstream/main
 
 const FONT_SCALE_OPTIONS: Array<{
   value: FontScale;
@@ -147,8 +150,11 @@ export default function AccessibilitySettingsPage() {
             })}
           </div>
         </section>
+<<<<<<< HEAD
+=======
 
         <AccessibilityAuditPanel />
+>>>>>>> upstream/main
       </div>
     </main>
   );

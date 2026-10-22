@@ -21,6 +21,8 @@ test.describe('Create invoice flow', () => {
     await expect(createPage.totalAmountInput).toHaveValue('200');
   });
 
+<<<<<<< HEAD
+=======
   test('back button returns to previous step without losing entered data', async ({ page }) => {
     const createPage = new CreateInvoicePage(page);
     await createPage.goto();
@@ -38,6 +40,7 @@ test.describe('Create invoice flow', () => {
     await expect(createPage.amountInput).toHaveValue('150');
   });
 
+>>>>>>> upstream/main
   test('fill form and submit redirects', async ({ page }) => {
     const createPage = new CreateInvoicePage(page);
     await createPage.goto();

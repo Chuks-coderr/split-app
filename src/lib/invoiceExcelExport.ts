@@ -42,6 +42,8 @@ export interface TransactionExportRow {
   status: string;
 }
 
+<<<<<<< HEAD
+=======
 export interface AgingBucketExportRow {
   bucket: string;
   invoiceCount: number;
@@ -239,6 +241,7 @@ export function buildAgingWorksheet(
   return { name: 'Aging Report', headers, rows };
 }
 
+>>>>>>> upstream/main
 /**
  * Convert invoices to export rows
  */
@@ -472,6 +475,8 @@ export function generateExportFilename(prefix = 'invoices'): string {
   const date = new Date().toISOString().split('T')[0];
   return `${prefix}-${date}.xlsx`;
 }
+<<<<<<< HEAD
+=======
 
 /**
  * Generate Excel binary data including the aging report worksheet.
@@ -517,3 +522,4 @@ export async function generateExcelBinaryWithAging(
 
   return generateExcelBinary(sheets);
 }
+>>>>>>> upstream/main

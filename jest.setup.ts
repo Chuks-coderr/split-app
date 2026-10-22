@@ -1,4 +1,6 @@
 import "@testing-library/jest-dom";
+<<<<<<< HEAD
+=======
 
 /**
  * Global Jest setup.
@@ -360,3 +362,4 @@ beforeEach(() => {
 afterEach(() => {
   jest.clearAllMocks();
 });
+>>>>>>> upstream/main

@@ -19,6 +19,8 @@ test.describe('Dashboard', () => {
     const hasEmpty = await dashboard.emptyState.isVisible().catch(() => false);
     expect(hasCards > 0 || hasEmpty).toBe(true);
   });
+<<<<<<< HEAD
+=======
 
   test('analytics dashboard updates in real-time', async ({ page }) => {
     const dashboard = new DashboardPage(page);
@@ -70,4 +72,5 @@ test.describe('Dashboard', () => {
     await expect(liveMetric).toBeVisible();
     await expect(liveMetric).not.toHaveText('');
   });
+>>>>>>> upstream/main
 });

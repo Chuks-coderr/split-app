@@ -4,12 +4,15 @@ import { useEffect, useState } from "react";
 import { splitClient } from "@/lib/stellar";
 import { truncateAddress } from "@stellar-split/sdk";
 import RelativeTime from "@/components/ui/RelativeTime";
+<<<<<<< HEAD
+=======
 import {
   getInvoiceVersions,
   notifyAffectedParties,
   type InvoiceVersion,
   type InvoiceVersionDiff,
 } from "@/lib/invoiceVersioning";
+>>>>>>> upstream/main
 
 interface HistoryEntry {
   action: string;
@@ -19,12 +22,15 @@ interface HistoryEntry {
   address?: string;
   /** Structured diff for the expanded diff view (issue #606). */
   diff?: FieldDiff[];
+<<<<<<< HEAD
+=======
   /** Amendment reason recorded with the version (issue #937). */
   reason?: string;
   /** Free-form amendment comment recorded with the version (issue #937). */
   comment?: string;
   /** Author of the amendment (issue #937). */
   author?: string;
+>>>>>>> upstream/main
 }
 
 /** A single field change shown in the diff panel. */
@@ -38,8 +44,11 @@ interface FieldDiff {
 
 interface Props {
   invoiceId: string;
+<<<<<<< HEAD
+=======
   /** Optional callback called when the user requests to restore a version. */
   onRestore?: (versionIndex: number, entry: HistoryEntry) => void;
+>>>>>>> upstream/main
 }
 
 // ─── Diff helpers ────────────────────────────────────────────────────────────
@@ -74,6 +83,14 @@ function buildDiff(entry: any): FieldDiff[] {
   ];
 
   for (const [key, label] of scalarFields) {
+<<<<<<< HEAD
+    const before = entry[`old${key.charAt(0).toUpperCase() + key.slice(1)}`] ??
+      entry[`prev${key.charAt(0).toUpperCase() + key.slice(1)}`];
+    const after = entry[`new${key.charAt(0).toUpperCase() + key.slice(1)}`] ??
+      entry[`next${key.charAt(0).toUpperCase() + key.slice(1)}`];
+    if (before != null || after != null) {
+      diffs.push({ field: label, before: before != null ? String(before) : undefined, after: after != null ? String(after) : undefined });
+=======
     const before =
       entry[`old${key.charAt(0).toUpperCase() + key.slice(1)}`] ??
       entry[`prev${key.charAt(0).toUpperCase() + key.slice(1)}`];
@@ -86,6 +103,7 @@ function buildDiff(entry: any): FieldDiff[] {
         before: before != null ? String(before) : undefined,
         after: after != null ? String(after) : undefined,
       });
+>>>>>>> upstream/main
     }
   }
 
@@ -146,6 +164,8 @@ function buildDiff(entry: any): FieldDiff[] {
   return diffs;
 }
 
+<<<<<<< HEAD
+=======
 // ─── Version mapping ─────────────────────────────────────────────────────────
 
 /** Map a stored invoice version into the timeline entry shape. */
@@ -168,6 +188,7 @@ function mapVersionToEntry(version: InvoiceVersion): HistoryEntry {
   };
 }
 
+>>>>>>> upstream/main
 // ─── DiffPanel ────────────────────────────────────────────────────────────────
 
 function DiffPanel({ diffs }: { diffs: FieldDiff[] }) {
@@ -206,6 +227,17 @@ function DiffPanel({ diffs }: { diffs: FieldDiff[] }) {
   );
 }
 
+<<<<<<< HEAD
+// ─── VersionHistory ───────────────────────────────────────────────────────────
+
+export default function VersionHistory({ invoiceId }: Props) {
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  /** Which entry index has its diff panel open. */
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+
+=======
 // ─── ComparisonView ──────────────────────────────────────────────────────────
 
 interface ComparisonViewProps {
@@ -414,10 +446,55 @@ export default function VersionHistory({ invoiceId, onRestore }: Props) {
   /** Notification message after restore. */
   const [restoreNotice, setRestoreNotice] = useState<string | null>(null);
 
+>>>>>>> upstream/main
   useEffect(() => {
     const loadHistory = async () => {
       try {
         setLoading(true);
+<<<<<<< HEAD
+        const auditLog = await (splitClient as any).getAuditLog(invoiceId);
+
+        if (!auditLog || auditLog.length === 0) {
+          setHistory([]);
+          return;
+        }
+
+        const entries: HistoryEntry[] = auditLog.map((entry: any) => {
+          const action = entry.action || entry.type;
+          const timestamp = entry.timestamp || entry.createdAt;
+
+          if (action === "extend_deadline") {
+            return {
+              action: "Deadline Extended",
+              timestamp,
+              oldValue: new Date(entry.oldDeadline * 1000).toLocaleDateString(),
+              newValue: new Date(entry.newDeadline * 1000).toLocaleDateString(),
+              diff: buildDiff(entry),
+            };
+          } else if (action === "add_co_creator") {
+            return {
+              action: "Co-creator Added",
+              timestamp,
+              address: entry.address,
+              diff: buildDiff(entry),
+            };
+          } else if (action === "remove_co_creator") {
+            return {
+              action: "Co-creator Removed",
+              timestamp,
+              address: entry.address,
+              diff: buildDiff(entry),
+            };
+          }
+
+          return {
+            action:
+              action.replace(/_/g, " ").charAt(0).toUpperCase() + action.slice(1),
+            timestamp,
+            diff: buildDiff(entry),
+          };
+        });
+=======
 
         // Prefer the versioned store; fall back to the raw audit log.
         let entries: HistoryEntry[] = [];
@@ -486,6 +563,7 @@ export default function VersionHistory({ invoiceId, onRestore }: Props) {
             };
           });
         }
+>>>>>>> upstream/main
 
         setHistory(entries.sort((a, b) => b.timestamp - a.timestamp));
       } catch (err) {
@@ -498,6 +576,8 @@ export default function VersionHistory({ invoiceId, onRestore }: Props) {
     loadHistory();
   }, [invoiceId]);
 
+<<<<<<< HEAD
+=======
   // Assign version numbers: latest is highest number
   const versioned: VersionedEntry[] = history.map((entry, idx) => ({
     ...entry,
@@ -542,6 +622,7 @@ export default function VersionHistory({ invoiceId, onRestore }: Props) {
     setTimeout(() => setRestoreNotice(null), 5000);
   };
 
+>>>>>>> upstream/main
   if (loading) {
     return (
       <div className="text-center py-8">
@@ -566,6 +647,94 @@ export default function VersionHistory({ invoiceId, onRestore }: Props) {
     );
   }
 
+<<<<<<< HEAD
+  return (
+    <div className="space-y-4">
+      {history.map((entry, index) => {
+        const isExpanded = expandedIndex === index;
+        const hasDiff = (entry.diff?.length ?? 0) > 0 ||
+          entry.oldValue != null ||
+          entry.newValue != null;
+
+        return (
+          <div
+            key={index}
+            className="flex gap-4 pb-4 border-b border-gray-700 last:border-b-0"
+          >
+            {/* Timeline dot */}
+            <div className="flex flex-col items-center">
+              <div className="w-3 h-3 rounded-full bg-indigo-500 mt-1 shrink-0" />
+              {index < history.length - 1 && (
+                <div className="w-0.5 flex-1 bg-gray-700 mt-2 min-h-[3rem]" />
+              )}
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 pt-0.5 min-w-0">
+              <div className="flex items-start justify-between gap-2">
+                <p className="font-semibold text-gray-200">{entry.action}</p>
+
+                {/* "Show diff" toggle button */}
+                <button
+                  type="button"
+                  aria-expanded={isExpanded}
+                  aria-label={isExpanded ? "Hide changes" : "Show changes"}
+                  onClick={() =>
+                    setExpandedIndex((prev) => (prev === index ? null : index))
+                  }
+                  className="shrink-0 text-xs text-indigo-400 hover:text-indigo-300 transition-colors px-2 py-0.5 rounded border border-indigo-800 hover:border-indigo-600"
+                >
+                  {isExpanded ? "Hide diff" : "Show diff"}
+                </button>
+              </div>
+
+              <p className="text-xs text-gray-400 mt-1">
+                <RelativeTime
+                  iso={new Date(entry.timestamp * 1000).toISOString()}
+                />
+              </p>
+
+              {/* Legacy inline diff (always shown for extend_deadline) */}
+              {entry.oldValue && entry.newValue && !isExpanded && (
+                <div className="mt-2 text-sm space-y-1">
+                  <p className="text-red-400">
+                    <span className="font-mono">- {entry.oldValue}</span>
+                  </p>
+                  <p className="text-green-400">
+                    <span className="font-mono">+ {entry.newValue}</span>
+                  </p>
+                </div>
+              )}
+
+              {entry.address && (
+                <p className="mt-2 text-sm font-mono text-gray-300">
+                  {truncateAddress(entry.address)}
+                </p>
+              )}
+
+              {/* Expanded diff panel (issue #606) */}
+              {isExpanded && (
+                <DiffPanel
+                  diffs={
+                    entry.diff && entry.diff.length > 0
+                      ? entry.diff
+                      : entry.oldValue || entry.newValue
+                      ? [
+                          {
+                            field: "Value",
+                            before: entry.oldValue,
+                            after: entry.newValue,
+                          },
+                        ]
+                      : []
+                  }
+                />
+              )}
+            </div>
+          </div>
+        );
+      })}
+=======
   const [leftIdx, rightIdx] = compareSelection;
 
   return (
@@ -792,6 +961,7 @@ export default function VersionHistory({ invoiceId, onRestore }: Props) {
           onCancel={() => setRestoreIndex(null)}
         />
       )}
+>>>>>>> upstream/main
     </div>
   );
 }

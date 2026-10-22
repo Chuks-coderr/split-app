@@ -1,12 +1,26 @@
 'use client';
 
+<<<<<<< HEAD
+import { useEffect, useState } from 'react';
+import { isVerifiedCreator } from '@/lib/attestation';
+=======
 import { useEffect, useId, useState } from 'react';
 import { getAttestation, isVerifiedCreator } from '@/lib/attestation';
+>>>>>>> upstream/main
 
 interface Props {
   address: string;
 }
 
+<<<<<<< HEAD
+export default function VerifiedCreatorBadge({ address }: Props) {
+  const [isVerified, setIsVerified] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    setIsVerified(isVerifiedCreator(address));
+=======
 /** Format a verification timestamp as a human-readable date, e.g. "January 15, 2024". */
 export function formatVerificationDate(timestamp: number): string {
   return new Intl.DateTimeFormat('en-US', {
@@ -43,12 +57,21 @@ export default function VerifiedCreatorBadge({ address }: Props) {
       timestamp: attestation?.timestamp ?? null,
       method: attestation?.method ?? null,
     });
+>>>>>>> upstream/main
   }, [address]);
 
   if (!mounted || !isVerified) {
     return null;
   }
 
+<<<<<<< HEAD
+  return (
+    <span
+      className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-green-900 text-green-300"
+      title="This creator has verified their identity"
+    >
+      ✓ Verified Creator
+=======
   const hasVerificationDate =
     typeof verification.timestamp === 'number' &&
     Number.isFinite(verification.timestamp);
@@ -78,6 +101,7 @@ export default function VerifiedCreatorBadge({ address }: Props) {
           {tooltipText}
         </span>
       )}
+>>>>>>> upstream/main
     </span>
   );
 }

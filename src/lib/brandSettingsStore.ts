@@ -43,19 +43,26 @@ export function hasBrandSettings(address: string): boolean {
  */
 export function saveBrandSettings(
   address: string,
+<<<<<<< HEAD
+  settings: { logoUrl: string | null; accentColor: string | null; tagline: string | null },
+=======
   settings: {
     logoUrl: string | null;
     accentColor: string | null;
     tagline: string | null;
     fontFamily: BrandSettings["fontFamily"];
   },
+>>>>>>> upstream/main
 ): BrandSettings {
   const key = normalizeAddress(address);
   const record: BrandSettings = {
     logoUrl: settings.logoUrl,
     accentColor: settings.accentColor,
     tagline: settings.tagline,
+<<<<<<< HEAD
+=======
     fontFamily: settings.fontFamily,
+>>>>>>> upstream/main
     updatedAt: new Date().toISOString(),
   };
   brandStore.set(key, record);

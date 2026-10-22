@@ -7,9 +7,12 @@ interface NotificationPreferences {
   deadlineApproaching: boolean;
   invoiceReleased: boolean;
   invoiceRefunded: boolean;
+<<<<<<< HEAD
+=======
   subscriptionBilling: boolean;
   subscriptionPaused: boolean;
   subscriptionCancelled: boolean;
+>>>>>>> upstream/main
 }
 
 const DEFAULT_PREFS: NotificationPreferences = {
@@ -18,9 +21,12 @@ const DEFAULT_PREFS: NotificationPreferences = {
   deadlineApproaching: true,
   invoiceReleased: true,
   invoiceRefunded: true,
+<<<<<<< HEAD
+=======
   subscriptionBilling: true,
   subscriptionPaused: true,
   subscriptionCancelled: true,
+>>>>>>> upstream/main
 };
 
 function getPreferences(): NotificationPreferences {
@@ -136,6 +142,8 @@ export function notifyInvoiceRefunded(invoiceId: string): void {
   });
 }
 
+<<<<<<< HEAD
+=======
 /** Notify when a subscription billing charge occurs. */
 export function notifySubscriptionBilling(subId: string, amountLabel: string): void {
   const prefs = getPreferences();
@@ -166,6 +174,7 @@ export function notifySubscriptionCancelled(subId: string, reason: string): void
   });
 }
 
+>>>>>>> upstream/main
 /** Stellar address regex: G followed by 55 uppercase alphanumeric chars. */
 const STELLAR_ADDRESS_RE = /\bG[A-Z0-9]{55}\b/g;
 

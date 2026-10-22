@@ -1,5 +1,11 @@
 "use client";
 
+<<<<<<< HEAD
+import { useState, useEffect, useRef } from "react";
+
+const REFRESH_MS = 60_000;
+
+=======
 import { useState, useEffect, useRef, useCallback } from "react";
 
 const REFRESH_MS = 60_000;
@@ -190,6 +196,7 @@ export function useCurrencyRates(): UseCurrencyRatesResult {
   };
 }
 
+>>>>>>> upstream/main
 export interface UseXlmUsdcRateOptions {
   /** Percentage move (e.g. 5 for 5%) from the rate at hook initialisation that triggers onAlert. */
   alertThreshold?: number;

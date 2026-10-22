@@ -20,7 +20,11 @@ interface Props {
  * FraudRiskPanel — displays fraud risk assessment for an invoice
  *
  * Shows a score gauge, tier classification, and expandable signal breakdown table.
+<<<<<<< HEAD
+ * High-risk invoices (score > 70) can trigger a confirmation requirement.
+=======
  * Scores are heuristic review signals and do not block invoice actions.
+>>>>>>> upstream/main
  */
 export default function FraudRiskPanel({
   invoice,
@@ -46,7 +50,11 @@ export default function FraudRiskPanel({
       {/* Header with score gauge */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+<<<<<<< HEAD
+          Fraud Risk Assessment
+=======
           Heuristic Risk Assessment
+>>>>>>> upstream/main
         </h3>
 
         {/* Score gauge */}
@@ -99,7 +107,11 @@ export default function FraudRiskPanel({
             </p>
             {isHighRisk && (
               <p className="text-sm text-red-600 font-medium mt-1">
+<<<<<<< HEAD
+                ⚠️ Requires confirmation
+=======
                 ⚠️ Review recommended
+>>>>>>> upstream/main
               </p>
             )}
           </div>
@@ -108,17 +120,27 @@ export default function FraudRiskPanel({
 
       {/* High-risk warning banner */}
       {isHighRisk && (
+<<<<<<< HEAD
+        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+          <p className="text-sm font-medium text-red-800 dark:text-red-200">
+            ⚠️ High fraud risk detected. Please review the signals below before
+            proceeding with payment.
+=======
         <div role="alert" className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
           <p className="text-sm font-medium text-red-800 dark:text-red-200">
             ⚠️ Elevated heuristic risk signals detected. Review the breakdown; this score is not proof of fraud and may include false positives.
+>>>>>>> upstream/main
           </p>
         </div>
       )}
 
+<<<<<<< HEAD
+=======
       <p className="text-xs text-gray-500 dark:text-gray-400">
         Heuristic estimate only; this is not a trained machine-learning model.
       </p>
 
+>>>>>>> upstream/main
       {/* Signal breakdown */}
       <div className="mt-4">
         <button

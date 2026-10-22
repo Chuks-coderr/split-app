@@ -14,10 +14,13 @@ interface AuditLogEntry {
   action: string;
   actor: string;
   timestamp: number;
+<<<<<<< HEAD
+=======
   version?: number;
   diffSummary?: string;
   amendmentReason?: string;
   amendmentComment?: string;
+>>>>>>> upstream/main
 }
 
 interface Props {
@@ -44,6 +47,9 @@ export default function AuditLogTable({ invoiceId, invoice }: Props) {
   const handleExportJSON = () => {
     if (!invoice) return;
     const nonPendingPayments = invoice.payments.filter((p) => !p.pending);
+<<<<<<< HEAD
+    const archive = buildInvoiceArchive(invoice, entries, nonPendingPayments);
+=======
     const versionHistory = entries
       .filter((entry) => entry.version !== undefined)
       .map((entry) => ({
@@ -59,6 +65,7 @@ export default function AuditLogTable({ invoiceId, invoice }: Props) {
       ...buildInvoiceArchive(invoice, entries, nonPendingPayments),
       versionHistory,
     };
+>>>>>>> upstream/main
     const filename = generateArchiveFilename(invoiceId);
     downloadInvoiceArchive(archive, filename);
   };
@@ -139,8 +146,11 @@ export default function AuditLogTable({ invoiceId, invoice }: Props) {
           <thead>
             <tr className="border-b border-gray-700">
               <th className="text-left px-4 py-2 font-semibold text-gray-300">Action</th>
+<<<<<<< HEAD
+=======
               <th className="text-left px-4 py-2 font-semibold text-gray-300">Version</th>
               <th className="text-left px-4 py-2 font-semibold text-gray-300">Changes</th>
+>>>>>>> upstream/main
               <th className="text-left px-4 py-2 font-semibold text-gray-300">Actor</th>
               <th className="text-left px-4 py-2 font-semibold text-gray-300">Timestamp</th>
             </tr>
@@ -149,6 +159,8 @@ export default function AuditLogTable({ invoiceId, invoice }: Props) {
             {paginatedEntries.map((entry, idx) => (
               <tr key={idx} className="border-b border-gray-800 hover:bg-gray-900/50">
                 <td className="px-4 py-3 text-gray-200">{entry.action}</td>
+<<<<<<< HEAD
+=======
                 <td className="px-4 py-3 text-gray-400">
                   {entry.version !== undefined ? `v${entry.version}` : "—"}
                 </td>
@@ -170,6 +182,7 @@ export default function AuditLogTable({ invoiceId, invoice }: Props) {
                     ? "—"
                     : null}
                 </td>
+>>>>>>> upstream/main
                 <td className="px-4 py-3 font-mono text-gray-400 truncate" title={entry.actor}>
                   {truncateAddress(entry.actor)}
                 </td>

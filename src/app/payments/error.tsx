@@ -2,8 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+<<<<<<< HEAD
+=======
 import { classifyError, getErrorCopy } from "@/lib/errors";
 import { logger } from "@/lib/logger";
+>>>>>>> upstream/main
 
 interface Props {
   error: Error & { digest?: string };
@@ -14,9 +17,12 @@ interface Props {
 export default function PaymentsError({ error, reset }: Props) {
   const [sentryEventId, setSentryEventId] = useState<string | null>(null);
 
+<<<<<<< HEAD
+=======
   const kind = classifyError(error);
   const copy = getErrorCopy(kind, "payments");
 
+>>>>>>> upstream/main
   useEffect(() => {
     const capture = async () => {
       try {
@@ -28,6 +34,17 @@ export default function PaymentsError({ error, reset }: Props) {
       }
     };
     capture();
+<<<<<<< HEAD
+    console.error("[PaymentsError]", error);
+  }, [error]);
+
+  return (
+    <main className="max-w-xl mx-auto px-4 py-20 text-center">
+      <h1 className="text-2xl font-bold mb-2">Could not load payment history</h1>
+      <p className="text-gray-400 text-sm mb-6">
+        {error.message || "An unexpected error occurred."}
+      </p>
+=======
     logger.error("Payments route error", {
       scope: "payments",
       kind,
@@ -48,6 +65,7 @@ export default function PaymentsError({ error, reset }: Props) {
           ))}
         </ul>
       )}
+>>>>>>> upstream/main
       {sentryEventId && (
         <p className="text-xs text-gray-500 font-mono mb-4">
           Error ID: {sentryEventId}

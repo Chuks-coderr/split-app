@@ -4,7 +4,10 @@ import { Component, type ReactNode } from "react";
 import Link from "next/link";
 import WalletConnect from "@/components/WalletConnect";
 import { classifyError } from "@/lib/errors";
+<<<<<<< HEAD
+=======
 import { getWalletAddress, hashWalletAddress } from "@/lib/errorTracking";
+>>>>>>> upstream/main
 
 interface Props {
   children: ReactNode;
@@ -30,6 +33,10 @@ export default class ErrorBoundary extends Component<Props, State> {
       // Sentry is only initialised when NEXT_PUBLIC_SENTRY_DSN is set.
       // Dynamic import keeps it out of the production bundle when unconfigured.
       const Sentry = await import("@sentry/nextjs");
+<<<<<<< HEAD
+      const eventId = Sentry.captureException(error);
+      this.setState({ sentryEventId: eventId });
+=======
       const { kind } = classifyError(error);
 
       Sentry.withScope((scope) => {
@@ -51,6 +58,7 @@ export default class ErrorBoundary extends Component<Props, State> {
         const eventId = Sentry.captureException(error);
         this.setState({ sentryEventId: eventId });
       });
+>>>>>>> upstream/main
     } catch {
       // Sentry unavailable — continue without it
     }

@@ -81,6 +81,8 @@ export default function SettingsPage() {
               API keys
             </a>
           </li>
+<<<<<<< HEAD
+=======
           <li>
             <a href="/settings/widgets" className="text-indigo-400 hover:text-indigo-300">
               Dashboard Widgets
@@ -91,6 +93,7 @@ export default function SettingsPage() {
               Wallet Verification
             </a>
           </li>
+>>>>>>> upstream/main
         </ul>
       </section>
     </main>

@@ -1,11 +1,39 @@
 "use client";
 
+<<<<<<< HEAD
+import { useState, useEffect } from "react";
+=======
 import { useState, useEffect, useCallback } from "react";
+>>>>>>> upstream/main
 import Link from "next/link";
 import WalletConnect from "@/components/WalletConnect";
 
 const ONBOARDING_KEY = "split-onboarded";
 const ONBOARDING_STEP_KEY = "stellarsplit_onboarding_step";
+<<<<<<< HEAD
+const TOTAL_STEPS = 3;
+
+const STEPS = [
+  {
+    icon: "🔗",
+    title: "Connect your Freighter wallet",
+    description:
+      "Freighter is a browser extension wallet for Stellar. Connect it to create and pay invoices on-chain.",
+  },
+  {
+    icon: "📄",
+    title: "Create your first invoice",
+    description:
+      "Fill in recipients, amounts, and a deadline. We'll pre-fill an example to get you started fast.",
+  },
+  {
+    icon: "🔗",
+    title: "Share and get paid",
+    description:
+      "Every invoice gets a unique link. Share it with payers — when the invoice is fully funded, USDC routes automatically to all recipients.",
+  },
+];
+=======
 const CHECKLIST_KEY = "stellarsplit_checklist";
 const TOTAL_STEPS = 5;
 
@@ -182,18 +210,30 @@ function OnboardingChecklist({
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
+>>>>>>> upstream/main
 
 export default function OnboardingFlow() {
   const [show, setShow] = useState(false);
   const [step, setStep] = useState(1);
+<<<<<<< HEAD
+
+=======
   const [checklistDone, setChecklistDone] = useState<Set<ChecklistId>>(new Set());
 
   // Load state from localStorage
+>>>>>>> upstream/main
   useEffect(() => {
     try {
       const onboarded = localStorage.getItem(ONBOARDING_KEY);
       if (onboarded === "true") return;
       const savedStep = localStorage.getItem(ONBOARDING_STEP_KEY);
+<<<<<<< HEAD
+      setShow(true);
+      if (savedStep) setStep(Math.min(parseInt(savedStep, 10), TOTAL_STEPS));
+    } catch {}
+  }, []);
+
+=======
       const savedChecklist = localStorage.getItem(CHECKLIST_KEY);
 
       setShow(true);
@@ -224,6 +264,7 @@ export default function OnboardingFlow() {
     [persistChecklist]
   );
 
+>>>>>>> upstream/main
   const handleSkip = () => {
     try {
       localStorage.setItem(ONBOARDING_KEY, "true");
@@ -244,6 +285,8 @@ export default function OnboardingFlow() {
     } catch {}
   };
 
+<<<<<<< HEAD
+=======
   const handleBack = () => {
     if (step <= 1) return;
     const prev = step - 1;
@@ -253,6 +296,7 @@ export default function OnboardingFlow() {
     } catch {}
   };
 
+>>>>>>> upstream/main
   if (!show) return null;
 
   const current = STEPS[step - 1];
@@ -282,6 +326,12 @@ export default function OnboardingFlow() {
         {/* Progress bar */}
         <div className="flex gap-1.5 px-6 mt-3">
           {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
+<<<<<<< HEAD
+            <div
+              key={i}
+              className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+                i < step ? "bg-brand-500" : "bg-white/[0.08]"
+=======
             <button
               key={i}
               type="button"
@@ -293,6 +343,7 @@ export default function OnboardingFlow() {
               }}
               className={`h-1 flex-1 rounded-full transition-all duration-300 focus:outline-none ${
                 i < step ? "bg-brand-500" : "bg-white/[0.08] hover:bg-white/[0.15]"
+>>>>>>> upstream/main
               }`}
             />
           ))}
@@ -302,6 +353,21 @@ export default function OnboardingFlow() {
         <div className="px-6 py-8 flex flex-col gap-4">
           <div className="flex flex-col items-center text-center gap-3">
             <span className="text-5xl" aria-hidden="true">{current.icon}</span>
+<<<<<<< HEAD
+            <h2 className="text-xl font-bold text-white">{current.title}</h2>
+            <p className="text-sm text-slate-400 leading-relaxed">{current.description}</p>
+          </div>
+
+          {/* Step 1: wallet connect inline */}
+          {step === 1 && (
+            <div className="mt-2">
+              <WalletConnect />
+            </div>
+          )}
+
+          {/* Step 2: CTA to create invoice with example values */}
+          {step === 2 && (
+=======
             <h2 className="text-xl font-bold text-white flex items-center justify-center gap-1">
               {current.title}
               <Tooltip text={current.tooltip} />
@@ -349,6 +415,7 @@ export default function OnboardingFlow() {
           )}
 
           {step === 3 && (
+>>>>>>> upstream/main
             <Link
               href="/invoice/new?prefill=example"
               onClick={handleNext}
@@ -358,6 +425,19 @@ export default function OnboardingFlow() {
             </Link>
           )}
 
+<<<<<<< HEAD
+          {/* Step 3: share explanation, no extra widget needed */}
+        </div>
+
+        {/* Footer actions */}
+        <div className="px-6 pb-6 flex gap-3">
+          <button
+            onClick={handleSkip}
+            className="flex-1 h-10 rounded-lg bg-white/[0.06] hover:bg-white/[0.1] text-slate-300 text-sm font-medium transition-colors"
+          >
+            Skip
+          </button>
+=======
           {step === 4 && (
             <div className="mt-2 flex flex-col gap-2">
               <div className="bg-white/[0.04] rounded-lg p-3 text-xs text-slate-400 border border-white/[0.06]">
@@ -411,13 +491,17 @@ export default function OnboardingFlow() {
               Back
             </button>
           )}
+>>>>>>> upstream/main
           <button
             onClick={handleNext}
             className="flex-1 h-10 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-sm font-semibold transition-colors"
           >
             {step === TOTAL_STEPS ? "Get started" : "Next"}
           </button>
+<<<<<<< HEAD
+=======
           </div>
+>>>>>>> upstream/main
         </div>
       </div>
     </div>

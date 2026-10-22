@@ -8,10 +8,13 @@ export type WalletErrorType =
   | "locked"
   | "rejected"
   | "network_mismatch"
+<<<<<<< HEAD
+=======
   | "ledger_not_connected"
   | "ledger_locked"
   | "ledger_app_not_open"
   | "ledger_denied"
+>>>>>>> upstream/main
   | null;
 
 interface Props {
@@ -144,6 +147,8 @@ function NetworkMismatchContent({
   );
 }
 
+<<<<<<< HEAD
+=======
 function LedgerNotConnectedContent({
   onRetry,
   onDismiss,
@@ -328,6 +333,7 @@ function LedgerDeniedContent({
   );
 }
 
+>>>>>>> upstream/main
 export default function WalletErrorModal({
   errorType,
   onDismiss,
@@ -391,6 +397,8 @@ export default function WalletErrorModal({
             onDismiss={onDismiss}
           />
         )}
+<<<<<<< HEAD
+=======
         {errorType === "ledger_not_connected" && (
           <LedgerNotConnectedContent onRetry={onRetry} onDismiss={onDismiss} />
         )}
@@ -403,6 +411,7 @@ export default function WalletErrorModal({
         {errorType === "ledger_denied" && (
           <LedgerDeniedContent onRetry={onRetry} onDismiss={onDismiss} />
         )}
+>>>>>>> upstream/main
       </div>
     </div>
   );

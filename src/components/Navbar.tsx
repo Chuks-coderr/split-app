@@ -8,6 +8,19 @@ import SimulationModeToggle from "@/components/SimulationModeToggle";
 import NotificationCenter from "@/components/NotificationCenter";
 import HeaderShortcutsButton from "@/components/HeaderShortcutsButton";
 import NetworkStatus from "@/components/NetworkStatus";
+<<<<<<< HEAD
+import GlobalSearch from "@/components/GlobalSearch";
+import MobileSidebar from "@/components/layout/MobileSidebar";
+
+const NAV_LINKS = [
+  { href: "/dashboard",      label: "Dashboard" },
+  { href: "/invoice",        label: "Invoices" },
+  { href: "/subscriptions",  label: "Subscriptions" },
+  { href: "/groups",         label: "Groups" },
+  { href: "/address-book",   label: "Contacts" },
+  { href: "/recipients",     label: "Recipients" },
+  { href: "/leaderboard",    label: "Leaderboard" },
+=======
 import NetworkSelector from "@/components/NetworkSelector";
 import GlobalSearch from "@/components/GlobalSearch";
 import MobileSidebar from "@/components/layout/MobileSidebar";
@@ -26,6 +39,7 @@ const NAV_LINKS = [
   { href: "/recipients",           label: "Recipients" },
   { href: "/leaderboard",          label: "Leaderboard" },
   { href: "/reputation",           label: "Reputation" },
+>>>>>>> upstream/main
 ];
 
 export default function Navbar() {
@@ -112,18 +126,24 @@ export default function Navbar() {
 
           {/* Right-side actions */}
           <div className="ml-auto flex items-center gap-1">
+<<<<<<< HEAD
+=======
             {/* Network selector stays visible at every breakpoint */}
             <NetworkSelector />
+>>>>>>> upstream/main
             <div className="hidden sm:flex items-center gap-2">
               <NetworkStatus />
               <SimulationModeToggle />
               <NotificationCenter />
               <HeaderShortcutsButton />
+<<<<<<< HEAD
+=======
               <HelpTooltip
                 content="Open the user guide to learn about invoices, subscriptions, groups, and more."
                 href="/help"
                 label="Help and user guide"
               />
+>>>>>>> upstream/main
             </div>
             <ThemeToggle />
 
@@ -154,6 +174,8 @@ export default function Navbar() {
         </div>
       </header>
 
+<<<<<<< HEAD
+=======
       {/* Contextual breadcrumb trail — hidden on the home route */}
       {pathname !== "/" && (
         <div className="border-b border-white/[0.06] bg-surface-900/80">
@@ -163,6 +185,7 @@ export default function Navbar() {
         </div>
       )}
 
+>>>>>>> upstream/main
       {/* Slide-in sidebar for below lg */}
       <MobileSidebar
         isOpen={sidebarOpen}

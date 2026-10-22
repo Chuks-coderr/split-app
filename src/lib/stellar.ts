@@ -90,6 +90,10 @@ export async function convertXlmToUsdc(
   }
 
   const { Asset, Horizon, Operation, TransactionBuilder, BASE_FEE } = await import("@stellar/stellar-sdk");
+<<<<<<< HEAD
+  const { signWithFreighter } = await import("./freighter");
+=======
+>>>>>>> upstream/main
 
   const destinationAmount = formatAmount(usdcAmount);
   const usdcAsset = new Asset("USDC", USDC_CONTRACT_ID);
@@ -128,10 +132,14 @@ export async function convertXlmToUsdc(
     .setTimeout(30)
     .build();
 
+<<<<<<< HEAD
+  const signedXdr = await signWithFreighter(tx.toXDR());
+=======
   const signedXdr = await signTransaction(tx.toXDR(), {
     address: walletAddress,
     networkPassphrase: NETWORK_PASSPHRASE,
   });
+>>>>>>> upstream/main
   const signedTx = TransactionBuilder.fromXDR(signedXdr, NETWORK_PASSPHRASE);
   const submitResult = await server.submitTransaction(signedTx);
 
@@ -165,6 +173,10 @@ export async function payMilestone(params: {
 }): Promise<{ txHash: string }> {
   const client = getSplitClient();
   const { TransactionBuilder, BASE_FEE, Memo, nativeToScVal, rpc } = await import("@stellar/stellar-sdk");
+<<<<<<< HEAD
+  const { signWithFreighter } = await import("./freighter");
+=======
+>>>>>>> upstream/main
 
   // The published @stellar-split/sdk keeps `contract`, `server` and `config`
   // as private fields with no public accessors. Milestone payments need a
@@ -204,10 +216,14 @@ export async function payMilestone(params: {
   }
 
   const preparedTx = rpc.assembleTransaction(tx, simResult).build();
+<<<<<<< HEAD
+  const signedXdr = await signWithFreighter(preparedTx.toXDR());
+=======
   const signedXdr = await signTransaction(preparedTx.toXDR(), {
     address: params.payer,
     networkPassphrase,
   });
+>>>>>>> upstream/main
   const signedTx = TransactionBuilder.fromXDR(signedXdr, networkPassphrase);
   const sendResult = await internals.server.sendTransaction(signedTx);
 

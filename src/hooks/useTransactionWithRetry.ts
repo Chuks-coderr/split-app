@@ -15,6 +15,8 @@ const DEFAULT_OPTIONS = {
   retryableStatusCodes: [429],
 };
 
+<<<<<<< HEAD
+=======
 // Ledger hardware wallet error codes/messages that should never be retried.
 const LEDGER_ERROR_PATTERNS = [
   'disconnected',
@@ -57,6 +59,7 @@ function getLedgerErrorMessage(error: any): string {
   return 'Ledger device error. Please check your connection and try again.';
 }
 
+>>>>>>> upstream/main
 export function useTransactionWithRetry(options?: RetryOptions) {
   const toast = useToast();
   const abortControllers = useRef<Map<string, AbortController>>(new Map());
@@ -105,6 +108,8 @@ export function useTransactionWithRetry(options?: RetryOptions) {
           return result;
         } catch (error) {
           lastError = error instanceof Error ? error : new Error(String(error));
+<<<<<<< HEAD
+=======
 
           // Ledger hardware wallet errors are never retryable; surface a clear message.
           if (isLedgerError(error)) {
@@ -113,6 +118,7 @@ export function useTransactionWithRetry(options?: RetryOptions) {
             throw lastError;
           }
 
+>>>>>>> upstream/main
           const statusCode = getStatusCode(error);
           const isRetryable =
             opts.retryableStatusCodes.includes(statusCode!) &&

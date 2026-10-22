@@ -1,5 +1,13 @@
 "use client";
 
+<<<<<<< HEAD
+import { useEffect, useRef, useState } from "react";
+import useSWR from "swr";
+
+interface WalletBalance {
+  xlm: string;
+  usdc: string;
+=======
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { fetchAccountBalances, type AccountBalance } from "@/lib/stellar/balances";
 import { useInterval } from "@/hooks/useInterval";
@@ -30,10 +38,58 @@ export interface UseWalletBalanceOptions {
   thresholds?: Record<string, string>;
   /** Maximum number of history entries to retain. Defaults to 50. */
   maxHistory?: number;
+>>>>>>> upstream/main
 }
 
 const MAX_RETRIES = 3;
 const RETRY_DELAYS_MS = [1000, 2000, 4000];
+<<<<<<< HEAD
+
+const fetcher = (url: string) => fetch(url).then(r => {
+  if (!r.ok) {
+    throw new Error(`Wallet balance request failed with status ${r.status}`);
+  }
+  return r.json();
+});
+
+export function useWalletBalance(address: string | null, enabled: boolean = true) {
+  const [isRetrying, setIsRetrying] = useState(false);
+  const retryCountRef = useRef(0);
+  const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const { data, error, isLoading, mutate } = useSWR<WalletBalance>(
+    enabled && address ? `/api/wallet/balance?address=${address}` : null,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 30000,
+      focusThrottleInterval: 30000,
+      shouldRetryOnError: false,
+    }
+  );
+
+  useEffect(() => {
+    if (!error) {
+      retryCountRef.current = 0;
+      setIsRetrying(false);
+      return;
+    }
+
+    if (retryCountRef.current >= MAX_RETRIES) {
+      setIsRetrying(false);
+      return;
+    }
+
+    const delay = RETRY_DELAYS_MS[retryCountRef.current];
+    retryCountRef.current += 1;
+    setIsRetrying(true);
+
+    retryTimeoutRef.current = setTimeout(() => {
+      mutate();
+    }, delay);
+
+    return () => {
+=======
 const DEFAULT_POLL_INTERVAL_MS = 30000;
 const DEFAULT_MAX_HISTORY = 50;
 const HISTORY_STORAGE_PREFIX = "wallet-balance-history:";
@@ -104,10 +160,22 @@ export function useWalletBalance(
     mountedRef.current = true;
     return () => {
       mountedRef.current = false;
+>>>>>>> upstream/main
       if (retryTimeoutRef.current) {
         clearTimeout(retryTimeoutRef.current);
       }
     };
+<<<<<<< HEAD
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error]);
+
+  useEffect(() => {
+    if (data) {
+      retryCountRef.current = 0;
+      setIsRetrying(false);
+    }
+  }, [data]);
+=======
   }, []);
 
   // Load persisted history when the address changes.
@@ -225,10 +293,19 @@ export function useWalletBalance(
 
   const findBalance = (asset: string): string | null =>
     assets.find(a => a.asset === asset)?.balance ?? null;
+>>>>>>> upstream/main
 
   const retriesExhausted = retryCountRef.current >= MAX_RETRIES;
 
   return {
+<<<<<<< HEAD
+    xlmBalance: data?.xlm ?? null,
+    usdcBalance: data?.usdc ?? null,
+    isLoading,
+    isRetrying,
+    error: error && retriesExhausted ? error : undefined,
+    refetch: mutate,
+=======
     // Legacy fields preserved for existing consumers.
     xlmBalance: findBalance("XLM"),
     usdcBalance: findBalance("USDC"),
@@ -242,5 +319,6 @@ export function useWalletBalance(
     isRetrying,
     error: error && retriesExhausted ? error : undefined,
     refetch: fetchBalances,
+>>>>>>> upstream/main
   };
 }

@@ -1,8 +1,11 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
+<<<<<<< HEAD
+=======
 import { isBiometricEnabled, verifyBiometric } from "@/lib/biometric";
 import { recordSecurityEvent } from "@/lib/walletSecurity";
+>>>>>>> upstream/main
 
 type TimeoutOption = 5 | 15 | 30 | 60 | null;
 
@@ -11,13 +14,19 @@ interface SessionLockContextValue {
   timeoutMinutes: TimeoutOption;
   setTimeoutMinutes: (minutes: TimeoutOption) => void;
   resume: () => void;
+<<<<<<< HEAD
+=======
   /** Seconds left before the session locks, or null when not in the warning window. */
   secondsUntilLock: number | null;
+>>>>>>> upstream/main
 }
 
 const SessionLockContext = createContext<SessionLockContextValue | undefined>(undefined);
 
 const STORAGE_KEY = "stellarsplit_session_lock_timeout";
+<<<<<<< HEAD
+const INTERACTION_EVENTS: (keyof DocumentEventMap)[] = ["mousedown", "keydown", "touchstart"];
+=======
 /** Cached wallet connection written by `useWallet`; cleared on lock so a reload needs a fresh connect. */
 const WALLET_SESSION_KEY = "stellarsplit_wallet";
 const INTERACTION_EVENTS: (keyof DocumentEventMap)[] = ["mousedown", "keydown", "touchstart"];
@@ -25,6 +34,7 @@ const WARNING_SECONDS = 60;
 const TICK_MS = 1_000;
 
 export const SESSION_TIMEOUT_OPTIONS: TimeoutOption[] = [5, 15, 30, 60, null];
+>>>>>>> upstream/main
 
 function getStoredTimeout(): TimeoutOption {
   if (typeof window === "undefined") return 15;
@@ -37,6 +47,16 @@ function getStoredTimeout(): TimeoutOption {
   return 15;
 }
 
+<<<<<<< HEAD
+export function SessionLockProvider({ children }: { children: React.ReactNode }) {
+  const [locked, setLocked] = useState(false);
+  const [timeoutMinutes, setTimeoutMinutesState] = useState<TimeoutOption>(getStoredTimeout);
+  const lastActivityRef = useRef(Date.now());
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const resetActivity = useCallback(() => {
+    lastActivityRef.current = Date.now();
+=======
 /**
  * Locks the app after a period of inactivity. Shows a countdown warning in
  * the last minute, clears the cached wallet session when it locks, and — when
@@ -58,6 +78,7 @@ export function SessionLockProvider({ children }: { children: React.ReactNode })
     if (lockedRef.current) return;
     lastActivityRef.current = Date.now();
     setSecondsUntilLock(null);
+>>>>>>> upstream/main
   }, []);
 
   const setTimeoutMinutes = useCallback((minutes: TimeoutOption) => {
@@ -65,12 +86,21 @@ export function SessionLockProvider({ children }: { children: React.ReactNode })
     try {
       localStorage.setItem(STORAGE_KEY, String(minutes));
     } catch {}
+<<<<<<< HEAD
+=======
     lockedRef.current = false;
+>>>>>>> upstream/main
     resetActivity();
     setLocked(false);
   }, [resetActivity]);
 
   const resume = useCallback(() => {
+<<<<<<< HEAD
+    setLocked(false);
+    resetActivity();
+  }, [resetActivity]);
+
+=======
     lockedRef.current = false;
     setLocked(false);
     setUnlockError(null);
@@ -104,6 +134,7 @@ export function SessionLockProvider({ children }: { children: React.ReactNode })
     window.location.reload();
   };
 
+>>>>>>> upstream/main
   useEffect(() => {
     INTERACTION_EVENTS.forEach((evt) => document.addEventListener(evt, resetActivity, true));
     return () => {
@@ -114,6 +145,16 @@ export function SessionLockProvider({ children }: { children: React.ReactNode })
   useEffect(() => {
     if (timerRef.current) clearInterval(timerRef.current);
 
+<<<<<<< HEAD
+    if (timeoutMinutes === null) return;
+
+    const ms = timeoutMinutes * 60 * 1000;
+    timerRef.current = setInterval(() => {
+      if (Date.now() - lastActivityRef.current >= ms) {
+        setLocked(true);
+      }
+    }, 10_000);
+=======
     if (timeoutMinutes === null) {
       setSecondsUntilLock(null);
       return;
@@ -129,10 +170,32 @@ export function SessionLockProvider({ children }: { children: React.ReactNode })
         setSecondsUntilLock(Math.ceil(remaining / 1000));
       }
     }, TICK_MS);
+>>>>>>> upstream/main
 
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
+<<<<<<< HEAD
+  }, [timeoutMinutes]);
+
+  return (
+    <SessionLockContext.Provider value={{ locked, timeoutMinutes, setTimeoutMinutes, resume }}>
+      {children}
+      {locked && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-gray-950/95 backdrop-blur">
+          <div className="bg-gray-900 rounded-2xl p-8 max-w-sm w-full mx-4 text-center space-y-4 border border-gray-800">
+            <h2 className="text-xl font-bold">Session Locked</h2>
+            <p className="text-sm text-gray-400">
+              Your session was locked due to inactivity.
+            </p>
+            <button
+              type="button"
+              onClick={resume}
+              className="w-full px-4 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-sm font-semibold transition-colors"
+            >
+              Resume
+            </button>
+=======
   }, [timeoutMinutes, lock]);
 
   return (
@@ -199,6 +262,7 @@ export function SessionLockProvider({ children }: { children: React.ReactNode })
                 Resume
               </button>
             )}
+>>>>>>> upstream/main
           </div>
         </div>
       )}

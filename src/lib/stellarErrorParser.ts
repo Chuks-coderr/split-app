@@ -1,3 +1,5 @@
+<<<<<<< HEAD
+=======
 import {
   AppError,
   AppErrorCode,
@@ -5,6 +7,7 @@ import {
   RecoverySuggestion,
 } from './appError';
 
+>>>>>>> upstream/main
 export type ErrorActionType = 'bump-fee' | 'refresh-seq' | 'fund-destination' | 'manual';
 
 export interface ParsedStellarError {
@@ -15,6 +18,8 @@ export interface ParsedStellarError {
   actionType: ErrorActionType;
 }
 
+<<<<<<< HEAD
+=======
 /**
  * Maps a Stellar/Horizon result code to the AppError taxonomy code.
  */
@@ -89,6 +94,7 @@ const STELLAR_RECOVERY: Record<string, RecoverySuggestion[]> = {
   ],
 };
 
+>>>>>>> upstream/main
 const ERROR_MAPPING: Record<string, ParsedStellarError> = {
   tx_insufficient_fee: {
     code: 'tx_insufficient_fee',
@@ -132,6 +138,8 @@ const ERROR_MAPPING: Record<string, ParsedStellarError> = {
     suggestedAction: 'Establish a trustline for this asset first, then retry.',
     actionType: 'manual',
   },
+<<<<<<< HEAD
+=======
   ledger_not_connected: {
     code: 'ledger_not_connected',
     title: 'Ledger Device Not Connected',
@@ -160,6 +168,7 @@ const ERROR_MAPPING: Record<string, ParsedStellarError> = {
     suggestedAction: 'Review the transaction details on your Ledger device and approve the signing request, then retry.',
     actionType: 'manual',
   },
+>>>>>>> upstream/main
 };
 
 export function parseStellarError(errorCode: string, rawError?: any): ParsedStellarError {
@@ -207,6 +216,8 @@ export function isFundingError(error: any): boolean {
   const parsed = parseStellarError(error?.message || error?.code || String(error), error);
   return parsed.actionType === 'fund-destination';
 }
+<<<<<<< HEAD
+=======
 
 /**
  * Extracts a normalized Stellar result code from a variety of error shapes:
@@ -312,3 +323,4 @@ export function toAppError(error: unknown): AppError {
     context: resultCode ? { stellarResultCode: resultCode } : undefined,
   });
 }
+>>>>>>> upstream/main

@@ -4,6 +4,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/apiClient';
+<<<<<<< HEAD
+=======
 import {
   clearWalletConnection,
   getWalletConnection,
@@ -11,6 +13,7 @@ import {
   setWalletPersistencePreference,
   type WalletConnection,
 } from '@/lib/walletConnection';
+>>>>>>> upstream/main
 
 interface SecuritySettingsResponse {
   mfaEnabled: boolean;
@@ -31,14 +34,20 @@ export default function SecuritySettingsPage() {
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState('default-user');
+<<<<<<< HEAD
+=======
   const [wallet, setWallet] = useState<WalletConnection | null>(null);
   const [persistWallet, setPersistWallet] = useState(true);
+>>>>>>> upstream/main
 
   useEffect(() => {
     const stored = localStorage.getItem('stellarsplit_wallet_address') || 'default-user';
     setUserId(stored);
+<<<<<<< HEAD
+=======
     setWallet(getWalletConnection());
     setPersistWallet(getWalletPersistencePreference());
+>>>>>>> upstream/main
 
     const load = async () => {
       try {
@@ -54,6 +63,8 @@ export default function SecuritySettingsPage() {
     load();
   }, []);
 
+<<<<<<< HEAD
+=======
   const handleDisconnectWallet = () => {
     clearWalletConnection();
     setWallet(null);
@@ -72,6 +83,7 @@ export default function SecuritySettingsPage() {
     }
   };
 
+>>>>>>> upstream/main
   const refreshSettings = async (id: string) => {
     try {
       const response = await fetch(`/api/settings/mfa?userId=${encodeURIComponent(id)}`);
@@ -186,6 +198,8 @@ export default function SecuritySettingsPage() {
           <Link href="/settings" className="text-sm text-indigo-400 hover:text-indigo-300">← Back to settings</Link>
         </div>
 
+<<<<<<< HEAD
+=======
         <WalletSecuritySettings />
 
         <section className="rounded-2xl border border-gray-800 bg-gray-900/80 p-6 shadow-xl">
@@ -235,6 +249,7 @@ export default function SecuritySettingsPage() {
           </div>
         </section>
 
+>>>>>>> upstream/main
         <section className="rounded-2xl border border-gray-800 bg-gray-900/80 p-6 shadow-xl">
           <div className="flex items-center justify-between gap-4">
             <div>

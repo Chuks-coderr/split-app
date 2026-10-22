@@ -47,6 +47,9 @@ function Avatar({ presence, isCurrentUser }: AvatarProps) {
           <img
             src={presence.avatarUrl}
             alt={presence.displayName}
+<<<<<<< HEAD
+            className="w-full h-full rounded-full object-cover"
+=======
             width={40}
             height={40}
             loading="lazy"
@@ -54,6 +57,7 @@ function Avatar({ presence, isCurrentUser }: AvatarProps) {
             className="w-full h-full rounded-full object-cover"
             loading="lazy"
             decoding="async"
+>>>>>>> upstream/main
           />
         ) : (
           initials

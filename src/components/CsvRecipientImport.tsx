@@ -2,6 +2,16 @@
 
 import { useRef, useState } from "react";
 
+<<<<<<< HEAD
+export interface CsvValidationError {
+  row: number;
+  column: string;
+  value: string;
+  message: string;
+}
+
+=======
+>>>>>>> upstream/main
 export interface CsvRow {
   address: string;
   /** percentage (0-100) or absolute amount string */
@@ -9,6 +19,11 @@ export interface CsvRow {
   amount?: string;
   /** validation error message, if any */
   error?: string;
+<<<<<<< HEAD
+  /** structured validation errors for this row, if any */
+  errors?: CsvValidationError[];
+=======
+>>>>>>> upstream/main
 }
 
 interface Props {
@@ -17,6 +32,10 @@ interface Props {
 }
 
 const MAX_RECIPIENTS = 20;
+<<<<<<< HEAD
+const MAX_ERRORS = 20;
+=======
+>>>>>>> upstream/main
 
 function isValidStellarAddress(addr: string) {
   return addr.startsWith("G") && addr.length >= 50;
@@ -57,6 +76,24 @@ function validateRows(
   const tooMany = totalAfterImport > MAX_RECIPIENTS;
 
   let pctSum = 0;
+<<<<<<< HEAD
+  let errorCount = 0;
+
+  return rows.map((row, idx): CsvRow => {
+    const errors: CsvValidationError[] = [];
+    const rowNumber = idx + 2; // +1 for header, +1 for 1-based rows
+
+    const pushError = (column: string, value: string, message: string) => {
+      if (errorCount >= MAX_ERRORS) return;
+      errors.push({ row: rowNumber, column, value, message });
+      errorCount += 1;
+    };
+
+    if (!isValidStellarAddress(row.address)) {
+      pushError("address", row.address, "Address must be a valid Stellar address");
+    } else if (seen.has(row.address)) {
+      pushError("address", row.address, "Address is a duplicate of an earlier row");
+=======
 
   return rows.map((row, idx): CsvRow => {
     const errors: string[] = [];
@@ -65,6 +102,7 @@ function validateRows(
       errors.push("Invalid Stellar address");
     } else if (seen.has(row.address)) {
       errors.push("Duplicate address");
+>>>>>>> upstream/main
     } else {
       seen.add(row.address);
     }
@@ -72,25 +110,48 @@ function validateRows(
     if (usePercent) {
       const pct = parseFloat(row.percentage ?? "");
       if (isNaN(pct) || pct <= 0) {
+<<<<<<< HEAD
+        pushError("percentage", row.percentage ?? "", "Percentage must be a positive number");
+      } else {
+        pctSum += pct;
+        if (pctSum > 100) {
+          pushError("percentage", row.percentage ?? "", "Percentage total exceeds 100%");
+=======
         errors.push("Percentage must be > 0");
       } else {
         pctSum += pct;
         if (pctSum > 100) {
           errors.push("Percentage total exceeds 100%");
+>>>>>>> upstream/main
         }
       }
     } else {
       const amt = parseFloat(row.amount ?? "");
       if (isNaN(amt) || amt <= 0) {
+<<<<<<< HEAD
+        pushError("amount", row.amount ?? "", "Amount must be a positive number");
+=======
         errors.push("Amount must be > 0");
+>>>>>>> upstream/main
       }
     }
 
     if (tooMany && existingCount + idx + 1 > MAX_RECIPIENTS) {
+<<<<<<< HEAD
+      pushError("address", row.address, `Maximum of ${MAX_RECIPIENTS} recipients allowed`);
+    }
+
+    return {
+      ...row,
+      errors: errors.length > 0 ? errors : undefined,
+      error: errors.length > 0 ? errors.map((e) => e.message).join("; ") : undefined,
+    };
+=======
       errors.push(`Max ${MAX_RECIPIENTS} recipients`);
     }
 
     return { ...row, error: errors.length > 0 ? errors.join("; ") : undefined };
+>>>>>>> upstream/main
   });
 }
 
@@ -232,6 +293,11 @@ export default function CsvRecipientImport({ onImport, existingCount = 0 }: Prop
                         value={row.address}
                         onChange={(e) => handleUpdateRow(i, "address", e.target.value)}
                         aria-label={`Row ${i + 1} address`}
+<<<<<<< HEAD
+                        className="w-full bg-transparent font-mon
+
+/* … truncated 2722 chars — edit only what you need near the top … */
+=======
                         className="w-full bg-transparent font-mono text-xs focus:outline-none focus-visible:ring-1 focus-visible:ring-indigo-500 rounded"
                       />
                     </td>
@@ -300,3 +366,4 @@ export default function CsvRecipientImport({ onImport, existingCount = 0 }: Prop
     </div>
   );
 }
+>>>>>>> upstream/main

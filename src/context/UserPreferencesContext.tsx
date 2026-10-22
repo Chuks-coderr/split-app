@@ -12,6 +12,13 @@ import {
 export const FIAT_CURRENCIES = ["USD", "EUR", "GBP", "BRL"] as const;
 export type FiatCurrency = (typeof FIAT_CURRENCIES)[number];
 
+<<<<<<< HEAD
+const STORAGE_KEY = "user-preferences";
+const DEFAULT_CURRENCY: FiatCurrency = "USD";
+
+export interface UserPreferences {
+  fiatCurrency: FiatCurrency;
+=======
 export const WALLET_TYPES = [
   "freighter",
   "lobstr",
@@ -30,12 +37,16 @@ export interface UserPreferences {
   fiatCurrency: FiatCurrency;
   preferredWalletType?: WalletType;
   autoReconnect?: boolean;
+>>>>>>> upstream/main
 }
 
 interface UserPreferencesContextValue extends UserPreferences {
   setFiatCurrency: (currency: FiatCurrency) => void;
+<<<<<<< HEAD
+=======
   setPreferredWalletType: (walletType: WalletType | undefined) => void;
   setAutoReconnect: (autoReconnect: boolean) => void;
+>>>>>>> upstream/main
 }
 
 const UserPreferencesContext = createContext<UserPreferencesContextValue | null>(null);
@@ -44,6 +55,37 @@ function isFiatCurrency(value: unknown): value is FiatCurrency {
   return typeof value === "string" && (FIAT_CURRENCIES as readonly string[]).includes(value);
 }
 
+<<<<<<< HEAD
+export function UserPreferencesProvider({ children }: { children: React.ReactNode }) {
+  const [fiatCurrency, setFiatCurrencyState] = useState<FiatCurrency>(DEFAULT_CURRENCY);
+
+  // Read after mount rather than during render so server and client markup match.
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(STORAGE_KEY);
+      if (!stored) return;
+      const parsed = JSON.parse(stored) as Partial<UserPreferences>;
+      if (isFiatCurrency(parsed.fiatCurrency)) {
+        setFiatCurrencyState(parsed.fiatCurrency);
+      }
+    } catch {
+      // Corrupt or unavailable storage — fall back to the default.
+    }
+  }, []);
+
+  const setFiatCurrency = useCallback((currency: FiatCurrency) => {
+    setFiatCurrencyState(currency);
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ fiatCurrency: currency }));
+    } catch {
+      // Preference is still applied for this session.
+    }
+  }, []);
+
+  const value = useMemo(
+    () => ({ fiatCurrency, setFiatCurrency }),
+    [fiatCurrency, setFiatCurrency]
+=======
 function isWalletType(value: unknown): value is WalletType {
   return typeof value === "string" && (WALLET_TYPES as readonly string[]).includes(value);
 }
@@ -144,6 +186,7 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
       setPreferredWalletType,
       setAutoReconnect,
     ]
+>>>>>>> upstream/main
   );
 
   return (

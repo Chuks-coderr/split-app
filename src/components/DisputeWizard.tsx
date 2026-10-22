@@ -3,9 +3,12 @@
 import { useState } from "react";
 import { searchArbitrators, getArbitrators } from "@/lib/arbitrators";
 import type { Arbitrator } from "@/lib/arbitrators";
+<<<<<<< HEAD
+=======
 import { createDispute } from "@/lib/disputes";
 import type { DisputeRecord } from "@/lib/disputes";
 import { notifyDisputeOpened } from "@/lib/disputeNotifications";
+>>>>>>> upstream/main
 
 const DISPUTE_REASONS = [
   "Non-delivery",
@@ -20,8 +23,11 @@ interface Props {
   invoiceId: string;
   onSubmit: (reason: string, description: string, arbitratorAddress?: string) => Promise<void>;
   onClose: () => void;
+<<<<<<< HEAD
+=======
   /** Called after a dispute is successfully created so the invoice can be refreshed. */
   onCreated?: (dispute: DisputeRecord) => void;
+>>>>>>> upstream/main
 }
 
 /**
@@ -69,7 +75,11 @@ function StepIndicator({ current, total }: { current: number; total: number }) {
  * DisputeWizard — multi-step modal form for filing an on-chain dispute.
  * Guides the user through: reason → description → arbitrator → confirmation.
  */
+<<<<<<< HEAD
+export default function DisputeWizard({ invoiceId, onSubmit, onClose }: Props) {
+=======
 export default function DisputeWizard({ invoiceId, onSubmit, onClose, onCreated }: Props) {
+>>>>>>> upstream/main
   const [step, setStep] = useState(1);
   const [reason, setReason] = useState("");
   const [description, setDescription] = useState("");
@@ -77,7 +87,10 @@ export default function DisputeWizard({ invoiceId, onSubmit, onClose, onCreated 
   const [arbitratorSearch, setArbitratorSearch] = useState("");
   const [manualArbitrator, setManualArbitrator] = useState("");
   const [useManualEntry, setUseManualEntry] = useState(false);
+<<<<<<< HEAD
+=======
   const [evidenceNote, setEvidenceNote] = useState("");
+>>>>>>> upstream/main
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -100,6 +113,11 @@ export default function DisputeWizard({ invoiceId, onSubmit, onClose, onCreated 
 
   const handleConfirm = async () => {
     setError(null);
+<<<<<<< HEAD
+    setSubmitting(true);
+    try {
+      await onSubmit(reason, description, effectiveArbitrator || undefined);
+=======
 
     if (!reason) {
       setError("Please select a dispute reason.");
@@ -123,6 +141,7 @@ export default function DisputeWizard({ invoiceId, onSubmit, onClose, onCreated 
       await onSubmit(reason, description, effectiveArbitrator || undefined);
       notifyDisputeOpened(dispute);
       onCreated?.(dispute);
+>>>>>>> upstream/main
       onClose();
     } catch (err) {
       setError(String(err));
@@ -296,6 +315,8 @@ export default function DisputeWizard({ invoiceId, onSubmit, onClose, onCreated 
                 </div>
               )}
             </div>
+<<<<<<< HEAD
+=======
             <div className="space-y-2">
               <p className="text-sm text-gray-400">Evidence (optional)</p>
               <textarea
@@ -307,6 +328,7 @@ export default function DisputeWizard({ invoiceId, onSubmit, onClose, onCreated 
               />
               <p className="text-xs text-gray-500">{evidenceNote.length}/500 characters</p>
             </div>
+>>>>>>> upstream/main
           </div>
         )}
 

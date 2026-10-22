@@ -12,12 +12,19 @@ function CompareInvoicesContent() {
   const router = useRouter();
   const [invoiceA, setInvoiceA] = useState<Invoice | null>(null);
   const [invoiceB, setInvoiceB] = useState<Invoice | null>(null);
+<<<<<<< HEAD
+=======
   const [batchInvoices, setBatchInvoices] = useState<Invoice[]>([]);
+>>>>>>> upstream/main
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const idA = searchParams.get("a");
   const idB = searchParams.get("b");
+<<<<<<< HEAD
+
+  useEffect(() => {
+=======
   const batchIds = searchParams.get("ids");
 
   useEffect(() => {
@@ -48,6 +55,7 @@ function CompareInvoicesContent() {
     }
 
     setBatchInvoices([]);
+>>>>>>> upstream/main
     if (!idA || !idB) {
       setError("Missing invoice IDs. Use /compare?a=[id]&b=[id]");
       setLoading(false);
@@ -71,7 +79,11 @@ function CompareInvoicesContent() {
     };
 
     fetchInvoices();
+<<<<<<< HEAD
+  }, [idA, idB]);
+=======
   }, [idA, idB, batchIds]);
+>>>>>>> upstream/main
 
   if (loading) {
     return (
@@ -105,6 +117,20 @@ function CompareInvoicesContent() {
     router.push(`/invoice/${invoiceA!.id}`);
   };
 
+<<<<<<< HEAD
+  const handlePayB = () => {
+    router.push(`/invoice/${invoiceB!.id}`);
+  };
+
+  return (
+    <main className="w-full">
+      <CompareInvoicesView
+        invoiceA={invoiceA}
+        invoiceB={invoiceB}
+        onPayA={handlePayA}
+        onPayB={handlePayB}
+      />
+=======
   const comparisons = batchInvoices.length > 2
     ? batchInvoices.slice(1).map((invoice) => [batchInvoices[0], invoice] as const)
     : [[invoiceA, invoiceB] as const];
@@ -125,6 +151,7 @@ function CompareInvoicesContent() {
           onPayB={() => router.push(`/invoice/${invoice.id}`)}
         />
       ))}
+>>>>>>> upstream/main
     </main>
   );
 }

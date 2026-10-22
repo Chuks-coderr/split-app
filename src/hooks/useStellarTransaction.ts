@@ -2,10 +2,15 @@
 
 import { useCallback, useRef, useState } from "react";
 import { signTransaction, NETWORK_PASSPHRASE } from "@/lib/freighter";
+<<<<<<< HEAD
+import { classifyError } from "@/lib/errors";
+import { useToast } from "@/contexts/ToastContext";
+=======
 import { signWithLedger, isLedgerError } from "@/lib/ledger";
 import { classifyError } from "@/lib/errors";
 import { useToast } from "@/contexts/ToastContext";
 import { useWallet } from "@/contexts/WalletContext";
+>>>>>>> upstream/main
 
 const HORIZON_URL =
   process.env.NEXT_PUBLIC_HORIZON_URL ??
@@ -43,6 +48,8 @@ function isUserRejection(error: unknown): boolean {
 }
 
 /**
+<<<<<<< HEAD
+=======
  * Ledger reports a declined signature with its own status codes rather than
  * the Freighter wording, so check both shapes.
  */
@@ -52,6 +59,7 @@ function isLedgerRejection(error: unknown): boolean {
 }
 
 /**
+>>>>>>> upstream/main
  * Sign a transaction with the connected wallet, submit it to Horizon, and
  * surface the outcome as a toast.
  *
@@ -61,7 +69,10 @@ function isLedgerRejection(error: unknown): boolean {
  */
 export function useStellarTransaction() {
   const toast = useToast();
+<<<<<<< HEAD
+=======
   const { activeWallet } = useWallet();
+>>>>>>> upstream/main
   const [status, setStatus] = useState<TransactionStatus>("idle");
   const [txHash, setTxHash] = useState<string | null>(null);
   // Guards against a double-submit from an impatient second click.
@@ -79,6 +90,11 @@ export function useStellarTransaction() {
       try {
         let signedXdr: string;
         try {
+<<<<<<< HEAD
+          signedXdr = await signTransaction(unsignedXdr);
+        } catch (err) {
+          if (isUserRejection(err)) {
+=======
           if (activeWallet === "ledger") {
             // signWithLedger displays the transaction on the device and waits
             // for the user to confirm before returning the signed envelope.
@@ -88,16 +104,20 @@ export function useStellarTransaction() {
           }
         } catch (err) {
           if (isUserRejection(err) || isLedgerRejection(err)) {
+>>>>>>> upstream/main
             toast.error("Transaction rejected in your wallet.");
             setStatus("error");
             throw err;
           }
+<<<<<<< HEAD
+=======
           if (isLedgerError(err)) {
             // Connection/transport failures get a Ledger-specific message.
             toast.error(err.message);
             setStatus("error");
             throw err;
           }
+>>>>>>> upstream/main
           throw err;
         }
 
@@ -121,9 +141,14 @@ export function useStellarTransaction() {
         return { txHash: hash };
       } catch (err) {
         setStatus("error");
+<<<<<<< HEAD
+        // A user rejection already produced its own toast above.
+        if (!isUserRejection(err)) {
+=======
         // A user rejection or Ledger transport error already produced its own
         // toast above.
         if (!isUserRejection(err) && !isLedgerError(err)) {
+>>>>>>> upstream/main
           toast.error(options.errorMessage ?? describeFailure(err));
         }
         throw err;
@@ -131,7 +156,11 @@ export function useStellarTransaction() {
         inFlight.current = false;
       }
     },
+<<<<<<< HEAD
+    [toast]
+=======
     [toast, activeWallet]
+>>>>>>> upstream/main
   );
 
   const reset = useCallback(() => {

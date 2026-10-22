@@ -1,5 +1,8 @@
 export type SubscriptionFrequency = "weekly" | "biweekly" | "monthly";
 
+<<<<<<< HEAD
+export type SubscriptionStatus = "active" | "paused" | "cancelled";
+=======
 export type SubscriptionStatus =
   | "active"
   | "paused"
@@ -12,6 +15,7 @@ export type CancellationReason =
   | "not_using"
   | "switched_service"
   | "other";
+>>>>>>> upstream/main
 
 export interface SubscriptionInvoice {
   invoiceId: string;
@@ -21,6 +25,8 @@ export interface SubscriptionInvoice {
   status: "Pending" | "Released" | "Refunded";
 }
 
+<<<<<<< HEAD
+=======
 export interface SubscriptionModification {
   id: string;
   modifiedAt: number;
@@ -30,6 +36,7 @@ export interface SubscriptionModification {
   reason?: string;
 }
 
+>>>>>>> upstream/main
 export interface Subscription {
   id: string;
   templateName: string;
@@ -45,6 +52,9 @@ export interface Subscription {
   totalInvoicesGenerated: number;
   totalUsdcCollected: bigint;
   invoiceHistory: SubscriptionInvoice[];
+<<<<<<< HEAD
+}
+=======
   pausedAt?: number | null;
   resumedAt?: number | null;
   cancellationReason?: CancellationReason | null;
@@ -70,3 +80,4 @@ export interface SubscriptionAnalytics {
   periodStart: number;
   periodEnd: number;
 }
+>>>>>>> upstream/main

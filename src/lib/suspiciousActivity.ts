@@ -18,12 +18,18 @@ export interface SuspiciousActivityAlert {
 }
 
 export interface DetectionOptions {
+<<<<<<< HEAD
+  velocityLimit?: number;
+  velocityWindowMs?: number;
+  spikeMultiplier?: number;
+=======
   /** Max events per actor inside `velocityWindowMs` before flagging. */
   velocityLimit?: number;
   velocityWindowMs?: number;
   /** Amount above `spikeMultiplier` × median of all events is flagged. */
   spikeMultiplier?: number;
   /** Same actor sending the same amount this many times is flagged. */
+>>>>>>> upstream/main
   repeatLimit?: number;
 }
 
@@ -94,4 +100,8 @@ export function detectSuspiciousActivity(
 
   const rank: Record<AlertSeverity, number> = { high: 0, medium: 1, low: 2 };
   return alerts.sort((a, b) => rank[a.severity] - rank[b.severity]);
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> upstream/main

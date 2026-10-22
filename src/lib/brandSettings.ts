@@ -18,6 +18,8 @@ export const LOGO_MIME_EXTENSION: Record<AllowedLogoMimeType, string> = {
 /** Max characters for the invoice tagline. */
 export const MAX_TAGLINE_LENGTH = 120;
 
+<<<<<<< HEAD
+=======
 /**
  * Font choices for invoice PDFs/previews. Values are react-pdf's built-in
  * standard fonts (no custom font embedding needed), with a matching CSS
@@ -43,6 +45,7 @@ export function getBrandFontCssFamily(font: string | null | undefined): string {
   return BRAND_FONT_OPTIONS.find((o) => o.value === font)?.cssFontFamily ?? BRAND_FONT_OPTIONS[0].cssFontFamily;
 }
 
+>>>>>>> upstream/main
 export const LOGO_TYPE_ERROR =
   "Unsupported file type. Upload a PNG, JPEG, or WebP image.";
 export const LOGO_SIZE_ERROR = "Logo exceeds the 2 MB size limit.";
@@ -65,7 +68,10 @@ export interface BrandSettings {
   logoUrl: string | null;
   accentColor: string | null;
   tagline: string | null;
+<<<<<<< HEAD
+=======
   fontFamily: BrandFont | null;
+>>>>>>> upstream/main
   updatedAt: string;
 }
 
@@ -74,7 +80,10 @@ export const DEFAULT_BRAND_SETTINGS: Omit<BrandSettings, "updatedAt"> = {
   logoUrl: null,
   accentColor: null,
   tagline: null,
+<<<<<<< HEAD
+=======
   fontFamily: null,
+>>>>>>> upstream/main
 };
 
 /** Platform default accent used when no accent color is configured. */
@@ -135,11 +144,14 @@ export const brandSettingsSchema = z.object({
     .transform((v) => (v.length === 0 ? null : v))
     .nullable()
     .optional(),
+<<<<<<< HEAD
+=======
   fontFamily: z
     .union([z.literal(""), z.string().refine(isBrandFont, { message: "Unsupported font selection" })])
     .nullable()
     .transform((v) => (v === "" ? null : (v as BrandFont | null) ?? null))
     .optional(),
+>>>>>>> upstream/main
 });
 
 export type BrandSettingsInput = z.input<typeof brandSettingsSchema>;

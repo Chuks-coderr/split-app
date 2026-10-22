@@ -1,6 +1,9 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+<<<<<<< HEAD
+=======
 import { vi } from "vitest";
+>>>>>>> upstream/main
 import userEvent from "@testing-library/user-event";
 import AccessCodeGate, { hashAccessCode, verifyAccessCode } from "@/components/invoice/AccessCodeGate";
 
@@ -57,7 +60,11 @@ describe("AccessCodeGate & Hash Verification", () => {
 
       expect(screen.queryByTestId("invoice-content")).not.toBeInTheDocument();
       expect(screen.getByRole("region", { name: /private invoice access code entry/i })).toBeInTheDocument();
+<<<<<<< HEAD
+      expect(screen.getByLabelText(/access code/i)).toBeInTheDocument();
+=======
       expect(document.getElementById("access-code-input")).toBeInTheDocument();
+>>>>>>> upstream/main
       expect(screen.getByRole("button", { name: /unlock invoice/i })).toBeInTheDocument();
     });
 
@@ -68,7 +75,11 @@ describe("AccessCodeGate & Hash Verification", () => {
         </AccessCodeGate>
       );
 
+<<<<<<< HEAD
+      const input = screen.getByLabelText(/access code/i);
+=======
       const input = document.getElementById("access-code-input") as HTMLInputElement;
+>>>>>>> upstream/main
       expect(input).toHaveAttribute("type", "password");
 
       const toggleButton = screen.getByRole("button", { name: /show access code/i });
@@ -88,7 +99,11 @@ describe("AccessCodeGate & Hash Verification", () => {
         </AccessCodeGate>
       );
 
+<<<<<<< HEAD
+      const input = screen.getByLabelText(/access code/i);
+=======
       const input = document.getElementById("access-code-input") as HTMLInputElement;
+>>>>>>> upstream/main
       await user.type(input, "wrong-code");
 
       const unlockButton = screen.getByRole("button", { name: /unlock invoice/i });
@@ -116,7 +131,11 @@ describe("AccessCodeGate & Hash Verification", () => {
         </AccessCodeGate>
       );
 
+<<<<<<< HEAD
+      const input = screen.getByLabelText(/access code/i);
+=======
       const input = document.getElementById("access-code-input") as HTMLInputElement;
+>>>>>>> upstream/main
       await user.type(input, "correct-code");
 
       const unlockButton = screen.getByRole("button", { name: /unlock invoice/i });

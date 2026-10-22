@@ -16,17 +16,26 @@ import CommandPalette from "@/components/CommandPalette";
 import { SessionLockProvider } from "@/contexts/SessionLockContext";
 import { ToastProvider } from "@/contexts/ToastContext";
 import InstallBanner from "@/components/InstallBanner";
+<<<<<<< HEAD
+import ToastContainer from "@/components/ToastContainer";
+=======
 import SkipNavLink from "@/components/SkipNavLink";
+>>>>>>> upstream/main
 import QueryProvider from "@/contexts/QueryProvider";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { UserPreferencesProvider } from "@/context/UserPreferencesContext";
 import { FiatRateProvider } from "@/hooks/useFiatRate";
 import { ShortcutRegistryProvider } from "@/context/ShortcutRegistry";
 import OfflineBanner from "@/components/OfflineBanner";
+<<<<<<< HEAD
+import { getNonce } from "@/lib/csp";
+import TransitionProvider from "@/components/layout/TransitionProvider";
+=======
 import WalletSecurityCenter from "@/components/security/WalletSecurityCenter";
 import { getNonce } from "@/lib/csp";
 import TransitionProvider from "@/components/layout/TransitionProvider";
 import WebVitalsReporter from "@/components/WebVitalsReporter";
+>>>>>>> upstream/main
 
 const themeBootstrap = `
 (function () {
@@ -127,6 +136,44 @@ export default function RootLayout({
         <QueryProvider>
           <ThemeProvider>
             <AccessibilityProvider>
+<<<<<<< HEAD
+
+              <WalletProvider>
+                <I18nProvider>
+                  <SessionLockProvider>
+                    <ToastProvider>
+                      <UserPreferencesProvider>
+                        <FiatRateProvider>
+                          <ShortcutRegistryProvider>
+                            <Navbar />
+                            <SimulationBanner />
+                            <UpgradeBanner />
+                            <OfflineBanner />
+                            <TransitionProvider>
+                              <ErrorBoundary>{children}</ErrorBoundary>
+                            </TransitionProvider>
+                            <footer className="border-t border-gray-200 dark:border-gray-800 mt-16 py-6 px-4 sm:px-6">
+                              <div className="max-w-7x mx-auto flex flex-wrap items-center justify-between gap-4">
+                                <p className="text-xs text-gray-500">
+                                  © {new Date().getFullYear()} StellarSplit
+                                </p>
+                                <LanguageSwitcher />
+                              </div>
+                            </footer>
+                            <CommandPalette />
+                            <OnboardingFlow />
+                            <RecipientOnboarding />
+                            <InstallBanner />
+                            <ToastContainer />
+                          </ShortcutRegistryProvider>
+                        </FiatRateProvider>
+                      </UserPreferencesProvider>
+                    </ToastProvider>
+                  </SessionLockProvider>
+                </I18nProvider>
+              </WalletProvider>
+
+=======
               <I18nProvider>
                 <SessionLockProvider>
                   <ToastProvider>
@@ -154,6 +201,7 @@ export default function RootLayout({
                   </ToastProvider>
                 </SessionLockProvider>
               </I18nProvider>
+>>>>>>> upstream/main
             </AccessibilityProvider>
           </ThemeProvider>
         </QueryProvider>

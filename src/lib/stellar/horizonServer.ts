@@ -5,7 +5,10 @@
  * route handler (for the client-side infinite-scroll dashboard).
  */
 import { splitClient } from "@/lib/stellar";
+<<<<<<< HEAD
+=======
 import { blockchainCache } from "@/lib/blockchainCache";
+>>>>>>> upstream/main
 import type { Invoice } from "@stellar-split/sdk";
 
 const DEFAULT_PAGE_SIZE = 20;
@@ -27,6 +30,8 @@ export interface FetchInvoicesResult {
  * Scans invoice ids starting after `cursor`, returning up to `limit`
  * invoices owned by (created by or a recipient of) `publicKey`.
  */
+<<<<<<< HEAD
+=======
 // Short-lived in-memory cache of fetched invoices, shared across requests
 // within this server process. The scan below re-reads the same low-numbered
 // invoice ids on every page/filter request, so caching avoids redundant
@@ -62,10 +67,27 @@ const SCAN_BATCH_SIZE = 10;
  * cache. Scanning stops as soon as a batch contains a non-existent id,
  * which marks the end of the list.
  */
+>>>>>>> upstream/main
 export async function fetchInvoicesForAddress(
   publicKey: string,
   { cursor, limit: limitParam, q: qParam }: FetchInvoicesOptions = {}
 ): Promise<FetchInvoicesResult> {
+<<<<<<< HEAD
+  const limit = Math.min(Math.max(1, limitParam ?? DEFAULT_PAGE_SIZE), MAX_PAGE_SIZE);
+  const q = (qParam ?? "").trim().toLowerCase();
+  const startId = cursor ? parseInt(cursor, 10) + 1 : 1;
+
+  const results: Invoice[] = [];
+
+  for (let id = startId; results.length < limit; id++) {
+    if (id > startId + limit * 10) break;
+
+    try {
+      const inv = await splitClient.getInvoice(String(id));
+      const mine =
+        inv.creator === publicKey || inv.recipients.some((r) => r.address === publicKey);
+
+=======
   const startTime = performance.now();
   const limit = Math.min(Math.max(1, limitParam ?? DEFAULT_PAGE_SIZE), MAX_PAGE_SIZE);
   const q = (qParam ?? "").trim().toLowerCase();
@@ -94,6 +116,7 @@ export async function fetchInvoicesForAddress(
 
       const mine =
         inv.creator === publicKey || inv.recipients.some((r) => r.address === publicKey);
+>>>>>>> upstream/main
       if (mine) {
         if (q) {
           const invExt = inv as { title?: string; memo?: string };
@@ -104,6 +127,15 @@ export async function fetchInvoicesForAddress(
           results.push(inv);
         }
       }
+<<<<<<< HEAD
+    } catch {
+      // splitClient throws when the invoice id does not exist — end of list.
+      return { invoices: results, nextCursor: null };
+    }
+  }
+
+  const nextCursor = results.length === limit ? String(results[results.length - 1].id) : null;
+=======
     }
 
     if (reachedEnd) break;
@@ -120,5 +152,6 @@ export async function fetchInvoicesForAddress(
     );
   }
 
+>>>>>>> upstream/main
   return { invoices: results, nextCursor };
 }

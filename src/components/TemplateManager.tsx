@@ -14,6 +14,8 @@ interface TemplateVersion {
   savedAt: string;
 }
 
+<<<<<<< HEAD
+=======
 export type ScheduleFrequency = "daily" | "weekly" | "monthly" | "custom";
 export type ScheduleStatus = "active" | "paused" | "cancelled";
 
@@ -35,6 +37,7 @@ export interface RecurringRun {
   status: "scheduled" | "processed" | "failed";
 }
 
+>>>>>>> upstream/main
 export interface UserTemplate {
   name: string;
   recipients: Recipient[];
@@ -42,13 +45,18 @@ export interface UserTemplate {
   createdAt?: string;
   lastUsed?: string;
   versions?: TemplateVersion[];
+<<<<<<< HEAD
+=======
   schedule?: RecurringSchedule;
   history?: RecurringRun[];
+>>>>>>> upstream/main
 }
 
 const STORAGE_KEY = "invoice_templates";
 const MAX_TEMPLATES = 20;
 const MAX_VERSIONS = 5;
+<<<<<<< HEAD
+=======
 const MAX_HISTORY = 20;
 const MAX_PREVIEW_RUNS = 5;
 
@@ -156,6 +164,7 @@ export function validateSchedule(
   }
   return null;
 }
+>>>>>>> upstream/main
 
 interface Props {
   recipients: Recipient[];
@@ -186,11 +195,14 @@ function pushVersion(template: UserTemplate, version: TemplateVersion): Template
   return updated;
 }
 
+<<<<<<< HEAD
+=======
 function pushRun(template: UserTemplate, run: RecurringRun): RecurringRun[] {
   const history = template.history ?? [];
   return [run, ...history].slice(0, MAX_HISTORY);
 }
 
+>>>>>>> upstream/main
 export function loadTemplates(): UserTemplate[] {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -295,6 +307,8 @@ function TemplatePreviewCard({ template }: { template: UserTemplate }) {
         </div>
       </div>
 
+<<<<<<< HEAD
+=======
       {/* Recurring schedule summary */}
       {template.schedule && (
         <div className="px-4 py-3 border-b border-gray-800">
@@ -327,6 +341,7 @@ function TemplatePreviewCard({ template }: { template: UserTemplate }) {
         </div>
       )}
 
+>>>>>>> upstream/main
       {/* Branding note */}
       <div className="px-4 py-2 bg-gray-900">
         <p className="text-xs text-gray-600">Powered by StellarSplit</p>
@@ -424,12 +439,15 @@ export default function TemplateManager({ recipients, token, onLoad }: Props) {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [deleteConfirmIndex, setDeleteConfirmIndex] = useState<number | null>(null);
   const importRef = useRef<HTMLInputElement>(null);
+<<<<<<< HEAD
+=======
   /** Index of the template whose schedule is being edited (null = none). */
   const [scheduleEditIndex, setScheduleEditIndex] = useState<number | null>(null);
   const [scheduleDraft, setScheduleDraft] = useState<RecurringSchedule | null>(null);
   const [scheduleError, setScheduleError] = useState<string | null>(null);
   /** Index of the template whose recurring history is being viewed. */
   const [historyIndex, setHistoryIndex] = useState<number | null>(null);
+>>>>>>> upstream/main
 
   useEffect(() => {
     setTemplates(loadTemplates());
@@ -550,6 +568,8 @@ export default function TemplateManager({ recipients, token, onLoad }: Props) {
     dismissPreview();
   };
 
+<<<<<<< HEAD
+=======
   const openScheduleEditor = (index: number) => {
     const template = templates[index];
     if (!template) return;
@@ -637,6 +657,7 @@ export default function TemplateManager({ recipients, token, onLoad }: Props) {
     flash(`Processed recurring invoice for ${next.toLocaleDateString()}`);
   };
 
+>>>>>>> upstream/main
   const deleteTemplate = (index: number) => {
     setDeleteConfirmIndex(index);
   };
@@ -646,8 +667,11 @@ export default function TemplateManager({ recipients, token, onLoad }: Props) {
     setSelectedTemplateIndex(null);
     setShowHistory(false);
     setDeleteConfirmIndex(null);
+<<<<<<< HEAD
+=======
     if (scheduleEditIndex === index) closeScheduleEditor();
     if (historyIndex === index) setHistoryIndex(null);
+>>>>>>> upstream/main
     flash("Template deleted");
   };
 
@@ -779,6 +803,8 @@ export default function TemplateManager({ recipients, token, onLoad }: Props) {
         </div>
       )}
 
+<<<<<<< HEAD
+=======
       {/* Schedule Editor Modal */}
       {scheduleEditIndex !== null && scheduleDraft && (
         <div
@@ -956,6 +982,7 @@ export default function TemplateManager({ recipients, token, onLoad }: Props) {
         </div>
       )}
 
+>>>>>>> upstream/main
       {/* Delete Confirmation Modal */}
       {deleteConfirmIndex !== null && (
         <div
@@ -1084,6 +1111,8 @@ export default function TemplateManager({ recipients, token, onLoad }: Props) {
                   </button>
                   <button
                     type="button"
+<<<<<<< HEAD
+=======
                     onClick={() => openScheduleEditor(selectedTemplateIndex)}
                     className="min-h-10 px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium transition-colors"
                   >
@@ -1091,6 +1120,7 @@ export default function TemplateManager({ recipients, token, onLoad }: Props) {
                   </button>
                   <button
                     type="button"
+>>>>>>> upstream/main
                     onClick={() => deleteTemplate(selectedTemplateIndex)}
                     className="min-h-10 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white text-sm font-medium transition-colors"
                   >
@@ -1102,6 +1132,8 @@ export default function TemplateManager({ recipients, token, onLoad }: Props) {
           )}
         </div>
 
+<<<<<<< HEAD
+=======
         {/* Schedule controls for the selected template */}
         {selectedTemplate?.schedule && selectedTemplateIndex !== null && (
           <div className="mb-3 rounded-lg border border-gray-700 bg-gray-900 px-4 py-3">
@@ -1184,6 +1216,7 @@ export default function TemplateManager({ recipients, token, onLoad }: Props) {
           </div>
         )}
 
+>>>>>>> upstream/main
         {/* Template list with per-row preview hover */}
         {templates.length > 0 && (
           <ul className="mb-3 divide-y divide-gray-700 border border-gray-700 rounded-lg overflow-hidden">
@@ -1192,6 +1225,9 @@ export default function TemplateManager({ recipients, token, onLoad }: Props) {
                 key={i}
                 className="flex items-center justify-between gap-3 px-4 py-2 text-sm bg-gray-900 hover:bg-gray-800/70 transition-colors group"
               >
+<<<<<<< HEAD
+                <span className="text-gray-200 truncate">{t.name}</span>
+=======
                 <div className="min-w-0">
                   <span className="text-gray-200 truncate block">{t.name}</span>
                   {t.schedule && (
@@ -1211,6 +1247,7 @@ export default function TemplateManager({ recipients, token, onLoad }: Props) {
                     </span>
                   )}
                 </div>
+>>>>>>> upstream/main
                 <div className="flex items-center gap-2 shrink-0 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
                   <button
                     type="button"
@@ -1228,6 +1265,8 @@ export default function TemplateManager({ recipients, token, onLoad }: Props) {
                   >
                     Apply
                   </button>
+<<<<<<< HEAD
+=======
                   <button
                     type="button"
                     onClick={() => openScheduleEditor(i)}
@@ -1236,6 +1275,7 @@ export default function TemplateManager({ recipients, token, onLoad }: Props) {
                   >
                     {t.schedule ? "Edit Schedule" : "Schedule"}
                   </button>
+>>>>>>> upstream/main
                 </div>
               </li>
             ))}

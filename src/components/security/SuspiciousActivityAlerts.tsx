@@ -58,4 +58,8 @@ export default function SuspiciousActivityAlerts({ events, options }: Props) {
       ))}
     </ul>
   );
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> upstream/main

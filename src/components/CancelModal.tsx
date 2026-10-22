@@ -5,15 +5,26 @@ import { useRouter } from "next/navigation";
 import FocusTrap from "./FocusTrap";
 import type { Payment } from "@stellar-split/sdk";
 
+<<<<<<< HEAD
+=======
 export interface CancelReasonOption {
   value: string;
   label: string;
 }
 
+>>>>>>> upstream/main
 export interface CancelModalProps {
   invoiceId: string;
   invoiceTitle?: string;
   payments?: Payment[];
+<<<<<<< HEAD
+  onConfirm: () => Promise<void>;
+  onClose: () => void;
+  onSuccess?: () => void;
+}
+
+export type CancelModalStep = "warn" | "confirm_gate" | "loading" | "success";
+=======
   onConfirm: (reason?: string, note?: string) => Promise<void>;
   onClose: () => void;
   onSuccess?: () => void;
@@ -32,6 +43,7 @@ const DEFAULT_REASONS: CancelReasonOption[] = [
   { value: "switching_provider", label: "Switching to another provider" },
   { value: "other", label: "Other" },
 ];
+>>>>>>> upstream/main
 
 /**
  * Multi-step invoice cancellation confirmation modal.
@@ -47,31 +59,44 @@ export default function CancelModal({
   onConfirm,
   onClose,
   onSuccess,
+<<<<<<< HEAD
+=======
   requireReason = false,
   reasons,
+>>>>>>> upstream/main
 }: CancelModalProps) {
   const router = useRouter();
   const [step, setStep] = useState<CancelModalStep>("warn");
   const [confirmText, setConfirmText] = useState("");
+<<<<<<< HEAD
+=======
   const [reason, setReason] = useState("");
   const [note, setNote] = useState("");
+>>>>>>> upstream/main
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const expectedTitle = (invoiceTitle || `Invoice #${invoiceId}`).trim();
   const isMatch = confirmText.trim().toLowerCase() === expectedTitle.toLowerCase();
+<<<<<<< HEAD
+=======
   const reasonOptions = reasons && reasons.length > 0 ? reasons : DEFAULT_REASONS;
   const isReasonValid = !requireReason || reason.trim().length > 0;
+>>>>>>> upstream/main
 
   const handleStartCancellation = async () => {
     setStep("loading");
     setLoading(true);
     setError(null);
     try {
+<<<<<<< HEAD
+      await onConfirm();
+=======
       await onConfirm(
         requireReason ? reason || undefined : undefined,
         requireReason && note.trim() ? note.trim() : undefined
       );
+>>>>>>> upstream/main
       setLoading(false);
       setStep("success");
     } catch (err) {
@@ -157,7 +182,11 @@ export default function CancelModal({
                 </button>
                 <button
                   type="button"
+<<<<<<< HEAD
+                  onClick={() => setStep("confirm_gate")}
+=======
                   onClick={() => setStep(requireReason ? "reason" : "confirm_gate")}
+>>>>>>> upstream/main
                   className="flex-1 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-sm font-semibold text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                 >
                   Continue
@@ -166,6 +195,8 @@ export default function CancelModal({
             </div>
           )}
 
+<<<<<<< HEAD
+=======
           {/* Step 1.5: Reason Capture (optional) */}
           {step === "reason" && (
             <div data-testid="step-reason">
@@ -227,6 +258,7 @@ export default function CancelModal({
             </div>
           )}
 
+>>>>>>> upstream/main
           {/* Step 2: Destructive Action Gate */}
           {step === "confirm_gate" && (
             <div data-testid="step-confirm-gate">
@@ -255,7 +287,11 @@ export default function CancelModal({
               <div className="flex gap-3">
                 <button
                   type="button"
+<<<<<<< HEAD
+                  onClick={() => setStep("warn")}
+=======
                   onClick={() => setStep(requireReason ? "reason" : "warn")}
+>>>>>>> upstream/main
                   className="flex-1 px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm font-semibold text-gray-200 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                 >
                   Back

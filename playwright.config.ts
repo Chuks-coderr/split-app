@@ -15,6 +15,8 @@ export default defineConfig({
     },
   },
 
+<<<<<<< HEAD
+=======
   // Visual regression settings: a small per-pixel color tolerance plus an
   // overall ratio keeps the suite resilient to anti-aliasing/font-rendering
   // noise between CI runs while still catching real UI regressions.
@@ -26,11 +28,14 @@ export default defineConfig({
     },
   },
 
+>>>>>>> upstream/main
   projects: [
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
+<<<<<<< HEAD
+=======
     {
       name: 'error-handling',
       testMatch: /error-handling\.spec\.ts/,
@@ -51,6 +56,7 @@ export default defineConfig({
       testMatch: /api-docs\.spec\.ts/,
       use: { ...devices['Desktop Chrome'] },
     },
+>>>>>>> upstream/main
   ],
 
   webServer: {
@@ -65,4 +71,8 @@ export default defineConfig({
       NEXT_PUBLIC_USDC_ADDRESS: process.env.NEXT_PUBLIC_USDC_ADDRESS || '',
     },
   },
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> upstream/main

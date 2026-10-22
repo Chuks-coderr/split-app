@@ -92,6 +92,8 @@
     "yourRank": "Sua carteira está na posição #{rank}.",
     "notInTop": "(não está no top 20)",
     "backToDashboard": "Voltar ao painel"
+<<<<<<< HEAD
+=======
   },
   "versionHistory": {
     "title": "Histórico de Versões",
@@ -173,5 +175,6 @@
     "collectionNameRequired": "O nome da coleção é obrigatório",
     "collectionNameTooLong": "O nome deve ter 40 caracteres ou menos",
     "collectionNameDuplicate": "Já existe uma coleção com este nome"
+>>>>>>> upstream/main
   }
 }

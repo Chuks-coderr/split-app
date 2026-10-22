@@ -92,6 +92,8 @@
     "yourRank": "Votre portefeuille est classé #{rank}.",
     "notInTop": "(pas dans le top 20)",
     "backToDashboard": "Retour au tableau de bord"
+<<<<<<< HEAD
+=======
   },
   "versionHistory": {
     "title": "Historique des versions",
@@ -173,5 +175,6 @@
     "collectionNameRequired": "Le nom de la collection est requis",
     "collectionNameTooLong": "Le nom doit comporter 40 caractères ou moins",
     "collectionNameDuplicate": "Une collection avec ce nom existe déjà"
+>>>>>>> upstream/main
   }
 }

@@ -8,6 +8,8 @@ export interface FundingMilestonePayload {
   remainingLabel: string;
 }
 
+<<<<<<< HEAD
+=======
 export interface SubscriptionBillingPayload {
   subscriptionId: string;
   /** Short label for the subscription/plan, e.g. "Pro plan". */
@@ -22,6 +24,7 @@ export interface SubscriptionBillingPayload {
   note?: string;
 }
 
+>>>>>>> upstream/main
 function vapidConfigured(): boolean {
   return Boolean(process.env.VAPID_PRIVATE_KEY && process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY);
 }
@@ -74,6 +77,8 @@ export async function sendFundingMilestoneNotification(
     return false;
   }
 }
+<<<<<<< HEAD
+=======
 
 function subscriptionBillingCopy(payload: SubscriptionBillingPayload): {
   title: string;
@@ -154,3 +159,4 @@ export async function sendSubscriptionBillingNotification(
     return false;
   }
 }
+>>>>>>> upstream/main

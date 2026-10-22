@@ -92,6 +92,8 @@
     "yourRank": "Tu billetera está clasificada #{rank}.",
     "notInTop": "(no en los mejores 20)",
     "backToDashboard": "Volver al panel de control"
+<<<<<<< HEAD
+=======
   },
   "versionHistory": {
     "title": "Historial de Versiones",
@@ -173,5 +175,6 @@
     "collectionNameRequired": "El nombre de la colección es obligatorio",
     "collectionNameTooLong": "El nombre debe tener 40 caracteres o menos",
     "collectionNameDuplicate": "Ya existe una colección con este nombre"
+>>>>>>> upstream/main
   }
 }

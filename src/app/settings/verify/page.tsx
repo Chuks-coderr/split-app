@@ -15,12 +15,17 @@ import {
   isValidUrl,
   type VerificationRequest,
 } from '@/lib/verificationRequests';
+<<<<<<< HEAD
+=======
 import { useAddressValidation } from '@/hooks/useAddressValidation';
 import { WalletAddress } from '@/components/WalletAddress';
+>>>>>>> upstream/main
 
 export default function VerifyIdentityPage() {
   const [mounted, setMounted] = useState(false);
   const [address, setAddress] = useState<string | null>(null);
+<<<<<<< HEAD
+=======
   const [walletInput, setWalletInput] = useState('');
   const {
     input: validatedInput,
@@ -31,6 +36,7 @@ export default function VerifyIdentityPage() {
     validate: validateAddress,
     reset: resetValidation,
   } = useAddressValidation();
+>>>>>>> upstream/main
   const [attestation, setAttestation] = useState<CreatorAttestation | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -83,7 +89,13 @@ export default function VerifyIdentityPage() {
       const signedMessage = await signMessage(challenge, {
         address,
         networkPassphrase:
+<<<<<<< HEAD
+          process.env.NEXT_PUBLIC_STELLAR_NETWORK === 'mainnet'
+            ? 'Public Global Stellar Network ; September 2015'
+            : 'Test SDF Network ; September 2015',
+=======
           getActiveNetwork().passphrase,
+>>>>>>> upstream/main
       });
 
       // Store attestation
@@ -198,7 +210,11 @@ export default function VerifyIdentityPage() {
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-400">Connected Address:</span>
+<<<<<<< HEAD
+                <span className="font-mono text-sm text-gray-200 break-all">{address}</span>
+=======
                 <WalletAddress address={address} />
+>>>>>>> upstream/main
               </div>
             </div>
           ) : (
@@ -208,6 +224,8 @@ export default function VerifyIdentityPage() {
           )}
         </div>
 
+<<<<<<< HEAD
+=======
         {/* Wallet Address Verification */}
         <div className="bg-gray-900 rounded-lg p-6 mb-6">
           <h2 className="text-lg font-semibold mb-2">Verify a Wallet Address</h2>
@@ -307,6 +325,7 @@ export default function VerifyIdentityPage() {
           )}
         </div>
 
+>>>>>>> upstream/main
         {/* Verification Status */}
         <div className="bg-gray-900 rounded-lg p-6 mb-6">
           <h2 className="text-lg font-semibold mb-4">Verification Status</h2>

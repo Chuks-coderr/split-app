@@ -9,17 +9,23 @@ import {
   type ReactNode,
 } from "react";
 
+<<<<<<< HEAD
+export type ToastType = "success" | "error" | "info" | "loading";
+=======
 export type ToastType = "success" | "error" | "info" | "loading" | "warning";
 
 export interface ToastAction {
   label: string;
   onClick: () => void;
 }
+>>>>>>> upstream/main
 
 export interface Toast {
   id: string;
   message: string;
   type: ToastType;
+<<<<<<< HEAD
+=======
   /** Optional deduplication key; toasts sharing a key are collapsed. */
   dedupeKey?: string;
   /** Optional action buttons (e.g. Retry / Discard). */
@@ -32,11 +38,24 @@ export interface ToastOptions {
   dedupeKey?: string;
   actions?: ToastAction[];
   persistent?: boolean;
+>>>>>>> upstream/main
 }
 
 interface ToastContextValue {
   toasts: Toast[];
   toast: {
+<<<<<<< HEAD
+    success: (message: string) => string;
+    error: (message: string) => string;
+    info: (message: string) => string;
+    loading: (message: string) => string;
+    /** Upgrade an existing loading toast to success or error */
+    update: (id: string, message: string, type: Exclude<ToastType, "loading">) => void;
+    dismiss: (id: string) => void;
+  };
+}
+
+=======
     success: (message: string, options?: ToastOptions) => string;
     error: (message: string, options?: ToastOptions) => string;
     info: (message: string, options?: ToastOptions) => string;
@@ -68,10 +87,16 @@ export interface RetryToastOptions extends ToastOptions {
   onCancel?: () => void;
 }
 
+>>>>>>> upstream/main
 const ToastContext = createContext<ToastContextValue | null>(null);
 
 const MAX_TOASTS = 5;
 const AUTO_DISMISS_MS = 4000;
+<<<<<<< HEAD
+
+export function ToastProvider({ children }: { children: ReactNode }) {
+  const [toasts, setToasts] = useState<Toast[]>([]);
+=======
 const RETRY_TOAST_DISMISS_MS = 8000;
 const QUEUE_TOAST_DISMISS_MS = 6000;
 
@@ -79,6 +104,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const toastsRef = useRef<Toast[]>([]);
   toastsRef.current = toasts;
+>>>>>>> upstream/main
   const timers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   const dismiss = useCallback((id: string) => {
@@ -88,15 +114,29 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const scheduleAutoDismiss = useCallback(
+<<<<<<< HEAD
+    (id: string) => {
+      const timer = setTimeout(() => dismiss(id), AUTO_DISMISS_MS);
+=======
     (id: string, durationMs: number = AUTO_DISMISS_MS) => {
       clearTimeout(timers.current.get(id));
       const timer = setTimeout(() => dismiss(id), durationMs);
+>>>>>>> upstream/main
       timers.current.set(id, timer);
     },
     [dismiss]
   );
 
   const add = useCallback(
+<<<<<<< HEAD
+    (message: string, type: ToastType): string => {
+      const id = `toast-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      setToasts((prev) => {
+        const next = [...prev, { id, message, type }];
+        return next.length > MAX_TOASTS ? next.slice(next.length - MAX_TOASTS) : next;
+      });
+      if (type !== "loading") scheduleAutoDismiss(id);
+=======
     (message: string, type: ToastType, options: ToastOptions = {}): string => {
       const { dedupeKey, actions, persistent } = options;
 
@@ -126,12 +166,20 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         return next.length > MAX_TOASTS ? next.slice(next.length - MAX_TOASTS) : next;
       });
       if (type !== "loading" && !persistent) scheduleAutoDismiss(id);
+>>>>>>> upstream/main
       return id;
     },
     [scheduleAutoDismiss]
   );
 
   const update = useCallback(
+<<<<<<< HEAD
+    (id: string, message: string, type: Exclude<ToastType, "loading">) => {
+      setToasts((prev) =>
+        prev.map((t) => (t.id === id ? { ...t, message, type } : t))
+      );
+      scheduleAutoDismiss(id);
+=======
     (
       id: string,
       message: string,
@@ -153,10 +201,20 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       );
       if (options.persistent) clearTimeout(timers.current.get(id));
       else scheduleAutoDismiss(id);
+>>>>>>> upstream/main
     },
     [scheduleAutoDismiss]
   );
 
+<<<<<<< HEAD
+  const toast = {
+    success: (message: string) => add(message, "success"),
+    error: (message: string) => add(message, "error"),
+    info: (message: string) => add(message, "info"),
+    loading: (message: string) => add(message, "loading"),
+    update,
+    dismiss,
+=======
   const retry = useCallback(
     (message: string, options: RetryToastOptions = {}): string => {
       const { attempt, maxAttempts, secondsRemaining, onCancel, ...rest } = options;
@@ -211,6 +269,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     retry,
     retryCountdown,
     queue,
+>>>>>>> upstream/main
   };
 
   return (
@@ -234,7 +293,10 @@ const TYPE_STYLES: Record<ToastType, string> = {
   error: "bg-red-800 text-red-100 border-red-700",
   info: "bg-indigo-800 text-indigo-100 border-indigo-700",
   loading: "bg-gray-800 text-gray-100 border-gray-700",
+<<<<<<< HEAD
+=======
   warning: "bg-amber-800 text-amber-100 border-amber-700",
+>>>>>>> upstream/main
 };
 
 const TYPE_ICONS: Record<ToastType, string> = {
@@ -242,7 +304,10 @@ const TYPE_ICONS: Record<ToastType, string> = {
   error: "✕",
   info: "ℹ",
   loading: "⟳",
+<<<<<<< HEAD
+=======
   warning: "↻",
+>>>>>>> upstream/main
 };
 
 function ToastContainer({
@@ -274,6 +339,8 @@ function ToastContainer({
             {TYPE_ICONS[t.type]}
           </span>
           <span className="flex-1 break-words">{t.message}</span>
+<<<<<<< HEAD
+=======
           {t.actions && t.actions.length > 0 && (
             <span className="flex shrink-0 items-center gap-2">
               {t.actions.map((action, i) => (
@@ -291,6 +358,7 @@ function ToastContainer({
               ))}
             </span>
           )}
+>>>>>>> upstream/main
           <button
             type="button"
             onClick={() => onDismiss(t.id)}

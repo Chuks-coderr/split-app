@@ -138,6 +138,8 @@ export async function uploadToIpfsWithFallback(file: File): Promise<string> {
     return mockIpfsUpload(file);
   }
 }
+<<<<<<< HEAD
+=======
 
 /**
  * Metadata describing an uploaded evidence file.
@@ -204,3 +206,4 @@ export function validateEvidenceReference(cid: string): boolean {
   if (!cid || typeof cid !== "string") return false;
   return isValidCid(cid.trim());
 }
+>>>>>>> upstream/main

@@ -1,5 +1,11 @@
 'use client';
 
+<<<<<<< HEAD
+import { useCallback, useState } from 'react';
+import type { Invoice } from '@stellar-split/sdk';
+import { formatAmount } from '@stellar-split/sdk';
+import { DEFAULT_ACCENT_COLOR, type BrandSettings } from '@/lib/brandSettings';
+=======
 import { useCallback, useEffect, useState } from 'react';
 import type { Invoice } from '@stellar-split/sdk';
 import { formatAmount } from '@stellar-split/sdk';
@@ -16,6 +22,7 @@ import {
 function resolvePdfFontFamily(font: BrandSettings['fontFamily'] | undefined): string {
   return BRAND_FONT_OPTIONS.find((o) => o.value === font)?.value ?? 'Helvetica';
 }
+>>>>>>> upstream/main
 
 interface Props {
   invoice: Invoice;
@@ -28,6 +35,25 @@ interface Props {
 const PDF_SAFE_IMAGE_TYPES = new Set(['image/png', 'image/jpeg']);
 
 /**
+<<<<<<< HEAD
+ * Fetches an image URL and returns it as a data URL that @react-pdf/renderer
+ * can embed, or null when the image cannot be inlined (network failure or a
+ * format react-pdf cannot decode, e.g. WebP — branding colors/tagline still
+ * apply; the export never fails because of the logo).
+ */
+async function fetchLogoDataUrl(url: string): Promise<string | null> {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const blob = await res.blob();
+    if (!PDF_SAFE_IMAGE_TYPES.has(blob.type)) return null;
+    return await new Promise<string | null>((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(typeof reader.result === 'string' ? reader.result : null);
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(blob);
+    });
+=======
  * Generates a QR code data URL for the given invoice verification URL.
  */
 async function generateQrCodeDataUrl(invoiceId: string): Promise<string | null> {
@@ -38,11 +64,16 @@ async function generateQrCodeDataUrl(invoiceId: string): Promise<string | null> 
         ? `${window.location.origin}/verify/${invoiceId}`
         : `https://stellarsplit-dapp.vercel.app/verify/${invoiceId}`;
     return await QRCode.toDataURL(verifyUrl, { margin: 1, width: 120 });
+>>>>>>> upstream/main
   } catch {
     return null;
   }
 }
 
+<<<<<<< HEAD
+export default function InvoiceExportButton({ invoice, total, branding }: Props) {
+  const [loading, setLoading] = useState(false);
+=======
 /**
  * Downloads a receipt-style PDF for the invoice (compact, single-page).
  * Useful after payment is confirmed to share a "paid receipt" with the payer.
@@ -206,6 +237,7 @@ export default function InvoiceExportButton({ invoice, total, branding }: Props)
     } catch {}
     return null;
   }, [branding, invoice.creator]);
+>>>>>>> upstream/main
 
   const handleExport = useCallback(async () => {
     setLoading(true);
@@ -213,6 +245,40 @@ export default function InvoiceExportButton({ invoice, total, branding }: Props)
       // Lazy-load @react-pdf/renderer so it doesn't bloat the initial bundle
       const { pdf, Document, Page, Text, View, StyleSheet, Image } = await import('@react-pdf/renderer');
 
+<<<<<<< HEAD
+      // Resolve branding: prefer the prop handed down from the invoice page,
+      // but fall back to fetching the creator's settings so exports triggered
+      // elsewhere stay branded.
+      let brand = branding ?? null;
+      if (!brand) {
+        try {
+          const res = await fetch(`/api/settings/branding?address=${encodeURIComponent(invoice.creator)}`);
+          if (res.ok) brand = (await res.json()) as BrandSettings;
+        } catch {
+          // default styling
+        }
+      }
+
+      const accent = brand?.accentColor ?? DEFAULT_ACCENT_COLOR;
+      const logoDataUrl = brand?.logoUrl ? await fetchLogoDataUrl(brand.logoUrl) : null;
+
+      // Generate QR code pointing to public verification page
+      let qrCodeDataUrl: string | null = null;
+      try {
+        const QRCode = (await import('qrcode')).default;
+        const verifyUrl = typeof window !== 'undefined'
+          ? `${window.location.origin}/verify/${invoice.id}`
+          : `https://stellarsplit-dapp.vercel.app/verify/${invoice.id}`;
+        qrCodeDataUrl = await QRCode.toDataURL(verifyUrl, { margin: 1, width: 120 });
+      } catch {
+        // QR code generation failed; export will still succeed without it
+      }
+
+      const exportedAt = new Date().toLocaleString();
+
+      const styles = StyleSheet.create({
+        page: { padding: 40, fontSize: 11, fontFamily: 'Helvetica', color: '#111' },
+=======
       const brand = await resolveBranding();
       const accent = brand?.accentColor ?? DEFAULT_ACCENT_COLOR;
       const fontFamily = resolvePdfFontFamily(brand?.fontFamily);
@@ -222,6 +288,7 @@ export default function InvoiceExportButton({ invoice, total, branding }: Props)
 
       const styles = StyleSheet.create({
         page: { padding: 40, fontSize: 11, fontFamily, color: '#111' },
+>>>>>>> upstream/main
         header: { marginBottom: 24 },
         logo: { height: 40, width: 'auto', marginBottom: 8, objectFit: 'contain' },
         title: { fontSize: 22, fontWeight: 'bold', marginBottom: 4, color: accent },
@@ -360,6 +427,61 @@ export default function InvoiceExportButton({ invoice, total, branding }: Props)
       a.download = `invoice-${invoice.id}-${formattedDate}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
+<<<<<<< HEAD
+    } finally {
+      setLoading(false);
+    }
+  }, [invoice, total, branding]);
+
+  return (
+    <div className="inline-flex items-center gap-2">
+      <button
+        type="button"
+        onClick={handleExport}
+        disabled={loading}
+        className="px-3 py-1.5 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm font-semibold transition-colors disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 inline-flex items-center gap-2"
+      >
+        {loading ? (
+          <>
+            <svg
+              className="animate-spin h-4 w-4 text-gray-200"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+              />
+            </svg>
+            Generating…
+          </>
+        ) : (
+          <>↓ Export PDF</>
+        )}
+      </button>
+      <button
+        type="button"
+        onClick={() => window.print()}
+        className="px-3 py-1.5 rounded-lg bg-gray-700 hover:bg-gray-600 text-white text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+        aria-label="Print invoice"
+      >
+        Print
+      </button>
+    </div>
+  );
+}
+=======
       addExportHistoryEntry({ format: 'pdf', filters: { invoiceId: invoice.id }, recordCount: 1, status: 'completed' });
     } finally {
       setLoading(false);
@@ -617,3 +739,4 @@ async function fetchLogoDataUrl(url: string): Promise<string | null> {
   }
 }
 
+>>>>>>> upstream/main

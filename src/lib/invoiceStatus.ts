@@ -1,6 +1,9 @@
+<<<<<<< HEAD
+=======
 import { getMilestones, canReleaseMilestone } from "./invoiceMilestones";
 import { getDisputesByInvoice, isDisputeActive } from "./arbitrators";
 
+>>>>>>> upstream/main
 export type InvoiceStatus =
   | "Pending"
   | "Active"
@@ -70,6 +73,8 @@ export const STATUS_CONFIG: Record<InvoiceStatus, StatusConfig> = {
     description: "Invoice has expired and can no longer be paid or modified",
   },
 };
+<<<<<<< HEAD
+=======
 
 /**
  * Allowed status transitions for the invoice state machine.
@@ -187,3 +192,4 @@ export function transitionToReleased(
 
   return "Released";
 }
+>>>>>>> upstream/main

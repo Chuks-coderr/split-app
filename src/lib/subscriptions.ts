@@ -1,6 +1,13 @@
 import { formatAmount } from "@stellar-split/sdk";
 import type {
   Subscription,
+<<<<<<< HEAD
+  SubscriptionFrequency,
+  SubscriptionInvoice,
+} from "@/types/subscription";
+
+const STORAGE_KEY = "stellar_split_subscriptions";
+=======
   SubscriptionCancellationReason,
   SubscriptionFrequency,
   SubscriptionInvoice,
@@ -462,6 +469,7 @@ export function getScheduleHistory(
 ): RecurringScheduleHistoryEntry[] {
   return getRecurringScheduleById(id)?.history ?? [];
 }
+>>>>>>> upstream/main
 
 export function loadSubscriptions(): Subscription[] {
   if (typeof window === "undefined") return [];
@@ -549,6 +557,12 @@ export function computeUpcomingDates(
 }
 
 /**
+<<<<<<< HEAD
+ * Pause a subscription — sets status to "paused".
+ */
+export function pauseSubscription(sub: Subscription): Subscription {
+  return { ...sub, status: "paused" as const };
+=======
  * Lifecycle state-transition guards.
  */
 export function canPause(sub: Subscription): boolean {
@@ -576,12 +590,25 @@ export function pauseSubscription(sub: Subscription): Subscription {
     subscriptionId: sub.id,
   });
   return { ...sub, status: "paused" as const, pausedAt };
+>>>>>>> upstream/main
 }
 
 /**
  * Resume a subscription — sets status to "active" and recomputes nextRunDate.
  */
 export function resumeSubscription(sub: Subscription): Subscription {
+<<<<<<< HEAD
+  const now = Date.now() / 1000;
+  const nextRunDate = now + sub.intervalDays * 86400;
+  return { ...sub, status: "active" as const, nextRunDate };
+}
+
+/**
+ * Cancel a subscription — sets status to "cancelled".
+ */
+export function cancelSubscription(sub: Subscription): Subscription {
+  return { ...sub, status: "cancelled" as const };
+=======
   if (!canResume(sub)) return sub;
   const now = Date.now() / 1000;
   const nextRunDate = now + sub.intervalDays * 86400;
@@ -699,6 +726,7 @@ export function aggregateSubscriptionAnalytics(
   const churnRate = total > 0 ? countsByStatus.cancelled / total : 0;
 
   return { countsByStatus, total, mrr, churnRate, cancellationReasons };
+>>>>>>> upstream/main
 }
 
 /**

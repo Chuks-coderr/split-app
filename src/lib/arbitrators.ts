@@ -51,6 +51,8 @@ export function searchArbitrators(query: string): Arbitrator[] {
 export function getArbitratorByAddress(address: string): Arbitrator | undefined {
   return getArbitrators().find((a) => a.address === address);
 }
+<<<<<<< HEAD
+=======
 
 // ---------------------------------------------------------------------------
 // Dispute resolution system
@@ -596,3 +598,4 @@ export function getDisputeVotes(disputeId: string): ArbitratorVote[] {
 export function isDisputeActive(dispute: DisputeRecord): boolean {
   return dispute.status !== "resolved" && dispute.status !== "enforced";
 }
+>>>>>>> upstream/main

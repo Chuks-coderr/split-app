@@ -61,7 +61,11 @@ export default function Modal({
     >
       <FocusTrap onClose={onClose}>
         <div
+<<<<<<< HEAD
+          className={`bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl w-full max-w-md p-6 flex flex-col gap-4 ${className}`}
+=======
           className={`bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-4 sm:p-6 flex flex-col gap-4 ${className}`}
+>>>>>>> upstream/main
           onClick={(e) => e.stopPropagation()}
         >
           {/* Title row */}

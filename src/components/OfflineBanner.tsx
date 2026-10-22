@@ -2,6 +2,10 @@
 
 import { useEffect, useState } from "react";
 
+<<<<<<< HEAD
+export default function OfflineBanner() {
+  const [offline, setOffline] = useState(false);
+=======
 type QueueStatus = {
   pending: number;
   retrying: boolean;
@@ -13,6 +17,7 @@ export default function OfflineBanner() {
     pending: 0,
     retrying: false,
   });
+>>>>>>> upstream/main
 
   useEffect(() => {
     setOffline(!navigator.onLine);
@@ -26,6 +31,9 @@ export default function OfflineBanner() {
     };
   }, []);
 
+<<<<<<< HEAD
+  if (!offline) return null;
+=======
   useEffect(() => {
     const handleQueueStatus = (event: Event) => {
       const detail = (event as CustomEvent<Partial<QueueStatus>>).detail;
@@ -55,11 +63,20 @@ export default function OfflineBanner() {
         queueStatus.pending === 1 ? "" : "s"
       } queued${queueStatus.retrying ? " — retrying…" : ""}.`
     : null;
+>>>>>>> upstream/main
 
   return (
     <div
       role="alert"
       aria-live="assertive"
+<<<<<<< HEAD
+      className="fixed top-0 inset-x-0 z-50 bg-yellow-500 text-yellow-950 text-sm font-medium text-center py-2 px-4"
+    >
+      You are offline. Some features may not be available.
+    </div>
+  );
+}
+=======
       className="fixed top-0 inset-x-0 z-50 bg-yellow-500 text-yellow-950 text-sm font-medium text-center py-2 px-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1"
     >
       {offline && (
@@ -77,3 +94,4 @@ export default function OfflineBanner() {
     </div>
   );
 }
+>>>>>>> upstream/main

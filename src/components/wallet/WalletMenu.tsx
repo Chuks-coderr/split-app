@@ -4,7 +4,10 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useWallet } from '@/hooks/useWallet';
 import DisconnectModal from '@/components/wallet/DisconnectModal';
+<<<<<<< HEAD
+=======
 import { explorerAccountUrl } from '@/lib/networks';
+>>>>>>> upstream/main
 
 export default function WalletMenu() {
   const router = useRouter();
@@ -42,7 +45,14 @@ export default function WalletMenu() {
             <div className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-20 overflow-hidden">
               <button
                 onClick={() => {
+<<<<<<< HEAD
+                  const explorerUrl =
+                    process.env.NEXT_PUBLIC_STELLAR_NETWORK === 'mainnet'
+                      ? `https://stellar.expert/explorer/public/account/${address}`
+                      : `https://stellar.expert/explorer/testnet/account/${address}`;
+=======
                   const explorerUrl = explorerAccountUrl(address ?? '');
+>>>>>>> upstream/main
                   window.open(explorerUrl, '_blank');
                   setOpen(false);
                 }}

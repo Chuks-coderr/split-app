@@ -7,6 +7,9 @@ const withPWA = require('@ducanh2912/next-pwa').default({
   disable: process.env.NODE_ENV === 'development',
 });
 
+<<<<<<< HEAD
+const nextConfig = {
+=======
 /** @type {import('next').NextConfig} */
 // CDN host for static assets (/_next/static/*, /public/*). When unset,
 // Next.js serves assets from the app's own origin — i.e. it "falls back to
@@ -22,15 +25,19 @@ const nextConfig = {
   // fingerprints these files with content hashes, so swapping the prefix on
   // deploy is automatic cache-busting / versioning — no manual query strings.
   assetPrefix: cdnAssetPrefix,
+>>>>>>> upstream/main
   experimental: {
     serverComponentsExternalPackages: ['@stellar/stellar-sdk', '@vercel/blob'],
   },
   images: {
+<<<<<<< HEAD
+=======
     // Serve modern formats where the browser supports them; falls back
     // automatically for browsers that don't.
     formats: ["image/webp"],
     // Recipient avatars fall back to Gravatar; served unoptimized so no image
     // requests are proxied through the Next.js optimizer.
+>>>>>>> upstream/main
     remotePatterns: [
       {
         protocol: 'https',
@@ -46,10 +53,13 @@ const nextConfig = {
         headers: [
           { key: 'X-Frame-Options', value: 'DENY' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
+<<<<<<< HEAD
+=======
           // X-XSS-Protection enables the browser's built-in XSS filter (IE/Chrome legacy).
           // Modern browsers rely on CSP instead, but this header provides defence-in-depth
           // for older clients. Mode=block prevents partial rendering of detected attacks.
           { key: 'X-XSS-Protection', value: '1; mode=block' },
+>>>>>>> upstream/main
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           {
             key: 'Strict-Transport-Security',
@@ -74,6 +84,8 @@ const nextConfig = {
           { key: 'X-Frame-Options', value: 'ALLOWALL' },
         ],
       },
+<<<<<<< HEAD
+=======
       {
         // Next.js fingerprints build assets with content hashes, so they're
         // safe to cache aggressively and immutably on the client/CDN.
@@ -97,6 +109,7 @@ const nextConfig = {
           { key: "Cache-Control", value: "private, max-age=0, must-revalidate" },
         ],
       },
+>>>>>>> upstream/main
     ];
   },
   webpack: (config, { isServer }) => {
@@ -131,6 +144,8 @@ const sentryWebpackPluginOptions = {
   project: process.env.SENTRY_PROJECT,
   authToken: process.env.SENTRY_AUTH_TOKEN,
   silent: true,
+<<<<<<< HEAD
+=======
   // Hide source maps from the client bundle; they are uploaded to Sentry instead.
   hideSourceMaps: true,
   // Upload source maps for all client files, not just the ones referenced in the bundle.
@@ -138,6 +153,7 @@ const sentryWebpackPluginOptions = {
   // Route Sentry requests through a same-origin tunnel to avoid ad-blockers.
   tunnelRoute: '/monitoring',
   // Only run the Sentry webpack plugins when a DSN is configured.
+>>>>>>> upstream/main
   disableServerWebpackPlugin: !process.env.NEXT_PUBLIC_SENTRY_DSN,
   disableClientWebpackPlugin: !process.env.NEXT_PUBLIC_SENTRY_DSN,
 };

@@ -133,6 +133,8 @@ test("lock overlay shows Resume button", () => {
   expect(screen.getByText("Session Locked")).toBeInTheDocument();
   expect(screen.getAllByText("Resume").length).toBeGreaterThanOrEqual(1);
 });
+<<<<<<< HEAD
+=======
 
 test("warns during the last minute before locking", () => {
   render(
@@ -182,3 +184,4 @@ test("requires biometrics to unlock when enabled", () => {
   expect(screen.getByText("Unlock with biometrics")).toBeInTheDocument();
   expect(screen.getByText("Disconnect wallet")).toBeInTheDocument();
 });
+>>>>>>> upstream/main

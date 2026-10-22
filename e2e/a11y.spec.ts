@@ -14,7 +14,13 @@ const PAGES: Array<{ path: string; name: string }> = [
   { path: '/', name: 'Home' },
   { path: '/dashboard', name: 'Dashboard' },
   { path: '/invoice/new', name: 'New Invoice' },
+<<<<<<< HEAD
+  { path: '/invoice/1', name: 'Invoice Detail' },
+  { path: '/verify/1', name: 'Verify Invoice' },
+  { path: '/analytics', name: 'Analytics' },
+=======
   { path: '/settings', name: 'Settings' },
+>>>>>>> upstream/main
 ];
 
 async function runAxe(page: Page) {

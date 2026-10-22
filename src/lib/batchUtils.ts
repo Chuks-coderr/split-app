@@ -37,6 +37,8 @@ export function findBatchDuplicates(rows: InvoiceRow[]): DuplicateGroup[] {
   }
   return duplicates;
 }
+<<<<<<< HEAD
+=======
 
 export interface BundleInvoice {
   id: string;
@@ -148,3 +150,4 @@ export function computeBundleEligibility(invoices: BundleInvoice[]): BundleEligi
     reasons,
   };
 }
+>>>>>>> upstream/main

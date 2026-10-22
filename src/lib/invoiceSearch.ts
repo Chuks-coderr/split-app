@@ -5,6 +5,29 @@ export interface SearchResult {
   query: string;
 }
 
+<<<<<<< HEAD
+export function searchInvoices(invoices: Invoice[], query: string): Invoice[] {
+  if (!query.trim()) return [];
+
+  const lowerQuery = query.toLowerCase();
+
+  return invoices.filter((inv) => {
+    const matches =
+      inv.id.toLowerCase().includes(lowerQuery) ||
+      inv.creator.toLowerCase().includes(lowerQuery) ||
+      ((inv as any).data?.title as string)?.toLowerCase().includes(lowerQuery) ||
+      inv.recipients.some((r) =>
+        r.address.toLowerCase().includes(lowerQuery)
+      );
+    return matches;
+  });
+}
+
+export function getStoredSearches(): string[] {
+  if (typeof window === "undefined") return [];
+  const stored = localStorage.getItem("recentSearches");
+  return stored ? JSON.parse(stored) : [];
+=======
 export interface SavedSearch {
   id: string;
   name: string;
@@ -58,10 +81,17 @@ export function getStoredSearches(): string[] {
   } catch {
     return [];
   }
+>>>>>>> upstream/main
 }
 
 export function saveSearch(query: string): void {
   if (typeof window === "undefined") return;
+<<<<<<< HEAD
+  const searches = getStoredSearches();
+  const filtered = searches.filter((s) => s !== query);
+  const updated = [query, ...filtered].slice(0, 10);
+  localStorage.setItem("recentSearches", JSON.stringify(updated));
+=======
   const trimmed = query.trim();
   if (!trimmed) return;
   try {
@@ -80,10 +110,14 @@ export function removeRecentSearch(query: string): void {
     const searches = getStoredSearches().filter((s) => s !== query);
     localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(searches));
   } catch {}
+>>>>>>> upstream/main
 }
 
 export function clearSearchHistory(): void {
   if (typeof window === "undefined") return;
+<<<<<<< HEAD
+  localStorage.removeItem("recentSearches");
+=======
   try {
     localStorage.removeItem(RECENT_SEARCHES_KEY);
   } catch {}
@@ -134,4 +168,5 @@ export function clearSavedSearches(): void {
   try {
     localStorage.removeItem(SAVED_SEARCHES_KEY);
   } catch {}
+>>>>>>> upstream/main
 }

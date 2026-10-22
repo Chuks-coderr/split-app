@@ -10,6 +10,12 @@ export const NETWORK_PASSPHRASE =
     ? "Public Global Stellar Network ; September 2015"
     : "Test SDF Network ; September 2015";
 
+<<<<<<< HEAD
+export type WalletType = "freighter" | "walletconnect";
+
+let walletConnectKit: WalletConnectKit | null = null;
+
+=======
 export type WalletType = "freighter" | "walletconnect" | "ledger";
 
 let walletConnectKit: WalletConnectKit | null = null;
@@ -17,6 +23,7 @@ let walletConnectKit: WalletConnectKit | null = null;
 /** Cached Ledger public key once a device has been connected. */
 let ledgerPublicKey: string | null = null;
 
+>>>>>>> upstream/main
 /** Initialize WalletConnect kit */
 async function initWalletConnectKit() {
   if (walletConnectKit) return walletConnectKit;
@@ -85,6 +92,8 @@ export async function signWithWalletConnect(xdr: string): Promise<string> {
   return (kit as any).signTransaction(xdr, NETWORK_PASSPHRASE);
 }
 
+<<<<<<< HEAD
+=======
 /** Connect a Ledger hardware wallet and return the user's public key. */
 export async function connectLedger(): Promise<string> {
   if (typeof window === "undefined") throw new Error("Browser only");
@@ -129,6 +138,7 @@ export async function disconnectLedger(): Promise<void> {
   }
 }
 
+>>>>>>> upstream/main
 /** Disconnect WalletConnect. */
 export async function disconnectWalletConnect(): Promise<void> {
   if (typeof window === "undefined") throw new Error("Browser only");
@@ -146,10 +156,13 @@ export async function disconnectWalletConnect(): Promise<void> {
 export async function isWalletConnected(): Promise<boolean> {
   if (typeof window === "undefined") return false;
   try {
+<<<<<<< HEAD
+=======
     const ledgerKey = await getLedgerPublicKey();
     if (ledgerKey) return true;
   } catch { /* fall through */ }
   try {
+>>>>>>> upstream/main
     const wcKey = await getWalletConnectPublicKey();
     if (wcKey) return true;
   } catch { /* fall through */ }
@@ -165,6 +178,8 @@ export async function isWalletConnected(): Promise<boolean> {
 export async function signTransaction(xdr: string): Promise<string> {
   if (typeof window === "undefined") throw new Error("Browser only");
 
+<<<<<<< HEAD
+=======
   // Prefer Ledger if a device is the active wallet
   try {
     const ledgerKey = await getLedgerPublicKey();
@@ -175,6 +190,7 @@ export async function signTransaction(xdr: string): Promise<string> {
     // Ledger not available, try WalletConnect
   }
 
+>>>>>>> upstream/main
   // Try WalletConnect first if available
   try {
     const wcKey = await getWalletConnectPublicKey();

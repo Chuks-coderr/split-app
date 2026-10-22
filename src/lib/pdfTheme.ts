@@ -7,8 +7,11 @@
  * respective backgrounds — see `src/lib/contrast.ts` for the checker.
  */
 
+<<<<<<< HEAD
+=======
 export type ExportMode = "print" | "screen";
 
+>>>>>>> upstream/main
 export interface PdfTheme {
   /** Page background colour. */
   background: string;
@@ -60,6 +63,8 @@ export const darkTheme: PdfTheme = {
 export function getPdfTheme(preferDark = false): PdfTheme {
   return preferDark ? darkTheme : lightTheme;
 }
+<<<<<<< HEAD
+=======
 
 export interface PDFThemeClasses {
   container: string;
@@ -106,3 +111,4 @@ export function getPDFThemeClasses(mode: "print" | "screen", theme: "light" | "d
     watermark: "text-gray-800",
   };
 }
+>>>>>>> upstream/main

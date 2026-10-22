@@ -9,6 +9,10 @@ import {
   getWalletConnectPublicKey,
 } from "@/lib/freighter";
 import type { WalletType } from "@/lib/freighter";
+<<<<<<< HEAD
+
+const STORAGE_KEY = "stellarsplit_wallet";
+=======
 import {
   connectLedger,
   getLedgerPublicKey,
@@ -19,6 +23,7 @@ import type { LedgerStatus } from "@/lib/ledger";
 
 const STORAGE_KEY = "stellarsplit_wallet";
 const DERIVATION_PATH_KEY = "stellarsplit_ledger_derivation_path";
+>>>>>>> upstream/main
 
 interface CachedWallet {
   address: string;
@@ -31,6 +36,8 @@ interface WalletState {
   connecting: boolean;
   error: string | null;
   freighterInstalled: boolean | null;
+<<<<<<< HEAD
+=======
   ledgerStatus: LedgerStatus;
   derivationPath: string;
 }
@@ -51,6 +58,7 @@ function writeDerivationPath(path: string) {
   } catch {
     // localStorage unavailable — path just won't persist across a refresh.
   }
+>>>>>>> upstream/main
 }
 
 function readCache(): CachedWallet | null {
@@ -100,8 +108,11 @@ export function useWallet() {
       connecting: false,
       error: null,
       freighterInstalled: null,
+<<<<<<< HEAD
+=======
       ledgerStatus: "disconnected",
       derivationPath: readDerivationPath(),
+>>>>>>> upstream/main
     };
   });
 
@@ -134,14 +145,20 @@ export function useWallet() {
       // For Freighter, only skip straight to getPublicKey() (no popup) when
       // isConnected() confirms the extension already granted this origin
       // access. For WalletConnect there's no equivalent probe — fall back
+<<<<<<< HEAD
+      // to the existing silent getWalletConnectPublicKey() check.
+=======
       // to the existing silent getWalletConnectPublicKey() check. Ledger
       // requires the device to be reconnected, so it's verified separately.
+>>>>>>> upstream/main
       if (cached.walletType === "freighter" && !freighterConnected) {
         writeCache(null);
         setState((prev) => ({ ...prev, address: null, walletType: null }));
         return;
       }
 
+<<<<<<< HEAD
+=======
       if (cached.walletType === "ledger") {
         try {
           const status = await getLedgerStatus();
@@ -177,6 +194,7 @@ export function useWallet() {
         return;
       }
 
+>>>>>>> upstream/main
       try {
         const key =
           cached.walletType === "freighter"
@@ -216,6 +234,8 @@ export function useWallet() {
         return { address, walletType: "freighter" as WalletType };
       }
 
+<<<<<<< HEAD
+=======
       if (type === "ledger") {
         const path = readDerivationPath();
         setState((prev) => ({ ...prev, ledgerStatus: "connecting" }));
@@ -232,21 +252,28 @@ export function useWallet() {
         return { address, walletType: "ledger" as WalletType };
       }
 
+>>>>>>> upstream/main
       const { publicKey, uri } = await connectWalletConnect();
       writeCache({ address: publicKey, walletType: "walletconnect" });
       setState((prev) => ({ ...prev, address: publicKey, walletType: "walletconnect", connecting: false }));
       return { address: publicKey, walletType: "walletconnect" as WalletType, uri };
     } catch (e) {
+<<<<<<< HEAD
+      setState((prev) => ({ ...prev, connecting: false, error: String(e) }));
+=======
       setState((prev) => ({
         ...prev,
         connecting: false,
         error: String(e),
         ledgerStatus: type === "ledger" ? "error" : prev.ledgerStatus,
       }));
+>>>>>>> upstream/main
       throw e;
     }
   }, []);
 
+<<<<<<< HEAD
+=======
   const setDerivationPath = useCallback((path: string) => {
     writeDerivationPath(path);
     setState((prev) => ({ ...prev, derivationPath: path }));
@@ -263,11 +290,15 @@ export function useWallet() {
     }
   }, []);
 
+>>>>>>> upstream/main
   const disconnect = useCallback(async () => {
     if (state.walletType === "walletconnect") {
       await disconnectWalletConnect();
     }
     writeCache(null);
+<<<<<<< HEAD
+    setState((prev) => ({ ...prev, address: null, walletType: null, error: null }));
+=======
     setState((prev) => ({
       ...prev,
       address: null,
@@ -275,6 +306,7 @@ export function useWallet() {
       error: null,
       ledgerStatus: prev.walletType === "ledger" ? "disconnected" : prev.ledgerStatus,
     }));
+>>>>>>> upstream/main
   }, [state.walletType]);
 
   return {
@@ -283,10 +315,13 @@ export function useWallet() {
     connecting: state.connecting,
     error: state.error,
     freighterInstalled: state.freighterInstalled,
+<<<<<<< HEAD
+=======
     ledgerStatus: state.ledgerStatus,
     derivationPath: state.derivationPath,
     setDerivationPath,
     refreshLedgerStatus,
+>>>>>>> upstream/main
     connect,
     disconnect,
   };

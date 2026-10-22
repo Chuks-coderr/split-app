@@ -7,7 +7,10 @@ import { fetchUsdcBalance } from "@/lib/stellar";
 import QRModal from "@/components/QRModal";
 import WalletErrorModal, { type WalletErrorType } from "@/components/WalletErrorModal";
 import { useToast } from "@/contexts/ToastContext";
+<<<<<<< HEAD
+=======
 import type { LedgerStatus } from "@/lib/ledger";
+>>>>>>> upstream/main
 
 interface Props {
   /** Smaller footprint for the sticky header nav: address badge + single connect button, no balance line. */
@@ -22,6 +25,8 @@ function classifyWalletError(e: unknown): WalletErrorType {
   if (msg.includes("network") || msg.includes("passphrase") || msg.includes("mismatch")) return "network_mismatch";
   return "not_installed";
 }
+<<<<<<< HEAD
+=======
 
 /** Common Stellar derivation paths offered in the Ledger path selector. */
 const LEDGER_DERIVATION_PATHS = [
@@ -47,6 +52,7 @@ const LEDGER_STATUS_DOT: Record<LedgerStatus, string> = {
   app_not_open: "bg-amber-500",
   error: "bg-red-500",
 };
+>>>>>>> upstream/main
 
 /**
  * WalletConnect — Connect via Freighter or WalletConnect.
@@ -63,10 +69,13 @@ export default function WalletConnect({ compact = false }: Props) {
     freighterInstalled,
     connect,
     disconnect,
+<<<<<<< HEAD
+=======
     connectLedger,
     ledgerStatus,
     ledgerDerivationPath,
     setLedgerDerivationPath,
+>>>>>>> upstream/main
   } = useWalletContext();
   const toast = useToast();
   const [modalError, setModalError] = useState<WalletErrorType>(null);
@@ -74,7 +83,10 @@ export default function WalletConnect({ compact = false }: Props) {
   const [balanceLoading, setBalanceLoading] = useState(false);
   const [qrOpen, setQrOpen] = useState(false);
   const [qrUri, setQrUri] = useState<string>("");
+<<<<<<< HEAD
+=======
   const [ledgerConnecting, setLedgerConnecting] = useState(false);
+>>>>>>> upstream/main
 
   const USDC_CONTRACT_ID = process.env.NEXT_PUBLIC_USDC_ADDRESS ?? "";
 
@@ -130,6 +142,8 @@ export default function WalletConnect({ compact = false }: Props) {
     }
   };
 
+<<<<<<< HEAD
+=======
   const handleConnectLedger = async () => {
     setLedgerConnecting(true);
     try {
@@ -146,6 +160,7 @@ export default function WalletConnect({ compact = false }: Props) {
     }
   };
 
+>>>>>>> upstream/main
   const handleDisconnect = async () => {
     await disconnect();
   };
@@ -250,6 +265,8 @@ export default function WalletConnect({ compact = false }: Props) {
         >
           {connecting ? "Connecting…" : "Connect with WalletConnect"}
         </button>
+<<<<<<< HEAD
+=======
 
         <button
           onClick={handleConnectLedger}
@@ -287,6 +304,7 @@ export default function WalletConnect({ compact = false }: Props) {
             ))}
           </select>
         </label>
+>>>>>>> upstream/main
       </div>
 
       {error && <p className="text-red-400 text-xs">Could not connect wallet.</p>}
@@ -303,11 +321,15 @@ export default function WalletConnect({ compact = false }: Props) {
         onDismiss={() => setModalError(null)}
         onRetry={() => {
           setModalError(null);
+<<<<<<< HEAD
+          handleConnect();
+=======
           if (walletType === "ledger") {
             handleConnectLedger();
           } else {
             handleConnect();
           }
+>>>>>>> upstream/main
         }}
       />
     </div>

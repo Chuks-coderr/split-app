@@ -1,5 +1,14 @@
 "use client";
 
+<<<<<<< HEAD
+import { useEffect } from 'react';
+
+export default function OfflineQueueSync() {
+  useEffect(() => {
+    // noop
+  }, []);
+  return null;
+=======
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export type OfflineQueueItemStatus = 'pending' | 'retrying' | 'failed';
@@ -386,4 +395,5 @@ export function enqueueOfflineTransaction(
     window.dispatchEvent(new CustomEvent('offline-queue:updated'));
   }
   return item;
+>>>>>>> upstream/main
 }

@@ -1,7 +1,11 @@
 "use client";
 
+<<<<<<< HEAD
+import { useState, useEffect, useCallback, useMemo, Suspense } from "react";
+=======
 import { useState, useEffect, useCallback, useMemo, useRef, Suspense } from "react";
 import { useRegisterShortcuts } from "@/context/ShortcutRegistry";
+>>>>>>> upstream/main
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import Stepper, { type Step } from "@/components/ui/Stepper";
@@ -19,15 +23,40 @@ import { useI18n } from "@/components/I18nProvider";
 import DeadlineSuggester from "@/components/DeadlineSuggester";
 import { validateDeadline } from "@/components/DuplicateModal";
 import { decodeTemplate } from "@/lib/templateSharing";
-import DraftCollaborationPanel from "@/components/DraftCollaborationPanel";
+<<<<<<< HEAD
+import type { ImportedTxData } from "@/lib/txImport";
 import {
-  createApprovalRequest,
-  getApprovalPolicy,
-  notifyApprovalUsers,
-  saveApprovalRequests,
-  getApprovalRequests,
-  shouldRequireApproval,
-} from "@/lib/invoiceApprovals";
+  generateRetroactiveInvoiceId,
+  saveRetroactiveInvoice,
+  type RetroactiveInvoice,
+} from "@/lib/retroactiveInvoices";
+import { useOfflineDraftAutosave } from "@/hooks/useOfflineDraftAutosave";
+import {
+  getOrCreateLocalUserId,
+  listDraftsForUser,
+  type StoredDraft,
+} from "@/lib/offlineDraftDB";
+import SplitCalculator from "@/components/SplitCalculator";
+import TagInput from "@/components/invoice/TagInput";
+import { useInvoiceTags } from "@/hooks/useInvoiceTags";
+import {
+  calculateSplit,
+  type SplitMeta,
+} from "@/hooks/useSplitCalculator";
+
+import InstallmentPlanBuilder, { type InstallmentMilestone as PlanMilestone } from "@/components/invoice/InstallmentPlanBuilder";
+import CoSignerSection from "@/components/invoice/CoSignerSection";
+import AmountDenominationInput from "@/components/AmountDenominationInput";
+import { useXlmUsdcRate } from "@/hooks/useXlmUsdcRate";
+
+import { useInvoiceCollaboration } from "@/hooks/useInvoiceCollaboration";
+import CursorOverlay from "@/components/CursorOverlay";
+import PresencePill from "@/components/PresencePill";
+import ReconnectionBanner from "@/components/ReconnectionBanner";
+
+=======
+import DraftCollaborationPanel from "@/components/DraftCollaborationPanel";
+>>>>>>> upstream/main
 
 const RecipientForm = dynamic(() => import("@/components/RecipientForm"), { ssr: false });
 const TemplateManager = dynamic(() => import("@/components/TemplateManager"), { ssr: false });
@@ -64,7 +93,11 @@ function useToasts() {
   return { toasts, addToast };
 }
 
+<<<<<<< HEAD
+const STEPS = ["Basic Info", "Recipients", "Options", "Review & Submit"];
+=======
 const STEPS = WIZARD_STEPS.map((s) => s.label);
+>>>>>>> upstream/main
 
 /** Clamp an arbitrary `?step=` value onto a real step index. */
 function parseStep(raw: string | null): number {
@@ -136,8 +169,11 @@ function NewInvoiceForm() {
 
   const fromId = searchParams.get("from");
   const deadlineParam = searchParams.get("deadline");
+<<<<<<< HEAD
+=======
   const draftId =
     searchParams.get("draft") ?? fromId ?? "new-invoice-draft";
+>>>>>>> upstream/main
   const [cloneSourceId, setCloneSourceId] = useState<string | null>(null);
   const [originalToken, setOriginalToken] = useState<string | null>(null);
   const [originalRecipients, setOriginalRecipients] = useState<RecipientRow[] | null>(null);
@@ -204,8 +240,304 @@ function NewInvoiceForm() {
     }
   }, [recipients, token, deadlineDays, tags, hasUserInteracted]);
 
+<<<<<<< HEAD
+  const draftSnapshot = {
+    recipients,
+    token,
+    deadlineDays,
+    recurring,
+    intervalDays,
+    splitMeta,
+    installments,
+  };
+
+  const { isOffline: draftOffline, discardDraft } = useOfflineDraftAutosave(
+    draftUserId ?? "",
+    formMode === "create" && !cloneSourceId ? draftId ?? "" : "",
+    draftSnapshot
+  );
+
+  const handleRestoreDraft = () => {
+    if (!recoveredDraft) return;
+    setRecipients(recoveredDraft.data.recipients);
+    setToken(recoveredDraft.data.token);
+    setDeadlineDays(recoveredDraft.data.deadlineDays);
+    setRecurring(recoveredDraft.data.recurring);
+    setIntervalDays(recoveredDraft.data.intervalDays);
+    if ((recoveredDraft.data as any).splitMeta) {
+      setSplitMeta((recoveredDraft.data as any).splitMeta);
+    }
+    if (draftUserId) {
+      import("@/lib/offlineDraftDB").then(({ deleteDraft }) =>
+        deleteDraft(draftUserId, recoveredDraft.draftId)
+      );
+    }
+    setRecoveredDraft(null);
+    addToast("Draft restored", "success");
+  };
+
+  const handleDiscardDraft = () => {
+    if (recoveredDraft && draftUserId) {
+      import("@/lib/offlineDraftDB").then(({ deleteDraft }) =>
+        deleteDraft(draftUserId, recoveredDraft.draftId)
+      );
+    }
+    setRecoveredDraft(null);
+  };
+
+  const { toasts, addToast } = useToasts();
+
+  const handleSplitEqually = () => {
+    if (recipients.length <= 1) return;
+
+    setPreviousRecipientsForUndo([...recipients]);
+
+    const { perRecipient, remainder } = (() => {
+      const pp = Math.floor(100 / recipients.length);
+      const rem = 100 - (pp * recipients.length);
+      return { perRecipient: pp, remainder: rem };
+    })();
+
+    const newRecipients = recipients.map((r, index) => ({
+      ...r,
+      amount: (100 / recipients.length).toFixed(7),
+    }));
+
+    if (remainder > 0 && newRecipients.length > 0) {
+      const firstAmount = parseFloat(newRecipients[0].amount) + (remainder / recipients.length);
+      newRecipients[0].amount = firstAmount.toFixed(7);
+    }
+
+    setRecipients(newRecipients);
+    addToast("Split distributed equally", "success");
+  };
+
+  const handleUndoSplit = () => {
+    if (previousRecipientsForUndo) {
+      setRecipients(previousRecipientsForUndo);
+      setPreviousRecipientsForUndo(null);
+      addToast("Distribution undone", "success");
+    }
+  };
+
+  const markFieldTouched = (fieldName: string) => {
+    setTouchedFields((prev) => new Set([...prev, fieldName]));
+  };
+
+  const validateField = (fieldName: string, value: unknown): string | null => {
+    if (fieldName === 'token') {
+      const tokenValue = value as string;
+      if (!tokenValue || !tokenValue.startsWith('C')) {
+        return 'Valid token contract address (starting with C) is required';
+      }
+    } else if (fieldName === 'deadlineDays') {
+      const days = value as number;
+      if (days < 1 || days > 365) {
+        return 'Deadline must be between 1 and 365 days';
+      }
+    } else if (fieldName === 'cloneDeadline') {
+      const deadlineError = validateDeadline(value as string);
+      return deadlineError;
+    }
+    return null;
+  };
+
+  const handleFieldBlur = (fieldName: string, value: unknown) => {
+    markFieldTouched(fieldName);
+    setHasUserInteracted(true);
+    const error = validateField(fieldName, value);
+    setFieldErrors((prev) => ({ ...prev, [fieldName]: error }));
+  };
+
+  const handleFieldChange = (fieldName: string, value: unknown) => {
+    setHasUserInteracted(true);
+    if (touchedFields.has(fieldName)) {
+      const error = validateField(fieldName, value);
+      setFieldErrors((prev) => ({ ...prev, [fieldName]: error }));
+    }
+  };
+
+  const handleImported = (data: ImportedTxData) => {
+    setImportedTx(data);
+    setRetroError(null);
+  };
+
+  const handleRetroactiveSubmit = async () => {
+    if (!importedTx) return;
+    setRetroSubmitting(true);
+    setRetroError(null);
+    try {
+      const creator = await getFreighterPublicKey().catch(() => importedTx.recipients[0]?.address ?? "unknown");
+      const recipients = importedTx.recipients.map((r) => ({
+        address: r.address,
+        amount: parseAmount(r.amount),
+      }));
+      const total = recipients.reduce((s, r) => s + r.amount, 0n);
+      const id = generateRetroactiveInvoiceId(importedTx.txHash);
+      const record: RetroactiveInvoice = {
+        id,
+        creator,
+        recipients,
+        token: importedTx.recipients[0]?.asset ?? "XLM",
+        deadline: 0,
+        funded: total,
+        status: "Released",
+        payments: [{ payer: creator, amount: total }],
+        retroactive: true,
+        sourceTxHash: importedTx.txHash,
+        memo: importedTx.memo,
+        createdAt: importedTx.createdAt,
+      };
+      saveRetroactiveInvoice(record);
+      addToast(`Retroactive invoice #${id} created`, "success");
+      router.push(`/invoice/${id}`);
+    } catch (err) {
+      setRetroError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setRetroSubmitting(false);
+    }
+  };
+
+  useEffect(() => {
+    const address = searchParams.get("address");
+    const templateParam = searchParams.get("template");
+
+    if (address) {
+      setRecipients([{ address, amount: "" }]);
+      return;
+    }
+
+    if (templateParam) {
+      const decoded = decodeTemplate(templateParam);
+      if (decoded) {
+        setRecipients(decoded.recipients);
+        setToken(decoded.token);
+        addToast("Shared template loaded successfully", "success");
+      } else {
+        addToast("Failed to decode shared template: invalid format", "error");
+      }
+      return;
+    }
+
+    const template = sessionStorage.getItem("invoiceTemplate");
+    if (template) {
+      const parsed: InvoiceTemplate = JSON.parse(template);
+      setRecipients(parsed.recipients);
+      setDeadlineDays(parsed.deadlineDays);
+      setToken(parsed.token);
+      sessionStorage.removeItem("invoiceTemplate");
+    }
+  }, [searchParams, addToast]);
+
+  const [publicKey, setPublicKey] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [txModal, setTxModal] = useState<{ txHash: string; invoiceId: string } | null>(null);
+=======
+>>>>>>> upstream/main
   const [equalSplit, setEqualSplit] = useState(false);
   const [totalAmount, setTotalAmount] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [autofilled, setAutofilled] = useState(false);
+  const [stepErrors, setStepErrors] = useState<Record<number, string | null>>({});
+  const [previousRecipientsForUndo, setPreviousRecipientsForUndo] = useState<RecipientRow[] | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string | null>>({});
+  const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
+  const [showUnsavedModal, setShowUnsavedModal] = useState(false);
+  const [pendingNavigationHref, setPendingNavigationHref] = useState<string | null>(null);
+  const { feeBreakdown, isLoading: feeLoading, error: feeError, refetch: refetchFees } = useNetworkFeeBreakdown();
+
+  // Denomination toggle state (XLM / USDC)
+  type Denomination = "XLM" | "USDC";
+  const [amountDenom, setAmountDenom] = useState<Denomination>("USDC");
+  const xlmUsdcRate = useXlmUsdcRate();
+
+  const {
+    remoteCursors,
+    remotePresence,
+    isConnected: collabConnected,
+    focusedField,
+    setFocusedField,
+    emitFieldBlur,
+  } = useInvoiceCollaboration({
+    invoiceId: draftId ?? "new",
+    currentAddress: publicKey,
+    hasWritePermission: true,
+  });
+
+  /** Convert an amount string from current denomination to USDC for on-chain use */
+  const toUsdc = useCallback(
+    (amount: string): string => {
+      if (amountDenom === "USDC" || !xlmUsdcRate) return amount;
+      const n = parseFloat(amount);
+      if (isNaN(n)) return amount;
+      return (n * xlmUsdcRate).toFixed(7).replace(/\.?0+$/, "");
+    },
+    [amountDenom, xlmUsdcRate],
+  );
+
+  useEffect(() => {
+    getFreighterPublicKey().then(setPublicKey).catch(() => null);
+  }, []);
+
+  useEffect(() => {
+    if (fromId || sessionStorage.getItem("invoiceTemplate") || searchParams.get("address")) return;
+
+    getFreighterPublicKey()
+      // as any: getInvoicesByCreator is not yet declared in the published @stellar-split/sdk types
+      .then((pk) => (splitClient as any).getInvoicesByCreator(pk))
+      .then((invoices: import("@stellar-split/sdk").Invoice[]) => {
+        if (!invoices || invoices.length === 0) return;
+        const recent = invoices.slice(-5);
+        const latestToken = recent[recent.length - 1].token;
+        const now = Math.floor(Date.now() / 1000);
+        const daysList = recent
+          .map((inv) => Math.round((inv.deadline - now) / 86400))
+          .filter((d) => d > 0)
+          .sort((a, b) => a - b);
+        const medianDays =
+          daysList.length > 0
+            ? daysList[Math.floor(daysList.length / 2)]
+            : null;
+        const lastRecipients = recent[recent.length - 1].recipients.map((r) => ({
+          address: r.address,
+          amount: formatAmount(r.amount),
+        }));
+        setToken(latestToken);
+        if (medianDays !== null) setDeadlineDays(medianDays);
+        setRecipients(lastRecipients.length > 0 ? lastRecipients : [{ address: "", amount: "" }]);
+        setAutofilled(true);
+      })
+      .catch(() => null);
+  }, []);
+
+  useEffect(() => {
+    if (!fromId) return;
+    setLoading(true);
+    splitClient
+      .getInvoice(fromId)
+      .then((invoice) => {
+        const recipientRows = invoice.recipients.map((r) => ({
+          address: r.address,
+          amount: formatAmount(r.amount),
+        }));
+        setRecipients(recipientRows);
+        setOriginalRecipients(recipientRows);
+        setToken(invoice.token);
+        setOriginalToken(invoice.token);
+        setCloneSourceId(fromId);
+        if (deadlineParam) {
+          const err = validateDeadline(deadlineParam);
+          if (err) setDeadlineError(err);
+          setCloneDeadlineIso(deadlineParam);
+        }
+      })
+      .catch((err) => {
+        setError(`Failed to load source invoice: ${err}`);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [fromId]);
 
   const draftSnapshot: DraftFormData = {
     recipients,
@@ -534,6 +866,65 @@ function NewInvoiceForm() {
 
   const tokenChanged = !!originalToken && token !== originalToken;
 
+<<<<<<< HEAD
+  const validateStep = (s: number): boolean => {
+    switch (s) {
+      case 0: {
+        if (!token || !token.startsWith("C")) {
+          setStepErrors((prev) => ({ ...prev, [s]: "Valid token contract address is required" }));
+          return false;
+        }
+        if (cloneSourceId && cloneDeadlineIso) {
+          const err = validateDeadline(cloneDeadlineIso);
+          if (err) {
+            setDeadlineError(err);
+            setStepErrors((prev) => ({ ...prev, [s]: err }));
+            return false;
+          }
+        }
+        setStepErrors((prev) => ({ ...prev, [s]: null }));
+        return true;
+      }
+      case 1: {
+        if (recipients.length === 0 || !recipients[0].address) {
+          setStepErrors((prev) => ({ ...prev, [s]: "At least one recipient is required" }));
+          return false;
+        }
+        const validRecipients = recipients.every(
+          (r) => r.address.startsWith("G") && r.address.length >= 50 && parseFloat(r.amount || "0") > 0
+        );
+        if (!validRecipients) {
+          setStepErrors((prev) => ({ ...prev, [s]: "Each recipient needs a valid G... address and positive amount" }));
+          return false;
+        }
+        if (splitMeta && splitMeta.recipients.length > 0) {
+          const splitResult = calculateSplit(splitMeta.totalAmount, splitMeta.recipients, splitMeta.assetCode);
+          if (!splitResult.validation.isValid) {
+            setStepErrors((prev) => ({
+              ...prev,
+              [s]: splitResult.validation.errorMessage ?? "Split calculator has invalid configuration",
+            }));
+            return false;
+          }
+        }
+        setStepErrors((prev) => ({ ...prev, [s]: null }));
+        return true;
+      }
+      case 2: {
+        if (deadlineDays && Number(deadlineDays) <= 0) {
+          setStepErrors((prev) => ({ ...prev, [s]: "Deadline must be a positive number of days" }));
+          return false;
+        }
+        setStepErrors((prev) => ({ ...prev, [s]: null }));
+        return true;
+      }
+      default:
+        return true;
+    }
+  };
+
+=======
+>>>>>>> upstream/main
   /**
    * Reason the split is not submittable, or null when it is. Drives both the
    * disabled state and the tooltip on the create button so the user can see
@@ -549,6 +940,8 @@ function NewInvoiceForm() {
     return validation.isValid ? null : validation.errorMessage ?? "Split configuration is invalid";
   }, [splitMeta]);
 
+<<<<<<< HEAD
+=======
   const wizardState: WizardState = {
     token,
     deadlineDays,
@@ -580,6 +973,7 @@ function NewInvoiceForm() {
     return valid;
   };
 
+>>>>>>> upstream/main
   const handleNext = () => {
     if (validateStep(step)) {
       goToStep(Math.min(step + 1, STEPS.length - 1));
@@ -625,6 +1019,11 @@ function NewInvoiceForm() {
     };
   };
 
+<<<<<<< HEAD
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateStep(step)) return;
+=======
   const formRef = useRef<HTMLFormElement>(null);
 
   // Cmd/Ctrl+Enter from anywhere in the wizard submits the form — on the
@@ -664,6 +1063,7 @@ function NewInvoiceForm() {
       goToStep(invalid);
       return;
     }
+>>>>>>> upstream/main
     setError(null);
 
     if (cloneSourceId && cloneDeadlineIso) {
@@ -678,46 +1078,6 @@ function NewInvoiceForm() {
 
     try {
       const creator = await getFreighterPublicKey();
-      const amounts = recipients.map((recipient) =>
-        toUsdc(equalSplit ? perRecipientAmount ?? "0" : recipient.amount),
-      );
-      const approvalAmount = amounts.reduce((sum, amount) => sum + (parseFloat(amount) || 0), 0);
-      const policy = getApprovalPolicy(creator);
-
-      if (shouldRequireApproval(approvalAmount, policy)) {
-        const approvalRequest = createApprovalRequest(
-          {
-            owner: creator,
-            title: `Invoice for ${recipients[0]?.address ?? "recipient"}`,
-            amount: approvalAmount,
-            payload: {
-              recipients: recipients.map((recipient, index) => ({
-                address: recipient.address,
-                amount: amounts[index],
-              })),
-              token,
-              deadline: cloneSourceId
-                ? Math.floor(new Date(cloneDeadlineIso).getTime() / 1000)
-                : deadlineFromDays(deadlineDays),
-              ...(recurring ? { recurring, intervalDays } : {}),
-              ...(payloadForApi() ? { splitMeta: payloadForApi() } : {}),
-              ...(tags.length > 0 ? { tags: [...tags] } : {}),
-              ...(cloneSourceId ? { cloneSourceId } : {}),
-            },
-          },
-          policy!,
-        );
-        saveApprovalRequests([approvalRequest, ...getApprovalRequests()]);
-        notifyApprovalUsers(
-          approvalRequest,
-          approvalRequest.levels[0]?.approvers ?? [],
-          `Approval requested for ${approvalRequest.title}`,
-        );
-        discardDraft();
-        addToast("Invoice submitted for approval", "success");
-        router.push(`/approvals?request=${approvalRequest.id}`);
-        return;
-      }
 
       if (cloneSourceId) {
         const deadlineTs = Math.floor(new Date(cloneDeadlineIso).getTime() / 1000);
@@ -810,6 +1170,16 @@ function NewInvoiceForm() {
     }
     goToStep(targetStep);
   };
+<<<<<<< HEAD
+
+  const renderStepIndicator = () => (
+    <Stepper steps={stepperSteps} onStepClick={handleStepClick} className="mb-8" />
+  );
+
+  const renderBasicInfo = () => (
+    <div className="flex flex-col gap-6">
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Basic Info</h2>
+=======
 
   const progressPercent = Math.round(((step + 1) / STEPS.length) * 100);
 
@@ -1214,6 +1584,7 @@ function NewInvoiceForm() {
           </a>
         </div>
       )}
+>>>>>>> upstream/main
 
       {!cloneSourceId && (
         <TemplateManager
@@ -1223,6 +1594,259 @@ function NewInvoiceForm() {
         />
       )}
 
+<<<<<<< HEAD
+      <ChangedField changed={tokenChanged}>
+        <FormField
+          id="token-address"
+          label={t("invoiceNew.tokenAddress")}
+          error={touchedFields.has('token') ? fieldErrors['token'] : null}
+          required
+        >
+          <input
+            type="text"
+            aria-label="Token address"
+            value={token}
+            onChange={(e) => setToken(e.target.value)}
+            onFocus={() => setFocusedField("token-address")}
+            onBlur={() => {
+              if (focusedField === "token-address") emitFieldBlur();
+            }}
+            required
+            placeholder="C..."
+            className={`w-full min-h-11 bg-gray-800 border rounded-lg px-4 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+              touchedFields.has('token') && fieldErrors['token']
+                ? 'border-red-500'
+                : 'border-gray-700'
+            }`}
+          />
+          <CursorOverlay cursors={remoteCursors} fieldName="token-address" />
+        </FormField>
+      </ChangedField>
+
+      {cloneSourceId ? (
+        <FormField
+          id="clone-deadline"
+          label={t("invoiceNew.deadline")}
+          error={touchedFields.has('cloneDeadline') ? fieldErrors['cloneDeadline'] : null}
+          required
+        >
+          <input
+            type="datetime-local"
+            value={cloneDeadlineIso.slice(0, 16)}
+            onChange={(e) => {
+              setCloneDeadlineIso(e.target.value);
+              handleFieldChange('cloneDeadline', e.target.value);
+            }}
+            onBlur={(e) => handleFieldBlur('cloneDeadline', e.target.value)}
+            className={`w-full min-h-11 bg-gray-800 border rounded-lg px-4 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+              touchedFields.has('cloneDeadline') && fieldErrors['cloneDeadline']
+                ? 'border-red-500'
+                : 'border-gray-700'
+            }`}
+          />
+        </FormField>
+      ) : (
+        <FormField
+          id="deadline-days"
+          label={t("invoiceNew.deadline")}
+          error={touchedFields.has('deadlineDays') ? fieldErrors['deadlineDays'] : null}
+          required
+        >
+          <input
+            type="number"
+            min={1}
+            max={365}
+            value={deadlineDays}
+            onChange={(e) => setDeadlineDays(Number(e.target.value))}
+            onFocus={() => setFocusedField("deadline-days")}
+            onBlur={() => {
+              if (focusedField === "deadline-days") emitFieldBlur();
+            }}
+            required
+            className="w-full min-h-11 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+          <CursorOverlay cursors={remoteCursors} fieldName="deadline-days" />
+          <DeadlineSuggester
+            totalAmount={
+              equalSplit
+                ? totalAmount
+                : recipients
+                    .reduce((sum, r) => sum + parseFloat(r.amount || "0"), 0)
+                    .toString()
+            }
+            recipientCount={recipients.filter((r) => r.address).length}
+            onUseSuggestion={(days: number) => setDeadlineDays(days)}
+          />
+        </FormField>
+      )}
+
+      {!cloneSourceId && (
+        <DeadlineSuggester
+          totalAmount={
+            equalSplit
+              ? totalAmount
+              : recipients
+                  .reduce((sum, r) => sum + parseFloat(r.amount || "0"), 0)
+                  .toString()
+          }
+          recipientCount={recipients.filter((r) => r.address).length}
+          onUseSuggestion={(days: number) => setDeadlineDays(days)}
+        />
+      )}
+
+      {!cloneSourceId && (
+        <div className="flex items-center justify-between rounded-lg bg-gray-800 border border-gray-700 px-4 py-3">
+          <label htmlFor="recurring-toggle" className="text-sm font-medium text-gray-300 cursor-pointer">
+            Recurring invoice
+          </label>
+          <button
+            id="recurring-toggle"
+            type="button"
+            role="switch"
+            aria-checked={recurring}
+            onClick={() => setRecurring((v) => !v)}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+              recurring ? "bg-indigo-600" : "bg-gray-600"
+            }`}
+          >
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                recurring ? "translate-x-6" : "translate-x-1"
+              }`}
+            />
+          </button>
+        </div>
+      )}
+
+      {recurring && !cloneSourceId && (
+        <div>
+          <label htmlFor="interval-days" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Repeat every
+          </label>
+          <select
+            id="interval-days"
+            value={intervalDays}
+            onChange={(e) => setIntervalDays(Number(e.target.value) as 7 | 30)}
+            className="w-full min-h-11 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            <option value={7}>7 days</option>
+            <option value={30}>30 days</option>
+          </select>
+        </div>
+      )}
+    </div>
+  );
+
+  const renderRecipients = () => (
+    <div className="flex flex-col gap-6">
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Recipients</h2>
+
+      {!cloneSourceId && (
+        <>
+          <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between rounded-lg bg-gray-800 border border-gray-700 px-4 py-3">
+            <label htmlFor="equal-split-toggle" className="text-sm font-medium text-gray-300 cursor-pointer">
+              {t("invoiceNew.equalSplit")}
+            </label>
+            <button
+              id="equal-split-toggle"
+              type="button"
+              role="switch"
+              aria-checked={equalSplit}
+              aria-label="Toggle equal split mode"
+              onClick={() => setEqualSplit((v) => !v)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                equalSplit ? "bg-indigo-600" : "bg-gray-300 dark:bg-gray-600"
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  equalSplit ? "translate-x-6" : "translate-x-1"
+                }`}
+              />
+            </button>
+          </div>
+
+          {!equalSplit && (
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={handleSplitEqually}
+                disabled={recipients.length <= 1}
+                aria-label="Distribute all amounts equally among recipients"
+                className="min-h-11 px-4 py-2 rounded-lg bg-indigo-700 hover:bg-indigo-600 text-sm text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                Split equally
+              </button>
+              {previousRecipientsForUndo && (
+                <button
+                  type="button"
+                  onClick={handleUndoSplit}
+                  aria-label="Undo the equal split distribution"
+                  className="min-h-11 px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm text-gray-200 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                  ↶ Undo
+                </button>
+              )}
+            </div>
+          )}
+        </>
+      )}
+
+      {equalSplit && !cloneSourceId && (
+        <>
+          <input
+            id="total-amount"
+            type="number"
+            placeholder="0.00"
+            step="0.0000001"
+            min="0.0000001"
+            value={totalAmount}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTotalAmount(e.target.value)}
+            onFocus={() => setFocusedField("total-amount")}
+            onBlur={() => {
+              if (focusedField === "total-amount") emitFieldBlur();
+            }}
+            required
+            className="w-full min-h-11 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+          <CursorOverlay cursors={remoteCursors} fieldName="total-amount" />
+          {perRecipientAmount && (
+            <p className="text-xs text-gray-600 dark:text-gray-400">
+              {perRecipientAmount} {t("invoiceNew.perRecipient")}
+            </p>
+          )}
+        </>
+      )}
+
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            {equalSplit ? t("invoiceNew.recipients") : t("invoiceNew.recipientsAndAmounts")}
+          </label>
+          {!equalSplit && !cloneSourceId && (
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-gray-500">Amounts in:</span>
+              <button
+                type="button"
+                onClick={() => setAmountDenom((d) => d === "XLM" ? "USDC" : "XLM")}
+                aria-label={`Switch amount denomination to ${amountDenom === "XLM" ? "USDC" : "XLM"}`}
+                title={xlmUsdcRate ? `1 XLM ≈ ${xlmUsdcRate.toFixed(4)} USDC` : "Rate unavailable"}
+                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold border transition-colors ${
+                  amountDenom === "XLM"
+                    ? "bg-yellow-500/15 border-yellow-500/40 text-yellow-300 hover:bg-yellow-500/25"
+                    : "bg-blue-500/15 border-blue-500/40 text-blue-300 hover:bg-blue-500/25"
+                }`}
+              >
+                <span aria-hidden="true">{amountDenom === "XLM" ? "✦" : "$"}</span>
+                {amountDenom}
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
+                </svg>
+              </button>
+              {xlmUsdcRate && (
+                <span className="text-xs text-gray-500">1 XLM ≈ {xlmUsdcRate.toFixed(4)} USDC</span>
+              )}
+=======
       {autofilled && !cloneSourceId && (
         <p className="text-xs text-indigo-400 bg-indigo-950/50 border border-indigo-800 rounded-lg px-3 py-2">
           Autofilled from history — you can override any value below.
@@ -1298,6 +1922,151 @@ function NewInvoiceForm() {
             <div className="px-4 py-3 flex justify-between">
               <span className="text-sm text-gray-400">Recurring</span>
               <span className="text-sm text-gray-200">Every {intervalDays} days</span>
+>>>>>>> upstream/main
+            </div>
+          )}
+          <div className="px-4 py-3 flex justify-between">
+            <span className="text-sm text-gray-400">Recipients</span>
+            <span className="text-sm text-gray-200">{recipients.length}</span>
+          </div>
+          {cosigners.length > 0 && (
+            <div className="px-4 py-3 flex justify-between">
+              <span className="text-sm text-gray-400">Co-Signers</span>
+              <span className="text-sm text-gray-200">
+                {cosignerThreshold} of {cosigners.length} approvals required
+              </span>
+            </div>
+          )}
+          <div className="px-4 py-3 flex justify-between">
+            <span className="text-sm text-gray-400">Total</span>
+            <FeeTooltip
+              feeBreakdown={feeBreakdown}
+              isLoading={feeLoading}
+              error={feeError}
+              onRefresh={refetchFees}
+            >
+              <span className="text-sm text-gray-200 font-semibold cursor-help hover:text-indigo-300 transition-colors">
+                {equalSplit ? totalAmount : total.toFixed(7)} USDC
+              </span>
+            </FeeTooltip>
+          </div>
+        </div>
+        <ChangedField changed={recipientsChanged}>
+          <RecipientForm
+            recipients={recipients}
+            onChange={setRecipients}
+            equalSplit={equalSplit}
+            amountOverride={perRecipientAmount}
+          />
+        </ChangedField>
+      </div>
+
+<<<<<<< HEAD
+      <SplitCalculator
+        initialTotal={equalSplit ? totalAmount : recipients.reduce((s, r) => s + parseFloat(r.amount || "0"), 0).toFixed(7)}
+        onSplitMetaChange={setSplitMeta}
+      />
+    </div>
+  );
+
+  const renderOptions = () => {
+    const total = recipients.reduce((s, r) => s + parseFloat(r.amount || "0"), 0);
+    return (
+    <div className="flex flex-col gap-6">
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Options</h2>
+
+      <TagInput
+        value={tags}
+        onChange={setTags}
+        suggestions={allTags}
+        placeholder="e.g. design, q3-retainer"
+      />
+
+      {cloneSourceId && (
+        <div className="flex items-center gap-2 text-sm bg-indigo-950/60 border border-indigo-700 text-indigo-300 rounded-lg px-3 py-2">
+          <span>Cloned from</span>
+          <a
+            href={`/invoice/${cloneSourceId}`}
+            className="underline hover:text-indigo-200 font-mono"
+          >
+            #{cloneSourceId}
+          </a>
+        </div>
+      )}
+
+      {!cloneSourceId && (
+        <TemplateManager
+          recipients={recipients}
+          token={token}
+          onLoad={handleLoadTemplate}
+        />
+      )}
+
+      {autofilled && !cloneSourceId && (
+        <p className="text-xs text-indigo-400 bg-indigo-950/50 border border-indigo-800 rounded-lg px-3 py-2">
+          Autofilled from history — you can override any value below.
+        </p>
+      )}
+
+      {recurring && !cloneSourceId && (
+        <div className="rounded-lg bg-gray-800 border border-gray-700 px-4 py-3">
+          <p className="text-sm text-gray-300">
+            This invoice will repeat every <span className="font-semibold text-indigo-300">{intervalDays} days</span>
+          </p>
+        </div>
+      )}
+
+      <InstallmentPlanBuilder
+        totalAmount={total}
+        installments={installments}
+        assetCode={token === (process.env.NEXT_PUBLIC_USDC_ADDRESS ?? "") ? "USDC" : "XLM"}
+        onChange={setInstallments}
+      />
+
+      <CoSignerSection
+        cosigners={cosigners}
+        threshold={cosignerThreshold}
+        onChange={(signers, thresh) => {
+          setCosigners(signers);
+          setCosignerThreshold(thresh);
+        }}
+      />
+    </div>
+    );
+  };
+
+  const renderReview = () => {
+    const total = recipients.reduce((s, r) => s + parseFloat(r.amount || "0"), 0);
+    return (
+      <div className="flex flex-col gap-6">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Review & Submit</h2>
+
+        {cloneSourceId && (
+          <div className="flex items-center gap-2 text-sm bg-indigo-950/60 border border-indigo-700 text-indigo-300 rounded-lg px-3 py-2">
+            <span>Cloned from</span>
+            <a href={`/invoice/${cloneSourceId}`} className="underline hover:text-indigo-200 font-mono">
+              #{cloneSourceId}
+            </a>
+          </div>
+        )}
+
+        <div className="rounded-lg bg-gray-800 border border-gray-700 divide-y divide-gray-700">
+          <div className="px-4 py-3 flex justify-between">
+            <span className="text-sm text-gray-400">Token</span>
+            <span className="text-sm text-gray-200 font-mono truncate ml-2">{token}</span>
+          </div>
+          <div className="px-4 py-3 flex justify-between">
+            <span className="text-sm text-gray-400">Deadline</span>
+            <span className="text-sm text-gray-200">
+              {cloneSourceId
+                ? new Date(cloneDeadlineIso).toLocaleString()
+                : `${deadlineDays} days`}
+            </span>
+          </div>
+          {recurring && !cloneSourceId && (
+            <div className="px-4 py-3 flex justify-between">
+              <span className="text-sm text-gray-400">Recurring</span>
+              <span className="text-sm text-gray-200">Every {intervalDays} days</span>
             </div>
           )}
           <div className="px-4 py-3 flex justify-between">
@@ -1328,6 +2097,26 @@ function NewInvoiceForm() {
         </div>
 
         <div className="rounded-lg bg-gray-800 border border-gray-700">
+          <div className="px-4 py-2 text-xs font-medium text-gray-400 border-b border-gray-700">
+            Recipients
+          </div>
+          <ul className="divide-y divide-gray-700">
+            {recipients.map((r, i) => (
+              <li key={i} className="px-4 py-2 flex justify-between items-center gap-2">
+                <span className="text-sm font-mono text-gray-300 truncate">{r.address}</span>
+                <span className="text-sm text-indigo-300 shrink-0">
+                  {equalSplit ? perRecipientAmount : r.amount} USDC
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    );
+  };
+
+=======
+        <div className="rounded-lg bg-gray-800 border border-gray-700">
           <div className="px-4 py-2 flex items-center justify-between border-b border-gray-700">
             <span className="text-xs font-medium text-gray-400">Recipients</span>
             {renderEditButton(1)}
@@ -1347,6 +2136,7 @@ function NewInvoiceForm() {
     );
   };
 
+>>>>>>> upstream/main
   return (
     <main className="max-w-xl mx-auto w-full px-4 sm:px-6 py-16 overflow-x-hidden">
       {/* Collaboration presence */}
@@ -1404,8 +2194,89 @@ function NewInvoiceForm() {
         )}
       </div>
 
+<<<<<<< HEAD
+      {recoveredDraft && (
+        <DraftRecoveryBanner
+          updatedAt={recoveredDraft.updatedAt}
+          onRestore={handleRestoreDraft}
+          onDiscard={handleDiscardDraft}
+        />
+      )}
+
+      {cloneSourceId && (
+        <CloneBanner sourceId={cloneSourceId} />
+      )}
+
+      {!cloneSourceId && (
+        <div className="flex gap-1 border-b border-gray-700 mb-8" role="tablist" aria-label="Invoice creation mode">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={formMode === "create"}
+            onClick={() => setFormMode("create")}
+            className={`px-4 py-2 text-sm font-medium transition-colors rounded-t-lg -mb-px border-b-2 ${
+              formMode === "create"
+                ? "border-indigo-500 text-indigo-600 dark:text-indigo-300"
+                : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+            }`}
+          >
+            Create New
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={formMode === "import"}
+            onClick={() => setFormMode("import")}
+            className={`px-4 py-2 text-sm font-medium transition-colors rounded-t-lg -mb-px border-b-2 ${
+              formMode === "import"
+                ? "border-indigo-500 text-indigo-600 dark:text-indigo-300"
+                : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+            }`}
+          >
+            Import from Transaction
+          </button>
+        </div>
+      )}
+
+      {formMode === "import" && !cloneSourceId ? (
+        <div className="flex flex-col gap-6">
+          <TxImportPanel onImported={handleImported} />
+
+          {importedTx && (
+            <div className="flex flex-col gap-4 rounded-lg bg-indigo-950/40 border border-indigo-800 px-4 py-4">
+              <p className="text-sm text-indigo-200">
+                This invoice will be created as <strong>retroactive</strong> and marked{" "}
+                <strong>Fully Paid</strong> automatically — no on-chain payment is required.
+              </p>
+              {retroError && (
+                <p role="alert" className="text-red-400 text-sm">{retroError}</p>
+              )}
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={handleRetroactiveSubmit}
+                  disabled={retroSubmitting}
+                  className="min-h-11 px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition-colors disabled:opacity-50"
+                >
+                  {retroSubmitting ? "Creating…" : "Create Retroactive Invoice"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setImportedTx(null)}
+                  className="min-h-11 px-6 py-3 rounded-lg bg-gray-700 hover:bg-gray-600 font-medium transition-colors"
+                >
+                  Start Over
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+      <>
+=======
       <DraftCollaborationPanel draftId={draftId} />
 
+>>>>>>> upstream/main
       {/* Cloned-from banner */}
       {cloneSourceId && (
         <div className="mb-6 flex items-center gap-2 text-sm bg-indigo-950/60 border border-indigo-700 text-indigo-300 rounded-lg px-3 py-2">
@@ -1445,7 +2316,11 @@ function NewInvoiceForm() {
         </p>
       )}
 
+<<<<<<< HEAD
+      <form onSubmit={handleSubmit} className="flex flex-col gap-6" aria-label="Create invoice form">
+=======
       <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-6" aria-label="Create invoice form">
+>>>>>>> upstream/main
         {step === 0 && !loading && renderBasicInfo()}
         {step === 1 && !loading && renderRecipients()}
         {step === 2 && !loading && renderOptions()}

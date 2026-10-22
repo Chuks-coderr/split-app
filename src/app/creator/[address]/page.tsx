@@ -69,10 +69,13 @@ export default async function CreatorPage({ params }: Props) {
       ? 50
       : Math.min(100, Math.max(10, Math.round(completionRate * 0.7 + Math.min(30, released.length * 6))));
 
+<<<<<<< HEAD
+=======
   const uniquePayers = new Set(
     invoices.flatMap((inv) => inv.payments.map((p) => p.payer))
   ).size;
 
+>>>>>>> upstream/main
   return (
     <main className="max-w-2xl mx-auto w-full px-4 sm:px-6 py-16 overflow-x-hidden">
       <CreatorProfileClient
@@ -82,7 +85,10 @@ export default async function CreatorPage({ params }: Props) {
         completionRate={completionRate}
         reputationScore={reputationScore}
         invoices={publicInvoices}
+<<<<<<< HEAD
+=======
         uniquePayers={uniquePayers}
+>>>>>>> upstream/main
       />
     </main>
   );

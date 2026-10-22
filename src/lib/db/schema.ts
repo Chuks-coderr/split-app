@@ -7,10 +7,15 @@ import type { DBSchema } from "idb";
 import type { Invoice } from "@stellar-split/sdk";
 
 export const DB_NAME = "stellarsplit-invoice-cache";
+<<<<<<< HEAD
+export const DB_VERSION = 1;
+export const INVOICES_STORE = "invoices";
+=======
 export const DB_VERSION = 2;
 export const INVOICES_STORE = "invoices";
 export const INVOICE_VERSIONS_STORE = "invoiceVersions";
 export const AMENDMENTS_STORE = "amendments";
+>>>>>>> upstream/main
 
 /** A cached invoice, tagged with the owner it was fetched for and when it landed in the cache. */
 export interface CachedInvoice {
@@ -21,6 +26,8 @@ export interface CachedInvoice {
   invoice: Invoice;
 }
 
+<<<<<<< HEAD
+=======
 /** A single field-level change captured between two invoice versions. */
 export interface InvoiceVersionDiffEntry {
   field: string;
@@ -61,6 +68,7 @@ export interface InvoiceAmendment {
   createdAt: number;
 }
 
+>>>>>>> upstream/main
 export interface InvoiceCacheDBSchema extends DBSchema {
   [INVOICES_STORE]: {
     key: string;
@@ -70,6 +78,9 @@ export interface InvoiceCacheDBSchema extends DBSchema {
       "by-owner": string;
     };
   };
+<<<<<<< HEAD
+}
+=======
   [INVOICE_VERSIONS_STORE]: {
     key: string;
     value: InvoiceVersion;
@@ -87,3 +98,4 @@ export interface InvoiceCacheDBSchema extends DBSchema {
     };
   };
 }
+>>>>>>> upstream/main

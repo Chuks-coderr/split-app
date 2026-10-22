@@ -44,6 +44,12 @@ export async function showInvoiceNotification(
   }
 }
 
+<<<<<<< HEAD
+export function isPushNotificationsEnabled(): boolean {
+  if (typeof window === "undefined") return false;
+  return localStorage.getItem("push_subscribed") === "true";
+}
+=======
 export async function showSubscriptionNotification(
   subscriptionId: string,
   title: string,
@@ -67,3 +73,4 @@ export function isPushNotificationsEnabled(): boolean {
   if (typeof window === "undefined") return false;
   return localStorage.getItem("push_subscribed") === "true";
 }
+>>>>>>> upstream/main

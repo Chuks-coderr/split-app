@@ -1,5 +1,8 @@
 import * as Sentry from "@sentry/nextjs";
+<<<<<<< HEAD
+=======
 import { initPerformanceMonitoring, onPerformanceMetric, isRegression } from "./src/lib/performanceMonitoring";
+>>>>>>> upstream/main
 
 const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
 
@@ -13,6 +16,9 @@ if (dsn) {
   });
 }
 
+<<<<<<< HEAD
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
+=======
 // Core Web Vitals collection + budget-regression reporting (see
 // src/lib/performanceMonitoring.ts and docs/PERFORMANCE.md).
 onPerformanceMetric((metric) => {
@@ -206,3 +212,4 @@ if (typeof window !== "undefined") {
   attachFlushHandler();
   initAnalytics();
 }
+>>>>>>> upstream/main

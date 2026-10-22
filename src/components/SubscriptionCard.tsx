@@ -46,6 +46,11 @@ interface Props {
 const STATUS_STYLES: Record<string, string> = {
   active: "bg-green-500/20 text-green-400 border-green-500/30",
   paused: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
+<<<<<<< HEAD
+  cancelled: "bg-red-500/20 text-red-400 border-red-500/30",
+};
+
+=======
   past_due: "bg-orange-500/20 text-orange-400 border-orange-500/30",
   cancelled: "bg-red-500/20 text-red-400 border-red-500/30",
   expired: "bg-gray-500/20 text-gray-400 border-gray-500/30",
@@ -66,6 +71,7 @@ function formatTimestamp(ts: number): string {
   });
 }
 
+>>>>>>> upstream/main
 export default function SubscriptionCard({ subscription }: Props) {
   const display = formatSubscriptionForDisplay(subscription);
   const { label: relativeLabel, overdue } = useRelativeBillingDate(subscription.nextRunDate);
@@ -81,9 +87,15 @@ export default function SubscriptionCard({ subscription }: Props) {
           {display.templateName}
         </h3>
         <span
+<<<<<<< HEAD
+          className={`text-xs font-medium px-2.5 py-0.5 rounded-full border ${STATUS_STYLES[subscription.status]}`}
+        >
+          {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
+=======
           className={`text-xs font-medium px-2.5 py-0.5 rounded-full border ${STATUS_STYLES[subscription.status] ?? STATUS_STYLES.expired}`}
         >
           {formatStatusLabel(subscription.status)}
+>>>>>>> upstream/main
         </span>
       </div>
 
@@ -91,6 +103,8 @@ export default function SubscriptionCard({ subscription }: Props) {
         {formatFrequency(subscription.frequency)}
       </p>
 
+<<<<<<< HEAD
+=======
       {subscription.status === "paused" && subscription.pausedAt != null && (
         <p className="text-xs text-yellow-400/80 mb-4">
           Paused since {formatTimestamp(subscription.pausedAt)}
@@ -103,6 +117,7 @@ export default function SubscriptionCard({ subscription }: Props) {
         </p>
       )}
 
+>>>>>>> upstream/main
       <div className="grid grid-cols-2 gap-3 text-sm">
         <div>
           <p className="text-gray-500 text-xs">Next Run</p>

@@ -20,6 +20,11 @@ interface StoredPayment {
   error?: string;
 }
 
+<<<<<<< HEAD
+const DB_NAME = "stellarsplit-offline";
+const STORE_NAME = "payments";
+const DB_VERSION = 1;
+=======
 /**
  * Serializable queued transaction schema used by the hardened offline queue.
  * All fields are JSON-safe so the queue can be persisted to IndexedDB or
@@ -57,6 +62,7 @@ const MAX_ATTEMPTS = 5;
 const BASE_BACKOFF_MS = 500;
 const MAX_BACKOFF_MS = 30_000;
 const DRAIN_DEBOUNCE_MS = 250;
+>>>>>>> upstream/main
 
 function toStored(payment: QueuedPayment): StoredPayment {
   return { ...payment, amount: payment.amount.toString() };
@@ -79,9 +85,12 @@ export async function openDB(): Promise<IDBPDatabase> {
       if (!db.objectStoreNames.contains(STORE_NAME)) {
         db.createObjectStore(STORE_NAME, { keyPath: "id" });
       }
+<<<<<<< HEAD
+=======
       if (!db.objectStoreNames.contains(TX_STORE_NAME)) {
         db.createObjectStore(TX_STORE_NAME, { keyPath: "id" });
       }
+>>>>>>> upstream/main
     },
   });
 }
@@ -184,6 +193,8 @@ export function setupOnlineListener(
   };
   window.addEventListener("online", handler);
   return () => window.removeEventListener("online", handler);
+<<<<<<< HEAD
+=======
 }
 
 /* -------------------------------------------------------------------------- */
@@ -558,4 +569,5 @@ export function initOfflineQueue(
       drainTimer = null;
     }
   };
+>>>>>>> upstream/main
 }

@@ -14,18 +14,29 @@ import { checkBudget, getBudgetLimit, setBudgetLimit, clearBudgetLimit } from "@
 import { fetchUsdcBalance, USDC_CONTRACT_ID } from "@/lib/stellar";
 import { saveReceipt } from "@/lib/receiptStore";
 import { apiFetch } from "@/lib/apiClient";
+<<<<<<< HEAD
+
+const STELLAR_EXPERT_BASE =
+  process.env.NEXT_PUBLIC_STELLAR_NETWORK === "mainnet"
+    ? "https://stellar.expert/explorer/public/tx"
+    : "https://stellar.expert/explorer/testnet/tx";
+=======
 import { useExchangeRates } from "@/hooks/useExchangeRates";
 import type { RateLock } from "@/lib/currency";
 
 const STELLAR_EXPERT_BASE =
   getActiveNetwork().explorerTxBase;
+>>>>>>> upstream/main
 
 type PaymentResult = { txHash?: string } | void;
 
 interface PaymentOptions {
   tip: bigint;
   donateOnFailure: boolean;
+<<<<<<< HEAD
+=======
   rateLock?: RateLock;
+>>>>>>> upstream/main
 }
 
 interface Props {
@@ -94,12 +105,15 @@ export default function PayModal({ invoice, total, publicKey, onPay, onClose }: 
   const [mfaSettings, setMfaSettings] = useState<{ mfaEnabled: boolean; highValueThreshold: number } | null>(null);
   const [showMfaGate, setShowMfaGate] = useState(false);
   const [pendingPayment, setPendingPayment] = useState<{ amount: bigint; email?: string; options?: PaymentOptions } | null>(null);
+<<<<<<< HEAD
+=======
   const [rateLock, setRateLock] = useState<RateLock | null>(null);
   const [lockExpired, setLockExpired] = useState(false);
 
   const invoiceCurrency = (invoice as any).currency || "USDC";
   const { rates, loading: ratesLoading, error: ratesError, getRate } = useExchangeRates();
   const xlmRate = getRate("XLM");
+>>>>>>> upstream/main
 
   const defaultAmount = getDefaultPaymentAmount(invoice, total, publicKey);
 
@@ -141,6 +155,8 @@ export default function PayModal({ invoice, total, publicKey, onPay, onClose }: 
   }, [defaultAmount]);
 
   useEffect(() => {
+<<<<<<< HEAD
+=======
     if (!rateLock) {
       setLockExpired(false);
       return;
@@ -152,6 +168,7 @@ export default function PayModal({ invoice, total, publicKey, onPay, onClose }: 
   }, [rateLock]);
 
   useEffect(() => {
+>>>>>>> upstream/main
     if (publicKey) {
       const existing = getBudgetLimit(publicKey);
       if (existing !== null) setBudgetInput(String(existing));
@@ -228,11 +245,14 @@ export default function PayModal({ invoice, total, publicKey, onPay, onClose }: 
 
   const handleReview = () => {
     if (!parsed || parsed <= 0n) return;
+<<<<<<< HEAD
+=======
     if (lockExpired) {
       setRateLock(null);
       setError("The exchange rate lock expired. Review the updated rate and try again.");
       return;
     }
+>>>>>>> upstream/main
     if (parsed > remainingInvoiceAmount) {
       setError(`Amount is greater than the remaining invoice balance of ${formatAmount(remainingInvoiceAmount)} USDC.`);
       return;
@@ -250,6 +270,8 @@ export default function PayModal({ invoice, total, publicKey, onPay, onClose }: 
       return;
     }
     setError(null);
+<<<<<<< HEAD
+=======
     if (!rateLock && xlmRate) {
       setRateLock({
         currency: invoiceCurrency,
@@ -258,6 +280,7 @@ export default function PayModal({ invoice, total, publicKey, onPay, onClose }: 
         expiresAt: Date.now() + 5 * 60 * 1000,
       });
     }
+>>>>>>> upstream/main
     setShowBreakdown(true);
   };
 
@@ -270,7 +293,10 @@ export default function PayModal({ invoice, total, publicKey, onPay, onClose }: 
     const options = {
       tip: parsedTip,
       donateOnFailure,
+<<<<<<< HEAD
+=======
       rateLock: rateLock ?? undefined,
+>>>>>>> upstream/main
     };
 
     const requiresMfa = Boolean(mfaSettings?.mfaEnabled) && Number(total) >= (mfaSettings?.highValueThreshold ?? 0);
@@ -594,6 +620,8 @@ export default function PayModal({ invoice, total, publicKey, onPay, onClose }: 
           </div>
         )}
 
+<<<<<<< HEAD
+=======
         {/* Currency & conversion preview */}
         <div className="rounded-xl bg-gray-950/60 border border-gray-800 p-3 text-xs">
           <div className="flex items-center justify-between">
@@ -632,6 +660,7 @@ export default function PayModal({ invoice, total, publicKey, onPay, onClose }: 
           )}
         </div>
 
+>>>>>>> upstream/main
         {error && <p role="alert" className="text-red-400 text-sm">{error}</p>}
 
         {/* Email input (optional) */}
@@ -653,7 +682,11 @@ export default function PayModal({ invoice, total, publicKey, onPay, onClose }: 
         <button
           type="button"
           onClick={handleReview}
+<<<<<<< HEAD
+          disabled={paying || !parsed || parsed <= 0n || isCapReached || isCapExceeded}
+=======
           disabled={paying || !parsed || parsed <= 0n || isCapReached || isCapExceeded || lockExpired}
+>>>>>>> upstream/main
           className="w-full px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 font-semibold transition-colors disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
         >
           {paying ? "Waiting for signature..." : "Review & Pay"}

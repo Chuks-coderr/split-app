@@ -62,12 +62,21 @@ describe('useInvoiceStream', () => {
     const fn = vi.fn().mockResolvedValue(mockInvoice);
     mockGetSplitClient.mockReturnValue({ getInvoice: fn });
 
+<<<<<<< HEAD
+    renderHook(() => useInvoiceStream('123'));
+
+    await vi.advanceTimersByTimeAsync(100);
+    await vi.advanceTimersByTimeAsync(3_000);
+
+    expect(fn).toHaveBeenCalledTimes(2);
+=======
     const { result } = renderHook(() => useInvoiceStream('123'));
 
     // Just verify the hook initializes and fetches data
     await waitFor(() => expect(result.current.invoice).not.toBeNull());
 
     expect(result.current.invoice?.id).toBe('123');
+>>>>>>> upstream/main
     expect(fn).toHaveBeenCalledWith('123');
   });
 

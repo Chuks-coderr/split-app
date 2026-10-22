@@ -7,6 +7,8 @@ export function formatXLM(amount: bigint): string {
 export function stroopsToXLM(stroops: number): string {
   return (stroops / 10_000_000).toFixed(7);
 }
+<<<<<<< HEAD
+=======
 
 /**
  * Default number of decimal places used per asset when no explicit precision
@@ -141,3 +143,4 @@ export function getLowBalanceWarnings(
     .map((balance) => computeLowBalanceWarning(balance, thresholds))
     .filter((warning) => warning.isLow);
 }
+>>>>>>> upstream/main

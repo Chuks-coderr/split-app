@@ -15,11 +15,19 @@ const LEVEL_LABEL: Record<SecurityLevel, string> = {
   attention: "Needs attention",
   at_risk: "At risk",
 };
+<<<<<<< HEAD
+
+=======
+>>>>>>> upstream/main
 const LEVEL_STYLE: Record<SecurityLevel, string> = {
   good: "border-green-300 bg-green-50 text-green-800",
   attention: "border-amber-300 bg-amber-50 text-amber-800",
   at_risk: "border-red-300 bg-red-50 text-red-800",
 };
+<<<<<<< HEAD
+
+=======
+>>>>>>> upstream/main
 const KIND_LABEL: Record<SecurityEventKind, string> = {
   failed_auth: "Failed sign-ins",
   permission_change: "Permission changes",
@@ -87,4 +95,8 @@ export default function InvoiceSecurityDashboard({ events, activity = [] }: Prop
       </div>
     </section>
   );
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> upstream/main

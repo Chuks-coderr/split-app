@@ -10,6 +10,8 @@
 
 const MUTATING_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
+<<<<<<< HEAD
+=======
 /**
  * Analytics hook. Kept as a lightweight, fire-and-forget emitter so the API
  * client has no hard dependency on a specific analytics provider. Query
@@ -70,6 +72,7 @@ function trackApiRequest(event: ApiRequestEvent): void {
   }, 0);
 }
 
+>>>>>>> upstream/main
 // Refresh a little early so a request that starts right before expiry
 // doesn't race the server-side clock.
 const REFRESH_SKEW_MS = 60 * 1000;
@@ -118,9 +121,12 @@ export async function apiFetch(input: RequestInfo | URL, init: RequestInit = {})
     return fetch(input, init);
   }
 
+<<<<<<< HEAD
+=======
   const path = toPathTemplate(input);
   const startedAt = Date.now();
 
+>>>>>>> upstream/main
   const attempt = async (token: string) => {
     const headers = new Headers(init.headers);
     headers.set("X-CSRF-Token", token);
@@ -130,12 +136,19 @@ export async function apiFetch(input: RequestInfo | URL, init: RequestInit = {})
   const token = await getCsrfToken();
   const response = await attempt(token);
   if (response.status !== 403) {
+<<<<<<< HEAD
+=======
     trackApiRequest({ method, path, status: response.status, durationMs: Date.now() - startedAt });
+>>>>>>> upstream/main
     return response;
   }
 
   const freshToken = await getCsrfToken(true);
+<<<<<<< HEAD
+  return attempt(freshToken);
+=======
   const retryResponse = await attempt(freshToken);
   trackApiRequest({ method, path, status: retryResponse.status, durationMs: Date.now() - startedAt });
   return retryResponse;
+>>>>>>> upstream/main
 }

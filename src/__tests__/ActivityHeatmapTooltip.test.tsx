@@ -89,6 +89,23 @@ describe("ActivityHeatmap Tooltip Positioning", () => {
     render(<ActivityHeatmap invoices={mockInvoices} />);
     const cells = screen.getAllByRole("button");
 
+<<<<<<< HEAD
+    for (const cell of cells) {
+      fireEvent.mouseEnter(cell);
+
+      await waitFor(() => {
+        const tooltip = document.querySelector('[role="tooltip"]');
+        if (tooltip) {
+          const rect = tooltip.getBoundingClientRect();
+          expect(rect.left).toBeGreaterThanOrEqual(0);
+          expect(rect.right).toBeLessThanOrEqual(window.innerWidth);
+          expect(rect.top).toBeGreaterThanOrEqual(0);
+          expect(rect.bottom).toBeLessThanOrEqual(window.innerHeight);
+        }
+      });
+    }
+  }, 30000);
+=======
     // Just verify tooltips are accessible when hovering cells
     fireEvent.mouseEnter(cells[0]);
 
@@ -97,6 +114,7 @@ describe("ActivityHeatmap Tooltip Positioning", () => {
       expect(tooltip || cells[0]).toBeTruthy();
     });
   });
+>>>>>>> upstream/main
 
   it("hides tooltip on mouse leave", async () => {
     render(<ActivityHeatmap invoices={mockInvoices} />);
